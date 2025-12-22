@@ -40,6 +40,7 @@ class Filters extends BaseFilters
         'jwt'           => \App\Filters\JWTAuth::class,
         'permission'    => \App\Filters\PermissionFilter::class,
         'post'          => \App\Filters\PostAuth::class,
+        '2fa'           => \App\Filters\TwoFactorFilter::class,
     ];
 
     /**

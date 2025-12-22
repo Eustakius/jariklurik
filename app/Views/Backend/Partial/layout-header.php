@@ -45,6 +45,11 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dark:text-white text-black px-0 py-2 hover:text-primary-600 flex items-center gap-4" href="/back-end/2fa/setup">
+                                    <iconify-icon icon="ri:lock-password-line" class="icon text-xl"></iconify-icon> Setup 2FA
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dark:text-white text-black px-0 py-2 hover:text-danger-600 flex items-center gap-4" href="<?= route_to('logout'); ?>">
                                     <iconify-icon icon="lucide:power" class="icon text-xl"></iconify-icon> Log Out
                                 </a>

@@ -41,7 +41,8 @@ if !errorlevel! neq 0 (
 
 rem 4. Add & Commit
 echo Checking for changes...
-git add .
+git add -u
+git add app
 git diff --cached --quiet
 if !errorlevel! equ 0 (
     echo [INFO] No new changes to commit.

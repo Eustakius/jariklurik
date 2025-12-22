@@ -34,7 +34,8 @@ class UserModel extends Model
         'force_pass_reset',
         'permissions',
         'deleted_at',
-        'user_type'
+        'user_type',
+        'google2fa_secret'
     ];
     protected $useTimestamps   = true;
     protected $validationRules = [

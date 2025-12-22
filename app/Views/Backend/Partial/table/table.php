@@ -368,7 +368,6 @@ if (!empty($importPerm)): ?>
                 columnDefs: [{
                         className: "dt-nowrap",
                         targets: "_all",
-                        visible: false
                     },
                     {
                         className: 'dtr-control',
@@ -376,6 +375,7 @@ if (!empty($importPerm)): ?>
                         orderable: false,
                         searchable: false,
                         searchBuilder: false,
+                        visible: true,
                         width: "50px",
                         render: function(data, type, row, meta) {
                             return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';

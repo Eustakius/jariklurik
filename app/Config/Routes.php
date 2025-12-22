@@ -11,11 +11,21 @@ $routes->group('back-end', static function ($routes) {
     $routes->post('login', 'AuthController::attemptLogin');
 });
 
+// Explicit 2FA Routes (Top Level Priority)
+$routes->get('back-end/2fa/setup', '\App\Controllers\Backend\TwoFactorController::setup', ['filter' => 'auth']);
+$routes->post('back-end/2fa/enable', '\App\Controllers\Backend\TwoFactorController::enable', ['filter' => 'auth']);
+$routes->get('back-end/2fa/reset', '\App\Controllers\Backend\TwoFactorController::resetSetup', ['filter' => 'auth']);
+$routes->get('back-end/2fa/login', '\App\Controllers\Backend\TwoFactorController::login', ['filter' => 'auth']);
+$routes->post('back-end/2fa/verify', '\App\Controllers\Backend\TwoFactorController::verify', ['filter' => 'auth']);
+
 $routes->group('back-end', ['filter' => 'auth'], static function ($routes) {
     $routes->get('logout', 'AuthController::logout', ['as' => 'logout']);
+});
+
+$routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($routes) {
     $routes->get('', 'Backend\DashboardController::index');
     $routes->get('/', 'Backend\DashboardController::index');
-    $routes->get('/dashboard', 'Backend\DashboardController::index');
+    $routes->get('dashboard', 'Backend\DashboardController::index');
     $routes->group('administrator', static function ($routes) {
         $routes->resource('user', ['controller' => 'Backend\Administrator\UserController', 'filter' => 'permission']);
         $routes->resource('role', ['controller' => 'Backend\Administrator\RoleController', 'filter' => 'permission']);
@@ -30,6 +40,7 @@ $routes->group('back-end', ['filter' => 'auth'], static function ($routes) {
     $routes->put('applicant/(:segment)/approve', 'Backend\Application\ApplicantController::approve/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/reject', 'Backend\Application\ApplicantController::reject/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/revert', 'Backend\Application\ApplicantController::revert/$1', ['filter' => 'permission']);
+
     $routes->resource('applicant', ['controller' => 'Backend\Application\ApplicantController', 'filter' => 'permission']);
     $routes->group('training', static function ($routes) {
         $routes->put('job-seekers/(:segment)/approve', 'Backend\Application\Training\JobSeekerController::approve/$1', ['filter' => 'permission']);

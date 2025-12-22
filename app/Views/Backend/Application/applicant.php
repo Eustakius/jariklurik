@@ -17,9 +17,9 @@
                     </ul>
                 </div>
                 <div class="card-body relative ">
-                    <div id="card-title-tab-content" class="hidden">
+                    <div id="card-title-tab-content">
                         <?php foreach ($tabs as $tab): ?>
-                            <div id="<?= $tab['key'] ?>" role="tabpanel" aria-labelledby="<?= $tab['key'] ?>-tab">                                
+                            <div class="<?= (session('key') == $tab['key'] || (!session('key') && $tab['key'] === 'new')) ? '' : 'hidden' ?>" id="<?= $tab['key'] ?>" role="tabpanel" aria-labelledby="<?= $tab['key'] ?>-tab">                                
                                 <?= view('Backend/Partial/table/table', ['title' => getTitleFromUri([2, 3]), 'props' => $tab['datatable']]) ?>
                             </div>
                         <?php endforeach ?>
