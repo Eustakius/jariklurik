@@ -1,0 +1,386 @@
+<?php
+
+namespace Config;
+
+use CodeIgniter\Config\BaseConfig;
+
+class Backend extends BaseConfig
+{
+    public string $viewLayout = 'Backend/layout';
+
+    public $menus = [
+        [
+            'id' => 0,
+            'parent_id' => null,
+            'name' => 'Dashboard',
+            'icon' => 'solar:home-smile-angle-outline',
+            'is_group' => false,
+            'url' => '/',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+            ]
+        ],
+        [
+            'id' => 1,
+            'parent_id' => null,
+            'name' => 'Company',
+            'icon' => 'mage:building-b',
+            'is_group' => false,
+            'url' => 'company',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 2,
+            'parent_id' => null,
+            'name' => 'Job Vacancy',
+            'icon' => 'mage:stack',
+            'is_group' => false,
+            'url' => 'job-vacancy',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Import',
+                    'name' => 'import'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 3,
+            'parent_id' => null,
+            'name' => 'Training',
+            'icon' => 'mage:star-moving',
+            'is_group' => false,
+            'url' => null,
+            'type' => 'sidebar',
+            'permissions' => []
+        ],
+        [
+            'id' => 4,
+            'parent_id' => 3,
+            'name' => 'Job Seekers',
+            'icon' => 'mage:scan-user',
+            'is_group' => false,
+            'url' => 'training/job-seekers',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Approve',
+                    'name' => 'approve'
+                ],
+                [
+                    'label' => 'Reject',
+                    'name' => 'reject'
+                ],
+                [
+                    'label' => 'Revert',
+                    'name' => 'revert'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 5,
+            'parent_id' => 3,
+            'name' => 'Purna PMI',
+            'icon' => 'mage:scan-user',
+            'is_group' => false,
+            'url' => 'training/purna-pmi',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Approve',
+                    'name' => 'approve'
+                ],
+                [
+                    'label' => 'Reject',
+                    'name' => 'reject'
+                ],
+                [
+                    'label' => 'Revert',
+                    'name' => 'revert'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 6,
+            'parent_id' => 3,
+            'name' => 'Training Type',
+            'icon' => 'material-symbols-light:model-training',
+            'is_group' => false,
+            'url' => 'training/training-type',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 99,
+            'parent_id' => null,
+            'name' => 'Administrator',
+            'icon' => null,
+            'is_group' => true,
+            'url' => null,
+            'type' => 'sidebar',
+            'permissions' => []
+        ],
+        [
+            'id' => 91,
+            'parent_id' => 99,
+            'name' => 'User',
+            'icon' => 'mage:user',
+            'is_group' => false,
+            'url' => 'administrator/user',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 92,
+            'parent_id' => 99,
+            'name' => 'Role',
+            'icon' => 'mage:checklist',
+            'is_group' => false,
+            'url' => 'administrator/role',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 93,
+            'parent_id' => 99,
+            'name' => 'Setting',
+            'icon' => 'mage:settings',
+            'is_group' => false,
+            'url' => 'administrator/setting',
+            'type' => 'sidebar',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Create',
+                    'name' => 'create'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+                [
+                    'label' => 'Delete',
+                    'name' => 'delete'
+                ],
+                [
+                    'label' => 'Restore',
+                    'name' => 'restore'
+                ],
+            ]
+        ],
+        [
+            'id' => 100,
+            'parent_id' => null,
+            'name' => 'My Profile',
+            'icon' => 'solar:user-linear',
+            'is_group' => false,
+            'url' => '/my-profile',
+            'type' => 'top',
+            'permissions' => [
+                [
+                    'label' => 'View',
+                    'name' => 'view'
+                ],
+                [
+                    'label' => 'Detail',
+                    'name' => 'detail'
+                ],
+                [
+                    'label' => 'Update',
+                    'name' => 'update'
+                ],
+            ]
+        ]
+    ];
+
+    public $permissions = [
+        [
+            'label' => 'View',
+            'name' => 'view'
+        ],
+        [
+            'label' => 'Create',
+            'name' => 'create'
+        ],
+        [
+            'label' => 'Detail',
+            'name' => 'detail'
+        ],
+        [
+            'label' => 'Update',
+            'name' => 'update'
+        ],
+        [
+            'label' => 'Delete',
+            'name' => 'delete'
+        ],
+        [
+            'label' => 'Approve',
+            'name' => 'approve'
+        ],
+        [
+            'label' => 'Reject',
+            'name' => 'reject'
+        ],
+        [
+            'label' => 'Revert',
+            'name' => 'revert'
+        ],
+        [
+            'label' => 'Restore',
+            'name' => 'restore'
+        ],
+    ];
+}

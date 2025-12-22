@@ -1,0 +1,570 @@
+<?php if (session()->has('key') && session('key') == $props['key'] || !session()->has('key')): ?>
+    <?php if (session()->has('message-backend')): ?>
+        <div class="mb-4 alert alert-success bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-white border-success-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert">
+            <div class="flex items-center gap-2 text-success-600 dark:text-white">
+                <iconify-icon icon="akar-icons:double-check" class="icon text-xl"></iconify-icon>
+                <?= esc(session('message-backend')) ?>
+            </div>
+            <button class="remove-button text-success-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->has('error-backend')): ?>
+        <div class="mb-4 alert alert-danger bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 border-danger-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert">
+            <div class="flex items-center gap-2">
+                <iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl"></iconify-icon>
+                <?= esc(session('error-backend')) ?>
+            </div>
+            <button class="remove-button text-danger-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+<div class="notification fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50"></div>
+<div id="confirm-modal<?= $props['key'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 max-h-full">
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+            <button type="button" class="close-modal absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="confirm-modal<?= $props['key'] ?>">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-4 md:p-5 text-center">
+                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 warning-text<?= $props['key'] ?>"></h3>
+                <div class="flex flex-row justify-center items-center">
+                    <form id="formConfirm<?= $props['key'] ?>" action="" method="post">
+                        <?= csrf_field() ?>
+                        <input id="method<?= $props['key'] ?>" type="hidden" name="_method" value="DELETE">
+                        <input id="key<?= $props['key'] ?>" type="hidden" name="key" value="">
+                        <button type="submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                            Yes, I'm sure
+                        </button>
+                    </form>
+                    <button data-modal-hide="confirm-modal<?= $props['key'] ?>" type="button" class="close-modal py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
+
+$buttons = [];
+$buttons[] = [
+    'text' => '<div class="px-3.5 py-2 text-success-600 hover:text-white flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:arrow-expand-all" class="text-sm"></iconify-icon> Expand All
+               </div>',
+    'className' => 'btn-collapse' . $props['key'] . ' hidden btn bg-success-100 text-success-600 hover:bg-success-700 hover:text-white rounded-lg text-sm p-0',
+    'action' => 'function(e, dt, node, config) {
+                var $icon = $(node).find("iconify-icon");
+                var $text = $(node).find("div");
+                if($icon.attr("icon") === "mdi:arrow-expand-all") {
+                    dt.rows().every(function() {
+                        var tr = $(this.node());
+                        var control = tr.find("td.dtr-control");
+                        if (!tr.hasClass("dtr-expanded")) {
+                            control.trigger("click");
+                        }                     
+                    });
+                    $icon.attr("icon", "mdi:arrow-collapse-all");
+                    $text.html(`<iconify-icon icon="mdi:arrow-collapse-all" class="text-sm"></iconify-icon> Collapse All`);                         
+                }
+                else{
+                    dt.rows().every(function() {
+                        this.child.hide();
+                        $(this.node()).removeClass("dt-hasChild dtr-expanded");                            
+                    });
+                    $icon.attr("icon", "mdi:arrow-expand-all");
+                    $text.html(`<iconify-icon icon="mdi:arrow-expand-all" class="text-sm"></iconify-icon> Expand All`);  
+                }
+            }'
+];
+$buttons[] = [
+    'text' => '<div class="px-3.5 py-2 text-success-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="teenyicons:refresh-solid" class="text-sm"></iconify-icon> Refresh</div>',
+    'className' => 'btn bg-success-100 text-success-600 hover:bg-success-700 hover:text-white rounded-lg text-sm p-0',
+    'action' => 'function(e, dt, node, config) { 
+                $("#tbl' . $props['key'] . ' tbody").empty();
+                dt.ajax.reload(null, true);
+            }'
+];
+$buttons[] = [
+    'extend' => 'collection',
+    'text' => '<div class="px-3.5 py-2 text-info-600 flex items-center justify-center gap-2"><iconify-icon icon="material-symbols-light:export-notes-outline-rounded" class="text-lg"></iconify-icon> Export</div>',
+    'className' => 'inline-flex items-center btn bg-info-100 text-info-600 hover:!bg-info-700 hover:!text-white rounded-lg text-sm p-0',
+    'buttons' => [
+        [
+            'extend' => 'copy',
+            'title'  => $title,     // judul di header export
+            'filename' => 'laporan_data'    // nama file download
+        ],
+        [
+            'extend' => 'excel',
+            'title'  => $title,
+            'filename' => $title
+        ],
+        [
+            'extend' => 'csv',
+            'title'  => $title,
+            'filename' => 'laporan_data'
+        ],
+        [
+            'extend' => 'pdf',
+            'title'  => $title,
+            'filename' => 'laporan_data'
+        ],
+        [
+            'extend' => 'print',
+            'title'  => $title
+        ],
+    ]
+];
+$createPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.create'));
+if (!empty($createPerm)) {
+    $route = base_url(reset($createPerm)['route'] . '/new');
+    $buttons[] = [
+        'text' => '<div class="px-3.5 py-2 text-warning-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mage:plus" class="text-sm"></iconify-icon> Add</div>',
+        'className' => 'btn bg-warning-100 [&_span]:text-warning-600 hover:bg-warning-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+        'action' => 'function(e, dt, node, config) {
+                    window.location.href = "' . esc($route) . '";
+                }'
+    ];
+}
+
+?>
+<?php
+$importPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.import'));
+if (!empty($importPerm)): ?>
+    <div class="flex items-center justify-between pb-4">
+        <div class="col-auto">
+            <div class="flex flex-col md:flex-row gap-4">
+                <form id="formUpload" action="<?= base_url(reset($importPerm)['route'] . '/import') ?>" method="post" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <div class="flex flex-row gap-4">
+                        <input type="file" name="excel_file" accept=".xls,.xlsx" required class="block w-full text-sm  text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                        <button type="submit" class="btn bg-neutral-100 text-neutral-600 hover:bg-neutral-700 hover:text-white rounded-lg px-3.5 py-2 text-sm">
+                            <div class="flex items-center justify-center gap-2"><iconify-icon icon="oui:import" class="text-sm"></iconify-icon> Import</div>
+                        </button>
+                    </div>
+                </form>
+                <a href="<?= base_url(reset($importPerm)['route'] . '/template-import') ?>" class="btn bg-info-100 text-info-600 hover:bg-info-700 hover:text-white rounded-lg px-3.5 py-2 text-sm">
+                    <div class="flex items-center justify-center gap-2"><iconify-icon icon="flowbite:file-import-outline" class="text-sm"></iconify-icon> Download Template Import</div>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+<div id="datatable-process<?= $props['key'] ?>"
+    class="hidden absolute inset-0 z-[9999] bg-white/70 flex flex-col items-center justify-center text-gray-700 font-semibold text-base backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-3">
+        <div class="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <span>Rendering data...</span>
+    </div>
+</div>
+<div class="customize-vue3-easy-data-table min-h-full max-w-full">
+    <table class="datatable border border-neutral-200 dark:border-neutral-600 rounded-lg border-separate" id="tbl<?= $props['key'] ?>">
+    </table>
+</div>
+<div id="drawer-contact<?= $props['key'] ?>"
+    class="fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800"
+    tabindex="-1"
+    aria-labelledby="drawer-contact-label">
+
+    <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
+        Filter
+    </h5>
+
+    <button type="button" id="filterClose<?= $props['key'] ?>" data-drawer-hide="drawer-contact<?= $props['key'] ?>" aria-controls="drawer-contact<?= $props['key'] ?>"
+        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">Close menu</span>
+    </button>
+    <?php foreach ($props['filters'] as $filter): ?>
+        <?php if ($filter['input'] == "text"): ?>
+            <div class="mb-6">
+                <?= view('Backend/Partial/form/text-box', ['attribute' => [
+                    'type' => 'text',
+                    'field' => $filter['id'],
+                    'label' => $filter['label'],
+                ]]) ?>
+            </div>
+        <?php elseif ($filter['input'] == "date"): ?>
+            <div class="mb-6">
+                <?= view('Backend/Partial/form/text-box', ['attribute' => [
+                    'type' => 'date',
+                    'field' => $filter['id'],
+                    'label' => $filter['label'],
+                ]]) ?>
+            </div>
+        <?php elseif ($filter['input'] == "textgroup"): ?>
+            <div class="mb-6">
+                <?= view('Backend/Partial/form/text-box-group', ['attribute' => [
+                    'type' => 'text-select',
+                    'field' => $filter['id'],
+                    'label' => $filter['label'],
+                    'group' => [
+                        'field' => $filter['group']['id'],
+                        'data' => $filter['group']['data'],
+                        'clear' => true
+                    ],
+                    'required' => true,
+                ]]) ?>
+            </div>
+        <?php elseif ($filter['input'] == "select"): ?>
+            <div class="mb-6">
+                <?php if (isset($filter['api'])): ?>
+                    <?= view('Backend/Partial/form/dropdown', ['attribute' => [
+                        'field' => $filter['id'],
+                        'label' => $filter['label'],
+                        'api' => $filter['api'],
+                    ]]) ?>
+                <?php else: ?>
+                    <?= view('Backend/Partial/form/dropdown-static', ['attribute' => [
+                        'field' => $filter['id'],
+                        'label' => $filter['label'],
+                        'data' => $filter['data'],
+                    ]]) ?>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    <div class="flex flex-row gap-4">
+        <button id="btnFilter<?= $props['key'] ?>"
+            class="dark:text-white bg-success-100 text-success-600 hover:bg-success-700 hover:text-white w-1/2 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+            Filter
+        </button>
+        <button id="btnReset<?= $props['key'] ?>"
+            class="text-center dark:text-white bg-warning-100 text-warning-600 hover:bg-warning-700 hover:text-white w-1/2 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+            Reset
+        </button>
+
+    </div>
+</div>
+<script>
+    (function() {
+        let isMobile = window.matchMedia("(max-width: 768px)").matches;
+        if (isMobile) {
+            $.fn.DataTable.ext.pager.numbers_length = 4;
+        }
+        var table = {};
+        let buttons = <?= json_encode($buttons, JSON_UNESCAPED_SLASHES) ?>;
+        buttons.forEach(b => {
+            b.action = eval("(" + b.action + ")");
+        });
+
+        function showAlert(message, type = 'success') {
+            const colors = {
+                success: 'bg-green-100 text-green-700 border-green-500',
+                danger: 'bg-red-100 text-red-700 border-red-500',
+            };
+
+            const icon = {
+                success: 'mdi:check-circle-outline',
+                danger: 'mdi:alert-circle-outline'
+            };
+            var html = '<div class="mb-4 alert alert-danger bg-danger-100 dark:bg-danger-400 text-danger-600 dark:text-danger-400 border-danger-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert"><div class="flex items-center gap-2"><iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl"></iconify-icon>' + message + '</div><button class="remove-button text-danger-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button></div>'
+
+
+            const container = $('.notification');
+            const alert = $(html).hide().appendTo(container).fadeIn(200);
+
+            // ✅ tombol close manual
+            alert.find('.remove-button').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // biar klik nggak nembus ke iconify
+                alert.fadeOut(200, function() {
+                    $(this).remove();
+                });
+            });
+
+            // ✅ auto close 5 detik
+            setTimeout(() => {
+                alert.fadeOut(200, function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+
+        $(document).on('change', '.triger-update', function() {
+            let checkbox = $(this);
+            let id = checkbox.data('id');
+            let isChecked = checkbox.is(':checked');
+            let url = checkbox.data('url');
+
+            $.ajax({
+                url: url,
+                method: 'PUT',
+                data: {
+                    id: id,
+                    pinned: isChecked ? 1 : 0
+                },
+                headers: {
+                    'Authorization': 'Bearer <?= esc($props['token']) ?>'
+                },
+                success: function(response) {
+                    if (response.status != 'Success') {
+                        checkbox.prop('checked', !isChecked);
+                        showAlert(response.message, 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Gagal update:', error);
+                    checkbox.prop('checked', !isChecked);
+                    showAlert('Terjadi kesalahan pada server', 'danger');
+                }
+            });
+        });
+        $(document).ready(function() {
+            const drawerEl = document.getElementById('drawer-contact<?= $props['key'] ?>');
+            const drawer = new Drawer(drawerEl, {
+                placement: 'right',
+                backdrop: false
+            });
+            $.extend(true, $.fn.dataTable.Buttons.defaults, {
+                dom: {
+                    button: {
+                        className: '' // hapus class bawaan .dt-button
+                    }
+                }
+            });
+
+            let dataTableAjax = '<?= esc($props['api']) ?>';
+            table.<?= $props['key'] ?> = $('#tbl<?= $props['key'] ?>').DataTable({
+                deferRender: true,
+                buttons: buttons,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: dataTableAjax,
+                    type: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer <?= esc($props['token']) ?>'
+                    },
+                    beforeSend: function() {
+                    },
+                    dataSrc: function(json) {
+                        return json.data; // penting! DataTables butuh ini
+                    },
+                    error: function(xhr, error, code) {
+                        if (xhr.status === 401) {
+                            window.location.href = '<?= site_url('back-end/logout') ?>';
+                        }
+                    }
+                },
+                responsive: {
+                    details: {
+                        // display: DataTable.Responsive.display.childRowImmediate,
+                        type: 'column'
+                    }
+                },
+                columns: <?= json_encode($props['columns']) ?>,
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, 500, 1000],
+                    [10, 25, 50, 100, 200, 500, 1000]
+                ],
+                columnDefs: [{
+                        className: "dt-nowrap",
+                        targets: "_all",
+                        visible: false
+                    },
+                    {
+                        className: 'dtr-control',
+                        targets: 0,
+                        orderable: false,
+                        searchable: false,
+                        searchBuilder: false,
+                        width: "50px",
+                        render: function(data, type, row, meta) {
+                            return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
+                    {
+                        targets: -1,
+                        orderable: false,
+                        searchable: false,
+                        searchBuilder: false,
+                        searchDropdown: false,
+                        render: function(data, type, row, meta) {
+                            return `
+                                <?php
+                                $filtereds = array_filter(
+                                    $props['permission'],
+                                    fn($p) => !str_ends_with($p['permission'], '.create')
+                                        && !str_ends_with($p['permission'], '.view')
+                                );
+                                foreach ($filtereds as $permission):
+                                    $route = base_url($permission['route']); ?>
+                                    <?php if (str_ends_with($permission['permission'], '.detail')): ?>
+                                        <a href="<?= esc($route) ?>/${data.id}" 
+                                        class="w-8 h-8 bg-info-50 dark:bg-info-600/10 text-info-600 dark:text-info-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="iconamoon:eye-light"></iconify-icon>
+                                        </a>
+                                    <?php elseif (str_ends_with($permission['permission'], '.update')): ?>
+                                        <a href="<?= esc($route) ?>/${data.id}/edit" 
+                                        class="w-8 h-8 bg-warning-100 dark:bg-warning-600/25 text-warning-600 dark:text-warning-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="lucide:edit"></iconify-icon>
+                                        </a>
+                                    <?php elseif (str_ends_with($permission['permission'], '.delete')): ?>
+                                        <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
+                                        </button>
+                                    <?php elseif (str_ends_with($permission['permission'], '.process')): ?>
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="mingcute:check-line"></iconify-icon>
+                                        </button>
+                                    <?php elseif (str_ends_with($permission['permission'], '.approve')): ?>
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="mingcute:check-line"></iconify-icon>
+                                        </button>
+                                    <?php elseif (str_ends_with($permission['permission'], '.reject')): ?>
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="mingcute:close-line"></iconify-icon>
+                                        </button>
+                                    <?php elseif (str_ends_with($permission['permission'], '.revert')): ?>
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-warning-100 dark:bg-warning-600/25 text-warning-600 dark:text-warning-400 rounded-full inline-flex items-center justify-center">
+                                            <iconify-icon icon="mingcute:back-line"></iconify-icon>
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            `;
+                        }
+                    }
+                ],
+                layout: {
+                    topStart: 'buttons',
+                    topEnd: {
+                        search: true,
+                        buttons: [{
+                            text: '<iconify-icon icon="mdi:filter-outline" width="24" height="24"></iconify-icon>',
+                            className: 'text-success-600 font-medium rounded-lg text-sm ',
+                            attr: {
+                                'type': 'button',
+                                'data-drawer-target': 'drawer-contact<?= $props['key'] ?>',
+                                'data-drawer-show': 'drawer-contact<?= $props['key'] ?>',
+                                'data-drawer-placement': 'right',
+                                'aria-controls': 'drawer-contact<?= $props['key'] ?>'
+                            },
+                            action: function() {
+                                drawer.show();
+                            }
+                        }]
+                    },
+                    bottomEnd: ['pageLength', 'paging'],
+                    bottomStart: 'info',
+                },
+            });
+
+            table.<?= $props['key'] ?>.on('responsive-resize', function(e, datatable, columns) {
+                let anyHidden = columns.some(col => col === false);
+
+                if (!anyHidden) {
+                    $('.btn-collapse<?= $props['key'] ?>').hide();
+                    $('#tbl<?= $props['key'] ?> td.dtr-control, #tbl<?= $props['key'] ?> th.dtr-control').removeClass('dtr-control');
+                } else {
+                    $('.btn-collapse<?= $props['key'] ?>').show();
+                    $('#tbl<?= $props['key'] ?> tr:not(.child) td:first-child, #tbl<?= $props['key'] ?> tr:not(.child) th:first-child').addClass('dtr-control');
+                }
+            });
+            const $modalElement = document.getElementById('confirm-modal<?= $props['key'] ?>');
+            const modal = new Modal($modalElement);
+            $(document).on('click', '.btn-open-modal<?= $props['key'] ?>', function() {
+                this.blur();
+                const action = $(this).data('action');
+                const url = $(this).data('url');
+                const method = $(this).data('method');
+                const key = $(this).data('key');
+                $('.warning-text<?= $props['key'] ?>').text(action);
+                $('#method<?= $props['key'] ?>').val(method);
+                $('#key<?= $props['key'] ?>').val(key);
+                $('#formConfirm<?= $props['key'] ?>').attr('action', url);
+                modal.show();
+            });
+            $('.close-modal').on('click', function() {
+                modal.hide();
+            });
+            $('#filterClose<?= $props['key'] ?>').on('click', function() {
+                drawer.hide();
+            });
+            $('#tbl<?= $props['key'] ?>').on('preXhr.dt', function(e, settings, data) {
+                let filters = <?= json_encode($props['filters'], JSON_UNESCAPED_SLASHES) ?>;
+                filters.forEach(function(filter) {
+                    var selector = filter.selector || ('[name="' + filter.id + '"]');
+                    var value = $(selector).val();
+                    if (filter.input === 'select') {
+                        data[filter.id] = value;
+                    } else if (filter.input === 'text') {
+                        data[filter.id] = value?.trim() || '';
+                    } else if (filter.input === 'date') {
+                        data[filter.id] = value?.trim() || '';
+                    } else if (filter.input === 'textgroup') {
+                        var selectorGroup = filter.selector || ('[name="' + filter.group.id + '"]');
+                        var valueGroup = $(selectorGroup).val();
+                        data[filter.id] = (value?.trim() || '') + (valueGroup?.trim() || '');
+                    } else if (filter.input === 'checkbox') {
+                        data[filter.id] = $(selector).is(':checked') ? 1 : 0;
+                    }
+                });
+            });
+
+            $('#tbl<?= $props['key'] ?>').on('xhr.dt', function(e, settings, json, xhr) {
+                table.<?= $props['key'] ?>.columns().visible(true);
+            });
+            $(document).on('click', '#btnFilter<?= $props['key'] ?>', function(e) {
+                e.preventDefault();
+                table.<?= $props['key'] ?>.ajax.reload();
+                $('#filterClose<?= $props['key'] ?>').click();
+            });
+
+            $(document).on('click', '#btnReset<?= $props['key'] ?>', function(e) {
+                e.preventDefault();
+                let filters = <?= json_encode($props['filters'], JSON_UNESCAPED_SLASHES) ?>;
+                filters.forEach(function(filter) {
+                    var selector = filter.selector || ('[name="' + filter.id + '"]');
+                    var $el = $(selector);
+                    $el.val('');
+                    if ($el.hasClass('select2-hidden-accessible')) {
+                        $el.val(null).trigger('change');
+                    }
+                });
+                table.<?= $props['key'] ?>.ajax.reload();
+            });
+            $('#tbl<?= $props['key'] ?>').on('length.dt', function(e, settings, len) {
+                $("#tbl<?= $props['key'] ?> tbody").empty();
+            });
+            $('#tbl<?= $props['key'] ?>').on('page.dt', function(e, settings, len) {
+                $("#tbl<?= $props['key'] ?> tbody").empty();
+            });
+            $('#tbl<?= $props['key'] ?>').on('preDraw.dt', function() {
+                // Paksa spinner bawaan tampil
+                showProcess(true);
+            });
+            $('#tbl<?= $props['key'] ?>').on('draw.dt', function() {
+                ensureFullRender(() => {
+                    showProcess(false);
+                });
+                $('#tbl<?= $props['key'] ?> td.dtr-hidden input, #tbljobvacancy td.dtr-hidden [id]').remove();
+            });
+        });
+
+        function showProcess(show) {
+            $('#datatable-process<?= $props['key'] ?>').css('display', show ? 'flex' : 'none');
+        }
+
+        function ensureFullRender(callback) {
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    callback();
+                }, 10);
+            });
+        }
+
+    })();
+</script>

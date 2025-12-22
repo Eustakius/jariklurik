@@ -1,0 +1,29 @@
+# Environment Variables
+.env
+ci/.env
+
+# Dependencies
+/vendor
+/node_modules
+ci/vendor
+
+# CodeIgniter Writable (Cache, Logs, etc.)
+ci/writable/cache/
+ci/writable/logs/
+ci/writable/session/
+ci/writable/uploads/
+ci/writable/debugbar/
+
+# XAMPP Staging Environment (Duplicate)
+/staging/
+
+# IDE & System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.zip

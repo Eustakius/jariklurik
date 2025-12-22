@@ -1,0 +1,305 @@
+.editor ol, .editor  ul{
+  list-style: revert !important;
+  margin: revert !important;
+  padding: revert !important;
+}
+
+input[type="date"] {
+  color: transparent;
+}
+
+.focused input[type="date"],
+input[type="date"].has-value {
+  color: inherit;
+}
+
+.input-group {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.input-group .form-line {
+  display: inline-block;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+}
+
+.input-group .form-line:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: -2px;
+  -moz-transform: scaleX(0);
+  -ms-transform: scaleX(0);
+  -o-transform: scaleX(0);
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -moz-transition: 0.25s ease-in;
+  -o-transition: 0.25s ease-in;
+  -webkit-transition: 0.25s ease-in;
+  transition: 0.25s ease-in;
+  border-bottom: 2px solid #1f91f3;
+}
+
+.input-group .form-line+.input-group-addon {
+  padding-right: 0;
+  padding-left: 10px;
+}
+
+.input-group .help-info {
+  float: right;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #999;
+}
+
+.input-group label.error {
+  font-size: 12px;
+  display: block;
+  margin-top: 5px;
+  font-weight: normal;
+  color: #F44336;
+}
+
+.input-group .form-line.error:after {
+  border-bottom: 2px solid #F44336;
+}
+
+.input-group .form-line.success:after {
+  border-bottom: 2px solid #4CAF50;
+}
+
+.input-group .form-line.warning:after {
+  border-bottom: 2px solid #FFC107;
+}
+
+.input-group .form-line.focused:after {
+  -moz-transform: scaleX(1);
+  -ms-transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+}
+
+.input-group .form-line.focused .form-label {
+  bottom: 25px;
+  left: 0;
+  font-size: 12px;
+}
+
+.form-group .form-line {
+  width: 100%;
+  position: relative;
+  margin-bottom: 8px;
+  /* border-bottom: 1px solid #ddd; */
+}
+
+
+.form-group .form-line:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 0;
+  bottom: -1px;
+  -moz-transform: scaleX(0);
+  -ms-transform: scaleX(0);
+  -o-transform: scaleX(0);
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -moz-transition: 0.25s ease-in;
+  -o-transition: 0.25s ease-in;
+  -webkit-transition: 0.25s ease-in;
+  transition: 0.25s ease-in;
+  /* border-bottom: 2px solid #1f91f3; */
+}
+
+.form-group .form-line .form-label {
+  font-family: "Inter", sans-serif;
+  font-weight: normal;
+  color: #714D00;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  cursor: text;
+  -moz-transition: 0.2s;
+  -o-transition: 0.2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+
+.form-group .form-line.error:after {
+  border-bottom: 2px solid #F44336;
+}
+
+.form-group .form-line.success:after {
+  border-bottom: 2px solid #4CAF50;
+}
+
+.form-group .form-line.warning:after {
+  border-bottom: 2px solid #FFC107;
+}
+
+.form-group .form-line.focused:after {
+  -moz-transform: scaleX(1);
+  -ms-transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+}
+
+.form-group .form-line.focused .form-label {
+  top: -15px;
+  left: 0;
+  font-size: 12px;
+}
+
+.form-group-sm .form-label {
+  font-size: 12px;
+}
+
+.form-group-sm .form-line.focused .form-label {
+  bottom: 20px;
+  font-size: 10px;
+}
+
+.form-group-lg .form-label {
+  font-size: 18px;
+}
+
+.form-group-lg .form-line.focused .form-label {
+  bottom: 35px;
+  font-size: 12px;
+}
+
+select.flatpickr-monthDropdown-months {
+  display: inline-block;
+}
+
+input.flatpickr-input {
+  /* pasang icon kalender custom warna #714D00 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23714D00' viewBox='0 0 24 24'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  background-size: 1.25rem 1.25rem;
+}
+
+/* hilangkan icon default browser (Chrome, Safari, Edge) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+/* Firefox hack: hilangkan icon default */
+input[type="date"]::-moz-focus-inner {
+  border: 0;
+}
+
+.preloader {
+  margin: 0 auto;
+  z-index: 111;
+}
+
+.loader {
+  display: block;
+  position: relative;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #714D00;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+.loader:before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #C88D22;
+  -webkit-animation: spin 3s linear infinite;
+  animation: spin 3s linear infinite;
+}
+
+.loader:after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #EBC470;
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; /* biar kalau teks panjang, turun ke bawah */
+  gap: 8px;
+}
+
+#file-info {
+  max-width: calc(100% - 40px); /* biar tidak nabrak icon upload di kanan */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#file-name {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+#remove-file {
+  flex-shrink: 0;
+}
+
+.logos--whatsapp-icon {
+  display: inline-block;
+  width: 27.79px;
+  height: 28px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 258'%3E%3Cdefs%3E%3ClinearGradient id='SVGBRLHCcSy' x1='50%25' x2='50%25' y1='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%231faf38'/%3E%3Cstop offset='100%25' stop-color='%2360d669'/%3E%3C/linearGradient%3E%3ClinearGradient id='SVGHW6lecxh' x1='50%25' x2='50%25' y1='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23f9f9f9'/%3E%3Cstop offset='100%25' stop-color='%23fff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23SVGBRLHCcSy)' d='M5.463 127.456c-.006 21.677 5.658 42.843 16.428 61.499L4.433 252.697l65.232-17.104a123 123 0 0 0 58.8 14.97h.054c67.815 0 123.018-55.183 123.047-123.01c.013-32.867-12.775-63.773-36.009-87.025c-23.23-23.25-54.125-36.061-87.043-36.076c-67.823 0-123.022 55.18-123.05 123.004'/%3E%3Cpath fill='url(%23SVGHW6lecxh)' d='M1.07 127.416c-.007 22.457 5.86 44.38 17.014 63.704L0 257.147l67.571-17.717c18.618 10.151 39.58 15.503 60.91 15.511h.055c70.248 0 127.434-57.168 127.464-127.423c.012-34.048-13.236-66.065-37.3-90.15C194.633 13.286 162.633.014 128.536 0C58.276 0 1.099 57.16 1.071 127.416m40.24 60.376l-2.523-4.005c-10.606-16.864-16.204-36.352-16.196-56.363C22.614 69.029 70.138 21.52 128.576 21.52c28.3.012 54.896 11.044 74.9 31.06c20.003 20.018 31.01 46.628 31.003 74.93c-.026 58.395-47.551 105.91-105.943 105.91h-.042c-19.013-.01-37.66-5.116-53.922-14.765l-3.87-2.295l-40.098 10.513z'/%3E%3Cpath fill='%23fff' d='M96.678 74.148c-2.386-5.303-4.897-5.41-7.166-5.503c-1.858-.08-3.982-.074-6.104-.074c-2.124 0-5.575.799-8.492 3.984c-2.92 3.188-11.148 10.892-11.148 26.561s11.413 30.813 13.004 32.94c1.593 2.123 22.033 35.307 54.405 48.073c26.904 10.609 32.379 8.499 38.218 7.967c5.84-.53 18.844-7.702 21.497-15.139c2.655-7.436 2.655-13.81 1.859-15.142c-.796-1.327-2.92-2.124-6.105-3.716s-18.844-9.298-21.763-10.361c-2.92-1.062-5.043-1.592-7.167 1.597c-2.124 3.184-8.223 10.356-10.082 12.48c-1.857 2.129-3.716 2.394-6.9.801c-3.187-1.598-13.444-4.957-25.613-15.806c-9.468-8.442-15.86-18.867-17.718-22.056c-1.858-3.184-.199-4.91 1.398-6.497c1.431-1.427 3.186-3.719 4.78-5.578c1.588-1.86 2.118-3.187 3.18-5.311c1.063-2.126.531-3.986-.264-5.579c-.798-1.593-6.987-17.343-9.819-23.64'/%3E%3C/svg%3E");
+}
