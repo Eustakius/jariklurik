@@ -337,3 +337,45 @@ $lastPart = end($parts);
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        const $fadeJob = $('#fadeJob');
+        const $fadeJobApply = $('#fadeJobApply');
+        const $btn = $('#toggleBtnApply');
+
+        // Ensure we handle the click cleanly
+        $btn.off('click').on('click', function (e) {
+            e.preventDefault();
+            
+            if ($fadeJob.hasClass('opacity-0') || $fadeJob.is(':hidden')) {
+                // Show Description, Hide Form
+                $(this).text('Apply Loker');
+                
+                $fadeJobApply.removeClass('opacity-100').addClass('opacity-0');
+                
+                setTimeout(() => {
+                    $fadeJobApply.addClass('hidden');
+                    $fadeJob.removeClass('hidden');
+                    // Small delay to allow display:block to apply before opacity transition
+                    setTimeout(() => {
+                        $fadeJob.removeClass('opacity-0').addClass('opacity-100');
+                    }, 50);
+                }, 500);
+
+            } else {
+                // Show Form, Hide Description
+                $(this).text('Persyaratan & Deskripsi');
+                
+                $fadeJob.removeClass('opacity-100').addClass('opacity-0');
+                
+                setTimeout(() => {
+                    $fadeJob.addClass('hidden');
+                    $fadeJobApply.removeClass('hidden');
+                    setTimeout(() => {
+                        $fadeJobApply.removeClass('opacity-0').addClass('opacity-100');
+                    }, 50);
+                }, 500);
+            }
+        });
+    });
+</script>

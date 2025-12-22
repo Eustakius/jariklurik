@@ -28,6 +28,12 @@ if not exist "%DEST_STAGING%" mkdir "%DEST_STAGING%"
 xcopy /Y /S "%SOURCE%\*.*" "%DEST_STAGING%\"
 echo.
 
+echo 3. Syncing Fonts to WRITABLE (for Captcha)...
+set "DEST_FONTS=%ROOT%writable\fonts"
+if not exist "%DEST_FONTS%" mkdir "%DEST_FONTS%"
+copy /Y "%ROOT%public_html\fonts\RedHatDisplay-Regular.ttf" "%DEST_FONTS%\Roboto-Regular.ttf"
+echo.
+
 echo ========================================================
 echo SYNC COMPLETE.
 echo Press any key to close this window.
