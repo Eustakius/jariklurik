@@ -107,3 +107,18 @@ Ini dokumentasi masalah teknis yang kita temuin pas setup dan gimana solusinya. 
 -   **Solusi**:
     1.  **UI Redesign**: Ganti SVG mentah itu pake komponen badge "Hapus Filter" yang rapi.
     2.  **Logic Fix**: Benerin `job-vacancy-list.php` biar ngambil nilai radio button yang baru **sebelum** manggil fungsi ambil data.
+
+### 7. Captcha Error (Gambar Rusak / 0 Bytes)
+-   **Masalah**: Gambar Captcha tidak muncul (icon gambar rusak) atau terminal menampilkan log `Image Generated. Size: 0 bytes`.
+-   **Penyebab Komplikasi**:
+    1.  **Missing GD Library**: Extension `php_gd.dll` mati di `php.ini` XAMPP, bikin fungsi `imagecreatetruecolor` crash diem-diem (silent death).
+    2.  **Output Buffering**: Ada "sampah" (whitespace/newline) dari file PHP lain (kayak `Filters.php` atau `Common.php`) yang kesedot masuk ke respon gambar PNG, bikin binary-nya corrupt.
+    3.  **Debug Toolbar**: Toolbar CI4 nyuntik script HTML ke dalam respon gambar (karena content-type filter kadang lolos), ngerusak struktur PNG.
+    4.  **ZLib Compression**: Server otomatis nge-compress output, padahal PNG udah compressed. Double compression bikin browser bingung.
+    5.  **Font Missing**: File font `.ttf` ga ketemu, dan fallback `imagestring` juga gagal gara-gara poin 1-4.
+-   **Solusi "Nuclear Option"**:
+    1.  **Enable GD**: Wajib nyalain `extension=gd` di `php.ini`.
+    2.  **Clean Buffer**: Pake `ob_clean()` sebelum `header()` buat hapus sampah log/whitespace.
+    3.  **Disable Features**: Matiin kompresi (`zlib.output_compression = Off`) dan Debug Toolbar buat rute captcha.
+    4.  **Explicit Headers**: Kirim `Content-Length` biar browser tau persis berapa byte gambarnya, jadi ga nunggu closing connection.
+    5.  **Manual Font Fix**: Script `manual_fix_logos.bat` dimodif buat nge-copy font `RedHatDisplay` jadi `Roboto-Regular.ttf` ke folder `writable/fonts`.
