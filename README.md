@@ -4,9 +4,21 @@ Halo guys! 👋 Panduan ini bakal bantuin kalian buat nge-setup aplikasi Jariklu
 
 ## 🛠️ Persiapan (Wajib Punya)
 
--   **🐘 XAMPP** (buat Database): Download dan install XAMPP dari [apachefriends.org](https://www.apachefriends.org/index.html).
--   **🐘 PHP**: Udah include di dalem XAMPP kok.
--   **🌐 Web Browser**: Chrome, Firefox, atau Edge (bebas dah).
+Sebelum mulai, pastikan laptop kalian udah terinstall alat-alat tempur ini biar ga error di tengah jalan:
+
+1.  **🐘 XAMPP** (buat Database & Server):
+    *   Download di [apachefriends.org](https://www.apachefriends.org/index.html).
+    *   **Penting**: Pastikan versi PHP-nya minimal **8.1** (sesuai `composer.json`).
+2.  **🎼 Composer** (Manajer Dependency PHP):
+    *   Download di [getcomposer.org](https://getcomposer.org/download/).
+    *   Ini **WAJIB** buat download library kayak `myth/auth` atau `spreadsheet`. Tanpa ini, app bakal error `Class not found`.
+3.  **🟢 Node.js** (Buat Frontend/Tailwind):
+    *   Download di [nodejs.org](https://nodejs.org/).
+    *   Kita butuh ini buat compile CSS biar ganteng (TailwindCSS).
+4.  **🐙 Git** (Buat Download/Upload Kodingan):
+    *   Download di [git-scm.com](https://git-scm.com/).
+    *   Biar bisa pake script `recommit_changes.bat`.
+5.  **🌐 Web Browser**: Chrome, Firefox, atau Edge (bebas dah).
 
 ## ⚡ Cara Install & Setup
 
@@ -21,10 +33,20 @@ Halo guys! 👋 Panduan ini bakal bantuin kalian buat nge-setup aplikasi Jariklu
 8.  Pilih file `jariklurik.sql` yang ada di folder project ini.
 9.  Klik **Import** di paling bawah.
 
-### 2. ⚙️ Konfigurasi Environment
-File `.env` udah kita settingin buat local development, jadi aman guys.
--   **🔗 Base URL**: `http://localhost:8081/`
--   **💾 Database**: `jariklurik` (User: `root`, Password: kosongin aja)
+### 2. ⚙️ Install Library & Konfigurasi
+Sebelum jalanin app, kita harus download semua "bumbu" pelengkapnya dulu.
+
+1.  **Install Dependency Backend**:
+    *   Buka terminal di folder project.
+    *   Ketik: `composer install`
+    *   Tunggu sampe selesai. Ini bakal download library PHP di folder `vendor`.
+2.  **Install Dependency Frontend**:
+    *   Ketik: `npm install`
+    *   Tunggu beres (folder `node_modules` bakal muncul).
+3.  **Setup Environment**:
+    *   File `.env` udah kita settingin buat local development, jadi aman guys.
+    *   **🔗 Base URL**: `http://localhost:8081/`
+    *   **💾 Database**: `jariklurik` (User: `root`, Password: kosongin aja)
 
 ### 3. ▶️ Jalanin Aplikasi (Rekomendasi)
 Pake script yang udah kita siapin biar gampang dan port-nya konsisten di 8081.
