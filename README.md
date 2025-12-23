@@ -47,8 +47,6 @@ Kita udah buatin beberapa script ajaib biar hidup kalian lebih mudah:
 
 -   **🪄 `manual_fix_logos.bat`**: Script ini buat **benerin logo perusahaan yang ilang**.
     -   *Cara pake*: Tinggal klik 2x aja. Script-nya pinter kok, dia bakal otomatis nyari folder project kalian (mau ditaruh dimana aja) dan nge-copy semua logo ke tempat yang bener.
--   **🚀 `commit_and_push.bat`**: Script buat **upload kodingan ke GitHub**.
-    -   *Cara pake*: Klik 2x, terus ketik pesan update kalian (misal: "Benerin fitur login"), tekan Enter. Beres! Kodingan langsung terbang ke GitHub.
 -   **✨ `recommit_changes.bat`**: Script baru buat **upload hanya file yang berubah & baru** dengan tampilan keren.
     -   *Cara pake*: Klik 2x, lebih efisien daripada script lama.
 
