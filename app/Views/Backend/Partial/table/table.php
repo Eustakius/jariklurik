@@ -18,6 +18,20 @@
         </div>
     <?php endif; ?>
 <?php endif; ?>
+<?php
+// Inject Checkbox Column if Selectable
+if (isset($props['selectable']) && $props['selectable']) {
+    // Check if we haven't already added it (in case of re-renders or shared props weirdness)
+    // Actually props are local to this view render.
+    array_unshift($props['columns'], [
+        'title' => '<input type="checkbox" id="selectAll' . $props['key'] . '" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">',
+        'data' => null,
+        'orderable' => false,
+        'searchable' => false,
+        'width' => '10px'
+    ]);
+}
+?>
 <div class="notification fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50"></div>
 <div id="confirm-modal<?= $props['key'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 max-h-full">
@@ -120,6 +134,112 @@ $buttons[] = [
         ],
     ]
 ];
+
+
+// Mass Action Buttons (Manual Configuration)
+if (isset($mas_actions) && !empty($mas_actions)) {
+    foreach ($mas_actions as $key => $action) {
+         $buttons[] = [
+            'text' => '<div class="px-3.5 py-2 flex items-center justify-center gap-2 text-white"><iconify-icon icon="' . ($action['icon'] ?? 'mingcute:check-line') . '" class="text-sm"></iconify-icon> ' . ($action['label'] ?? 'Action') . '</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-' . ($action['type'] ?? 'success') . '-100 [&_div]:text-' . ($action['type'] ?? 'success') . '-600 hover:bg-' . ($action['type'] ?? 'success') . '-700 hover:[&_div]:text-white rounded-lg text-sm p-0',
+            'attr' =>  [
+                'data-url' => $action['url'],
+                'data-action-name' => $key
+            ]
+        ];
+    }
+} else if (isset($props['selectable']) && $props['selectable']) {
+    // Mass Action Buttons (Auto-Generated based on Permissions)
+    $approvePerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.approve'));
+    if (!empty($approvePerm)) {
+         $approveRouteDef = reset($approvePerm)['route']; 
+         $massApproveRoute = preg_replace('/\(:(segment|num|any)\)\/approve/', 'mass-approve', $approveRouteDef);
+         if ($massApproveRoute === $approveRouteDef) {
+             $massApproveRoute = rtrim($approveRouteDef, '/') . '/mass-approve';
+         }
+         $massApproveUrl = base_url($massApproveRoute);
+         
+         $buttons[] = [
+            'text' => '<div class="px-3.5 py-2 text-success-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mingcute:check-line" class="text-sm"></iconify-icon> Mass Approve</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-success-100 [&_span]:text-success-600 hover:bg-success-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+            'attr' =>  [
+                'data-url' => $massApproveUrl,
+                'data-action-name' => 'approve'
+            ]
+        ];
+    }
+
+    // Mass Action Buttons (Process)
+    $processPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.process'));
+    if (!empty($processPerm)) {
+         $processRouteDef = reset($processPerm)['route']; 
+         $massProcessRoute = preg_replace('/\(:(segment|num|any)\)\/process/', 'mass-process', $processRouteDef);
+         if ($massProcessRoute === $processRouteDef) {
+             $massProcessRoute = rtrim($processRouteDef, '/') . '/mass-process';
+         }
+         $massProcessUrl = base_url($massProcessRoute);
+         
+         $buttons[] = [
+            'text' => '<div class="px-3.5 py-2 text-success-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mingcute:check-line" class="text-sm"></iconify-icon> Mass Process</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-success-100 [&_span]:text-success-600 hover:bg-success-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+            'attr' =>  [
+                'data-url' => $massProcessUrl,
+                'data-action-name' => 'process'
+            ]
+        ];
+    }
+
+    // Mass Action Buttons (Revert)
+    $revertPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.revert'));
+    if (!empty($revertPerm)) {
+         $revertRouteDef = reset($revertPerm)['route']; 
+         // Helper to derive mass route or fallback
+         $massRevertRoute = preg_replace('/\(:(segment|num|any)\)\/revert/', 'mass-revert', $revertRouteDef);
+         if ($massRevertRoute === $revertRouteDef) {
+             $massRevertRoute = 'back-end/applicant/mass-revert';
+         }
+         $massRevertUrl = base_url($massRevertRoute);
+         
+         $buttons[] = [
+            'text' => '<div class="px-3.5 py-2 text-warning-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mingcute:back-line" class="text-sm"></iconify-icon> Mass Revert</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-warning-100 [&_span]:text-warning-600 hover:bg-warning-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+            'attr' =>  [
+                'data-url' => $massRevertUrl,
+                'data-action-name' => 'revert'
+            ]
+        ];
+    }
+
+    // Mass Action Buttons (Delete)
+    $deletePerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.delete'));
+    if (!empty($deletePerm)) {
+         $deleteRouteDef = reset($deletePerm)['route']; 
+         // Helper to derive mass route or fallback
+         // Usually route is /delete or /(:num) for delete. 
+         // Let's assume standard resource route: /training-type/(:num) -> DELETE
+         // We want /training-type/mass-delete
+         
+         // If route is like 'back-end/training/training-type/(:num)'
+         $massDeleteRoute = preg_replace('/\(:(segment|num|any)\)/', 'mass-delete', $deleteRouteDef);
+         
+         // If replace didn't happen (no param in definition? unlikely for delete), append
+         if ($massDeleteRoute === $deleteRouteDef) {
+             $massDeleteRoute = rtrim($deleteRouteDef, '/') . '/mass-delete';
+         }
+         
+         $massDeleteUrl = base_url($massDeleteRoute);
+         
+         $buttons[] = [
+            'text' => '<div class="px-3.5 py-2 text-danger-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mingcute:delete-2-line" class="text-sm"></iconify-icon> Mass Delete</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-danger-100 [&_span]:text-danger-600 hover:bg-danger-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+            'attr' =>  [
+                'data-url' => $massDeleteUrl,
+                'data-action-name' => 'delete'
+            ]
+        ];
+    }
+}
+
 $createPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.create'));
 if (!empty($createPerm)) {
     $route = base_url(reset($createPerm)['route'] . '/new');
@@ -131,6 +251,7 @@ if (!empty($createPerm)) {
                 }'
     ];
 }
+
 
 ?>
 <?php
@@ -175,7 +296,7 @@ if (!empty($importPerm)): ?>
         Filter
     </h5>
 
-    <button type="button" id="filterClose<?= $props['key'] ?>" data-drawer-hide="drawer-contact<?= $props['key'] ?>" aria-controls="drawer-contact<?= $props['key'] ?>"
+    <button type="button" id="filterClose<?= $props['key'] ?>"
         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
@@ -243,6 +364,40 @@ if (!empty($importPerm)): ?>
 
     </div>
 </div>
+<!-- Mass Decision Modal -->
+<div id="decision-modal<?= $props['key'] ?>" tabindex="-1" class="hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-900/50 backdrop-blur-sm">
+    <div class="relative p-4 w-full max-w-md max-h-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+             <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Select Action
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="$('#decision-modal<?= $props['key'] ?>').addClass('hidden')">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5 text-center">
+                 <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">What do you want to do with <span id="decision-count<?= $props['key'] ?>"></span> selected items?</h3>
+                <div class="flex justify-center gap-4">
+                    <button id="btn-decision-approve<?= $props['key'] ?>" type="button" class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                        <iconify-icon icon="mingcute:check-line" class="mr-2"></iconify-icon> Approve
+                    </button>
+                    <button id="btn-decision-reject<?= $props['key'] ?>" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                        <iconify-icon icon="mingcute:close-line" class="mr-2"></iconify-icon> Reject
+                    </button> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     (function() {
         let isMobile = window.matchMedia("(max-width: 768px)").matches;
@@ -250,6 +405,9 @@ if (!empty($importPerm)): ?>
             $.fn.DataTable.ext.pager.numbers_length = 4;
         }
         var table = {};
+        // Persistent Selection Set
+        var selectedIds<?= $props['key'] ?> = new Set();
+
         let buttons = <?= json_encode($buttons, JSON_UNESCAPED_SLASHES) ?>;
         buttons.forEach(b => {
             b.action = eval("(" + b.action + ")");
@@ -357,7 +515,24 @@ if (!empty($importPerm)): ?>
                 responsive: {
                     details: {
                         // display: DataTable.Responsive.display.childRowImmediate,
-                        type: 'column'
+                        type: 'column',
+                        target: <?= (isset($props['selectable']) && $props['selectable']) ? 1 : 0 ?>,
+                        renderer: function (api, rowIdx, columns) {
+                            var data = $.map(columns, function (col, i) {
+                                return col.hidden ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
+                                    '<td class="px-4 py-2 font-semibold text-gray-500 text-xs uppercase dark:text-gray-400">' + col.title + ':' + '</td> ' +
+                                    '<td class="px-4 py-2 text-gray-700 dark:text-gray-200">' + col.data + '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+
+                            return data ?
+                                $('<div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg shadow-inner border border-neutral-200 dark:border-neutral-700"/>').append(
+                                    $('<table class="w-full text-sm text-left"/>').append(data)
+                                ) :
+                                false;
+                        }
                     }
                 },
                 columns: <?= json_encode($props['columns']) ?>,
@@ -369,6 +544,30 @@ if (!empty($importPerm)): ?>
                         className: "dt-nowrap",
                         targets: "_all",
                     },
+                    <?php if (isset($props['selectable']) && $props['selectable']): ?>
+                    {
+                        className: 'text-center',
+                        targets: 0, 
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            var isChecked = selectedIds<?= $props['key'] ?>.has(row.id.toString()) ? 'checked' : '';
+                            return '<input type="checkbox" class="row-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" value="' + row.id + '" ' + isChecked + '>';
+                        }
+                    },
+                    {
+                        className: 'dtr-control',
+                        targets: 1, // Shifted to 1
+                        orderable: false,
+                        searchable: false,
+                        searchBuilder: false,
+                        visible: true,
+                        width: "50px",
+                        render: function(data, type, row, meta) {
+                            return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
+                    <?php else: ?>
                     {
                         className: 'dtr-control',
                         targets: 0,
@@ -381,6 +580,7 @@ if (!empty($importPerm)): ?>
                             return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
                         }
                     },
+                    <?php endif; ?>
                     {
                         targets: -1,
                         orderable: false,
@@ -408,27 +608,27 @@ if (!empty($importPerm)): ?>
                                             <iconify-icon icon="lucide:edit"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.delete')): ?>
-                                        <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" 
                                         class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
                                             <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.process')): ?>
-                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" 
                                         class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
                                             <iconify-icon icon="mingcute:check-line"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.approve')): ?>
-                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" 
                                         class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
                                             <iconify-icon icon="mingcute:check-line"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.reject')): ?>
-                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" 
                                         class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
                                             <iconify-icon icon="mingcute:close-line"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.revert')): ?>
-                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" data-modal-target="confirm-modal<?= $props['key'] ?>" data-modal-toggle="confirm-modal<?= $props['key'] ?>" 
+                                        <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" 
                                         class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-warning-100 dark:bg-warning-600/25 text-warning-600 dark:text-warning-400 rounded-full inline-flex items-center justify-center">
                                             <iconify-icon icon="mingcute:back-line"></iconify-icon>
                                         </button>
@@ -446,11 +646,7 @@ if (!empty($importPerm)): ?>
                             text: '<iconify-icon icon="mdi:filter-outline" width="24" height="24"></iconify-icon>',
                             className: 'text-success-600 font-medium rounded-lg text-sm ',
                             attr: {
-                                'type': 'button',
-                                'data-drawer-target': 'drawer-contact<?= $props['key'] ?>',
-                                'data-drawer-show': 'drawer-contact<?= $props['key'] ?>',
-                                'data-drawer-placement': 'right',
-                                'aria-controls': 'drawer-contact<?= $props['key'] ?>'
+                                'type': 'button'
                             },
                             action: function() {
                                 drawer.show();
@@ -462,6 +658,50 @@ if (!empty($importPerm)): ?>
                 },
             });
 
+            // Logic Checkbox Select All (Event Handlers Only)
+            <?php if (isset($props['selectable']) && $props['selectable']): ?>
+                // Note: Header checkbox is injected via props['columns'] in PHP
+                
+                // Select All Click Event
+                $(document).on('click', '#selectAll<?= $props['key'] ?>', function() {
+                    var rows = table.<?= $props['key'] ?>.rows({ 'search': 'applied' }).nodes();
+                    $('input[type="checkbox"].row-checkbox', rows).prop('checked', this.checked);
+                    
+                    // Update Set
+                    $('input[type="checkbox"].row-checkbox', rows).each(function() {
+                        var id = $(this).val().toString();
+                        if(this.checked) selectedIds<?= $props['key'] ?>.add(id);
+                        else selectedIds<?= $props['key'] ?>.delete(id);
+                    });
+                });
+
+
+                // Individu Checkbox Click Event (untuk update status Select All & Persistent Set)
+                $('#tbl<?= $props['key'] ?> tbody').on('change', 'input[type="checkbox"].row-checkbox', function(){
+                    var id = $(this).val().toString();
+                    if(this.checked) {
+                        selectedIds<?= $props['key'] ?>.add(id);
+                        console.log('Added ID:', id, 'Set:', Array.from(selectedIds<?= $props['key'] ?>));
+                    } else {
+                        selectedIds<?= $props['key'] ?>.delete(id);
+                        console.log('Removed ID:', id, 'Set:', Array.from(selectedIds<?= $props['key'] ?>));
+                    }
+
+                    if(!this.checked){
+                       var el = $('#selectAll<?= $props['key'] ?>').get(0);
+                       if(el && el.checked && ('indeterminate' in el)){
+                          el.indeterminate = true;
+                       }
+                    }
+                });
+
+                // Prevent Row Expansion when clicking checkbox
+                $('#tbl<?= $props['key'] ?> tbody').on('click', 'input[type="checkbox"].row-checkbox', function(e){
+                    e.stopPropagation();
+                });
+            <?php endif; ?>
+
+
             table.<?= $props['key'] ?>.on('responsive-resize', function(e, datatable, columns) {
                 let anyHidden = columns.some(col => col === false);
 
@@ -470,48 +710,12 @@ if (!empty($importPerm)): ?>
                     $('#tbl<?= $props['key'] ?> td.dtr-control, #tbl<?= $props['key'] ?> th.dtr-control').removeClass('dtr-control');
                 } else {
                     $('.btn-collapse<?= $props['key'] ?>').show();
-                    $('#tbl<?= $props['key'] ?> tr:not(.child) td:first-child, #tbl<?= $props['key'] ?> tr:not(.child) th:first-child').addClass('dtr-control');
+                    <?php if (isset($props['selectable']) && $props['selectable']): ?>
+                        $('#tbl<?= $props['key'] ?> tr:not(.child) td:nth-child(2), #tbl<?= $props['key'] ?> tr:not(.child) th:nth-child(2)').addClass('dtr-control');
+                    <?php else: ?>
+                        $('#tbl<?= $props['key'] ?> tr:not(.child) td:first-child, #tbl<?= $props['key'] ?> tr:not(.child) th:first-child').addClass('dtr-control');
+                    <?php endif; ?>
                 }
-            });
-            const $modalElement = document.getElementById('confirm-modal<?= $props['key'] ?>');
-            const modal = new Modal($modalElement);
-            $(document).on('click', '.btn-open-modal<?= $props['key'] ?>', function() {
-                this.blur();
-                const action = $(this).data('action');
-                const url = $(this).data('url');
-                const method = $(this).data('method');
-                const key = $(this).data('key');
-                $('.warning-text<?= $props['key'] ?>').text(action);
-                $('#method<?= $props['key'] ?>').val(method);
-                $('#key<?= $props['key'] ?>').val(key);
-                $('#formConfirm<?= $props['key'] ?>').attr('action', url);
-                modal.show();
-            });
-            $('.close-modal').on('click', function() {
-                modal.hide();
-            });
-            $('#filterClose<?= $props['key'] ?>').on('click', function() {
-                drawer.hide();
-            });
-            $('#tbl<?= $props['key'] ?>').on('preXhr.dt', function(e, settings, data) {
-                let filters = <?= json_encode($props['filters'], JSON_UNESCAPED_SLASHES) ?>;
-                filters.forEach(function(filter) {
-                    var selector = filter.selector || ('[name="' + filter.id + '"]');
-                    var value = $(selector).val();
-                    if (filter.input === 'select') {
-                        data[filter.id] = value;
-                    } else if (filter.input === 'text') {
-                        data[filter.id] = value?.trim() || '';
-                    } else if (filter.input === 'date') {
-                        data[filter.id] = value?.trim() || '';
-                    } else if (filter.input === 'textgroup') {
-                        var selectorGroup = filter.selector || ('[name="' + filter.group.id + '"]');
-                        var valueGroup = $(selectorGroup).val();
-                        data[filter.id] = (value?.trim() || '') + (valueGroup?.trim() || '');
-                    } else if (filter.input === 'checkbox') {
-                        data[filter.id] = $(selector).is(':checked') ? 1 : 0;
-                    }
-                });
             });
 
             $('#tbl<?= $props['key'] ?>').on('xhr.dt', function(e, settings, json, xhr) {
@@ -552,6 +756,208 @@ if (!empty($importPerm)): ?>
                 });
                 $('#tbl<?= $props['key'] ?> td.dtr-hidden input, #tbljobvacancy td.dtr-hidden [id]').remove();
             });
+            // MODAL INITIALIZATION & MASS ACTIONS
+            const $modalElement = document.getElementById('confirm-modal<?= $props['key'] ?>');
+            let modal = null;
+            
+            function getModal() {
+                 if (modal) return modal;
+                 if ($modalElement) {
+                     try {
+                          modal = new Modal($modalElement);
+                     } catch(e) { }
+                 }
+                 return modal;
+            }
+
+            $(document).on('click', '.btn-open-modal<?= $props['key'] ?>', function() {
+                modal = getModal();
+                if (!modal) return;
+                this.blur();
+                const action = $(this).data('action');
+                const url = $(this).data('url');
+                const method = $(this).data('method');
+                const key = $(this).data('key');
+                $('.warning-text<?= $props['key'] ?>').text(action);
+                $('#method<?= $props['key'] ?>').val(method);
+                $('#key<?= $props['key'] ?>').val(key);
+                $('#formConfirm<?= $props['key'] ?>').attr('action', url);
+                
+                $('#formConfirm<?= $props['key'] ?>').off('submit').on('submit', function(e) {
+                     e.preventDefault();
+                     $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: $(this).serialize(),
+                        headers: {
+                            'Authorization': 'Bearer <?= esc($props['token']) ?>',
+                             'X-Requested-With': 'XMLHttpRequest'
+                        },
+                         success: function(response) {
+                            if(modal) modal.hide();
+                            if (response.status == 'Success' || response.status == 200) {
+                                showAlert(response.message || 'Action successful', 'success');
+                                table.<?= $props['key'] ?>.ajax.reload(null, false);
+                            } else {
+                                showAlert(response.message || 'Error occurred', 'danger');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            if(modal) modal.hide();
+                             showAlert('Server error occurred', 'danger');
+                        }
+                     });
+                });
+                modal.show();
+            });
+
+             $(document).on('click', '.btn-mass-action<?= $props['key'] ?>', function() {
+                var actionUrl = $(this).data('url');
+                var actionName = $(this).data('action-name');
+                
+                var idsList = Array.from(selectedIds<?= $props['key'] ?>);
+                if (idsList.length === 0) {
+                    showAlert('Please select at least one item.', 'danger');
+                    return;
+                }
+
+                if (actionName === 'process') {
+                    let btnApproveLabel = 'Process';
+                    let btnApproveAction = 'mass-process';
+                    let key = '<?= $props['key'] ?>';
+                    if (key === 'process') {
+                        btnApproveLabel = 'Approve';
+                        btnApproveAction = 'mass-approve';
+                    }
+
+                    $('#btn-decision-approve<?= $props['key'] ?>').html('<iconify-icon icon="mingcute:check-line" class="mr-2"></iconify-icon> ' + btnApproveLabel);
+                     $('#decision-count<?= $props['key'] ?>').text(idsList.length);
+                     const $decisionModalEl = document.getElementById('decision-modal<?= $props['key'] ?>');
+                     if ($decisionModalEl) {
+                         const decisionModal = new Modal($decisionModalEl);
+                         decisionModal.show();
+                         
+                         $('#btn-decision-approve<?= $props['key'] ?>').off('click').on('click', function() {
+                             decisionModal.hide();
+                             let url = actionUrl;
+                             if (actionUrl.includes('mass-process')) {
+                                 url = actionUrl.replace('mass-process', btnApproveAction);
+                             } else {
+                                 url = '<?= base_url("back-end/applicant") ?>/' + btnApproveAction;
+                             }
+                             performMassAction(idsList, url, btnApproveLabel); 
+                         });
+                         
+                         $('#btn-decision-reject<?= $props['key'] ?>').off('click').on('click', function() {
+                             decisionModal.hide();
+                             let url = actionUrl.replace('mass-process', 'mass-reject');
+                             if(actionUrl === url) { 
+                                 url = '<?= base_url("back-end/applicant/mass-reject") ?>';
+                             }
+                             performMassAction(idsList, url, 'Reject'); 
+                         });
+                     } else {
+                        console.error('Decision modal element not found for key: <?= $props['key'] ?>');
+                     }
+                } else {
+                    performMassAction(idsList, actionUrl, actionName);
+                }
+            });
+
+            function performMassAction(ids, url, action) {
+                modal = getModal(); 
+                if(!modal) {
+                     console.error("Modal initialization failed in performMassAction");
+                     return;
+                }
+                
+                $('.warning-text<?= $props['key'] ?>').text("Are you sure you want to " + action + " " + ids.length + " items?");
+                
+                $('#formConfirm<?= $props['key'] ?>').off('submit').on('submit', function(e) {
+                     e.preventDefault();
+                     $.ajax({
+                        url: url,
+                        method: 'POST', 
+                        data: {
+                            ids: ids,
+                            key: '<?= $props['key'] ?>',
+                            _method: 'PUT', 
+                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                        },
+                        headers: {
+                            'Authorization': 'Bearer <?= esc($props['token']) ?>',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                         success: function(response) {
+                             console.log('=== MASS ACTION RESPONSE ===');
+                             console.log('URL:', url);
+                             console.log('Action:', action);
+                             console.log('Response:', response);
+                             console.log('Response Type:', typeof response);
+                             console.log('Response Status:', response.status);
+                             console.log('Response Message:', response.message);
+                             console.log('============================');
+                             
+                             if(modal) modal.hide();
+                            if (response.status == 'Success' || response.status == 'success' || response.status == 200) {
+                                showAlert(response.message || 'Mass action successful', 'success');
+                                table.<?= $props['key'] ?>.ajax.reload();
+                                selectedIds<?= $props['key'] ?>.clear(); 
+                                $('#selectAll<?= $props['key'] ?>').prop('checked', false);
+                            } else {
+                                // Enhanced error message with full details
+                                let errorMsg = response.message || 'Error occurred';
+                                if (!response.message) {
+                                    errorMsg += ' [No message from server] ';
+                                    errorMsg += 'Status: ' + (response.status || 'undefined') + ' ';
+                                    errorMsg += 'Full Response: ' + JSON.stringify(response);
+                                }
+                                console.error('Mass action failed with response:', response);
+                                showAlert(errorMsg, 'danger');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                             console.error('=== MASS ACTION ERROR ===');
+                             console.error('URL:', url);
+                             console.error('Status Code:', xhr.status);
+                             console.error('Status Text:', xhr.statusText);
+                             console.error('Response Text:', xhr.responseText);
+                             console.error('Error:', error);
+                             console.error('XHR Object:', xhr);
+                             console.error('========================');
+                             
+                             if(modal) modal.hide();
+                             
+                             let errorMsg = 'Server error occurred';
+                             
+                             // Try to parse JSON error response
+                             try {
+                                 let jsonResponse = JSON.parse(xhr.responseText);
+                                 console.log('Parsed JSON Error:', jsonResponse);
+                                 errorMsg = jsonResponse.message || jsonResponse.error || errorMsg;
+                             } catch(e) {
+                                 // Not JSON, show raw response
+                                 if (xhr.responseText && xhr.responseText.length < 500) {
+                                     errorMsg += ': ' + xhr.responseText;
+                                 } else {
+                                     errorMsg += ' (HTTP ' + xhr.status + ' - ' + xhr.statusText + ')';
+                                 }
+                             }
+                             
+                             showAlert(errorMsg, 'danger');
+                         }
+                     });
+                });
+                
+                modal.show();
+            }
+
+            $('.close-modal').on('click', function() {
+                if(modal) modal.hide();
+            });
+             $(document).on('click', '.btn-open-modal<?= $props['key'] ?>', function() {
+                $('#formConfirm<?= $props['key'] ?>').off('submit'); 
+             });
         });
 
         function showProcess(show) {

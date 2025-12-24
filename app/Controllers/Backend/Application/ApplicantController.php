@@ -61,8 +61,10 @@ class ApplicantController extends BaseController
                 [
                     'key' => 'new',
                     'label' => 'New',
+                    'icon' => 'mingcute:new-folder-line',
                     'datatable'  => [
                         'key' => 'new',
+                        'selectable' => true,
                         'api' => $this->configApp->baseBackendURL . '/api/applicant/data-table-new',
                         'fixedcolumns' => 0,
                         'token' => $token,
@@ -87,8 +89,10 @@ class ApplicantController extends BaseController
                 [
                     'key' => 'process',
                     'label' => 'Process',
+                    'icon' => 'mingcute:refresh-2-line',
                     'datatable'  => [
                         'key' => 'process',
+                        'selectable' => true,
                         'api' => $this->configApp->baseBackendURL . '/api/applicant/data-table-processed',
                         'fixedcolumns' => 0,
                         'token' => $token,
@@ -113,8 +117,10 @@ class ApplicantController extends BaseController
                 [
                     'key' => 'approved',
                     'label' => 'Approved',
+                    'icon' => 'mingcute:check-circle-line',
                     'datatable'  => [
                         'key' => 'approved',
+                        'selectable' => true,
                         'api' => $this->configApp->baseBackendURL . '/api/applicant/data-table-approved',
                         'fixedcolumns' => 0,
                         'token' => $token,
@@ -139,8 +145,10 @@ class ApplicantController extends BaseController
                 [
                     'key' => 'rejected',
                     'label' => 'Rejected',
+                    'icon' => 'mingcute:close-circle-line',
                     'datatable'  => [
                         'key' => 'rejected',
+                        'selectable' => true,
                         'api' => $this->configApp->baseBackendURL . '/api/applicant/data-table-rejected',
                         'fixedcolumns' => 0,
                         'token' => $token,
@@ -325,17 +333,79 @@ class ApplicantController extends BaseController
     public function process($id = null)
     {
         $data = $this->request->getPost();
+        
+        $result = $this->processItem($id, $data);
+
+        if ($this->request->isAJAX()) {
+             if ($result === true) {
+                 return $this->response->setJSON(['status' => 'Success', 'message' => 'Applicant Process successfully']);
+             }
+             return $this->response->setJSON(['status' => 'Error', 'message' => (is_array($result) ? implode(', ', $result) : $result)]);
+        }
+
+        if ($result !== true) {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $result);
+        }
+
+        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Process successfully');
+    }
+
+    public function massProcess()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected'
+            ]);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            $data = ['key' => $key]; 
+            $result = $this->processItem($id, $data);
+            if ($result === true) {
+                $successCount++;
+            } else {
+                $errors[] = "ID $id: " . (is_array($result) ? json_encode($result) : $result);
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items processed successfully.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed.";
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to process items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    private function processItem($id, $contextData)
+    {
+        $data = $contextData;
         $data['status'] = 2;
         $data['id'] = $id;
-        
+
         $item = $this->model->find($id);
 
         if (!$item) {
-            return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', "Applicant with ID $id not found");
+            return "Applicant with ID $id not found";
         }
 
         if (!$this->model->update($id, $data)) {
-            return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->model->errors());
+            return $this->model->errors();
         }
 
         $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
@@ -344,10 +414,10 @@ class ApplicantController extends BaseController
             $dataJobVacancy->applicant_process = $dataJobVacancy->applicant_process + 1;
             
             if (!$this->modelJobVacancy->update($item->job_vacancy_id, $dataJobVacancy)) {
-                return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->modelJobVacancy->errors());
+                return $this->modelJobVacancy->errors();
             }
         }
-        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Process successfully');
+        return true;
     }
 
     /**
@@ -356,10 +426,78 @@ class ApplicantController extends BaseController
      */
     public function approve($id = null)
     {
-        $data = $this->request->getPost();
+        $data = $this->request->getVar();
+        $result = $this->approveItem($id, $data);
+
+        if ($this->request->isAJAX()) {
+             if ($result === true) {
+                 return $this->response->setJSON(['status' => 'Success', 'message' => 'Applicant Approve successfully']);
+             }
+             return $this->response->setJSON(['status' => 'Error', 'message' => (is_array($result) ? implode(', ', $result) : $result)]);
+        }
+
+        if ($result !== true) {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'] ?? 'process')->with('error-backend', $result);
+        }
+
+        return redirect()->to('/back-end/applicant')->with('key', $data['key'] ?? 'approved')->with('message-backend', 'Applicant Approve successfully');
+    }
+
+    public function massApprove()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected'
+            ]);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            $data = ['key' => $key]; // Context data if needed
+            $result = $this->approveItem($id, $data);
+            if ($result === true) {
+                $successCount++;
+            } else {
+                $errors[] = "ID $id: " . (is_array($result) ? json_encode($result) : $result);
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items approved successfully.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to approve items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    private function approveItem($id, $contextData) 
+    {
+        $data = $contextData; // Use context data from request if needed, or minimal
+        // But the original code merged request->getPost() with status=1.
+        // We should replicate that or just accept what we need.
+        // The important part is logic inside.
+        
+        // We reconstruct $data as in the original method
         $data['status'] = 1;
         $data['id'] = $id;
+
         $item = $this->model->find($id);
+        if (!$item) return "Item not found";
 
         $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
 
@@ -371,46 +509,48 @@ class ApplicantController extends BaseController
                 {
                     $dataJobVacancy->male_quota_used = $dataJobVacancy->male_quota_used + 1;
                 }
-                else if($dataJobVacancy->unisex_quota_used < $dataJobVacancy->unisex_quota_used && $dataJobVacancy->unisex_quota_used > 0)
+                else if($dataJobVacancy->unisex_quota_used < $dataJobVacancy->unisex_quota && $dataJobVacancy->unisex_quota > 0)
                 {
                     $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used + 1;
                 }
                 else{
-                    return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', 'Quota Full !!');
+                    return 'Quota Full !!';
                 }
             }
             else if($item->gender == 'F'){
-                if($dataJobVacancy->female_quota_used < $dataJobVacancy->female_quota && $dataJobVacancy->female_quota_used > 0)
+                if($dataJobVacancy->female_quota_used < $dataJobVacancy->female_quota && $dataJobVacancy->female_quota > 0)
                 {
                     $dataJobVacancy->female_quota_used = $dataJobVacancy->female_quota_used + 1;
                 }
-                else if($dataJobVacancy->unisex_quota_used < $dataJobVacancy->unisex_quota_used && $dataJobVacancy->unisex_quota_used > 0)
+                else if($dataJobVacancy->unisex_quota_used < $dataJobVacancy->unisex_quota && $dataJobVacancy->unisex_quota > 0)
                 {
                     $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used + 1;
                 }
                 else{
-                    return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', 'Quota Full !!');
+                    return 'Quota Full !!';
                 }
             }
             
             if (!$this->modelJobVacancy->update($item->job_vacancy_id, $dataJobVacancy)) {
-                return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->modelJobVacancy->errors());
+                return $this->modelJobVacancy->errors();
             }
         }
         
         if (!$this->model->update($id, $data)) {
-            return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->model->errors());
+            return $this->model->errors();
         }
-
-        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Approve successfully');
+        
+        return true;
     }
 
-    public function reject($id = null)
+    private function rejectItem($id, $contextData)
     {
-        $data = $this->request->getPost();
+        $data = $contextData;
         $data['status'] = -1;
         $data['id'] = $id;
+
         $item = $this->model->find($id);
+        if (!$item) return "Item not found";
 
         $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
 
@@ -425,68 +565,211 @@ class ApplicantController extends BaseController
             if($item->status > 0)
             {
                 if (!$this->modelJobVacancy->update($item->job_vacancy_id, $dataJobVacancy)) {
-                    return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->modelJobVacancy->errors());
+                    return $this->modelJobVacancy->errors();
                 }
             }
         }
         
         if (!$this->model->update($id, $data)) {
-            return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->model->errors());
+            return $this->model->errors();
+        }
+        
+        return true;
+    }
+
+    public function reject($id = null)
+    {
+        $data = $this->request->getPost();
+        
+        $result = $this->rejectItem($id, $data);
+
+        if ($this->request->isAJAX()) {
+             if ($result === true) {
+                 return $this->response->setJSON(['status' => 'Success', 'message' => 'Applicant Reject successfully']);
+             }
+             return $this->response->setJSON(['status' => 'Error', 'message' => (is_array($result) ? implode(', ', $result) : $result)]);
         }
 
-        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Reject successfully');
+        if ($result === true) {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Reject successfully');
+        } else {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', is_array($result) ? implode(', ', $result) : $result);
+        }
+    }
+
+    public function massReject()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected'
+            ]);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            $data = ['key' => $key];
+            $result = $this->rejectItem($id, $data);
+            if ($result === true) {
+                $successCount++;
+            } else {
+                $errors[] = "ID $id: " . (is_array($result) ? json_encode($result) : $result);
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items rejected successfully.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to reject items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    private function revertItem($id, $contextData)
+    {
+        try {
+            $data = $contextData;
+            $data['status'] = 0;
+            $data['id'] = $id;
+            
+            $item = $this->model->find($id);
+            if (!$item) return "Applicant ID $id not found";
+
+            if (!$this->model->update($id, $data)) {
+                return $this->model->errors();
+            }
+
+            if (!empty($item->job_vacancy_id)) {
+                $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
+
+                if (!empty($dataJobVacancy)) {
+                    $needUpdate = false;
+
+                    if($item->status == 2){
+                        // Reverting from Process: Decrement process count
+                        $dataJobVacancy->applicant_process = $dataJobVacancy->applicant_process - 1;
+                        $needUpdate = true;
+                    }
+                    else if($item->status == 1){
+                        // Reverting from Approved: Decrement quota and process count?
+                        // Note: approveItem decrements process and increments quota.
+                        // So revertItem should decrement quota and ... increment process?
+                        // No, revertItem status=0 (New). New items don't count in process or quota.
+                        // So we just decrement quota.
+                        // Wait, approveItem decremented applicant_process.
+                        // If we revert to 0, we imply it was never processed.
+                        // So we just restore quota.
+                        
+                       if($item->gender == 'M'){
+                           if($dataJobVacancy->male_quota_used > 0) {
+                               $dataJobVacancy->male_quota_used = $dataJobVacancy->male_quota_used - 1;
+                               $needUpdate = true;
+                           } else if($dataJobVacancy->unisex_quota_used > 0) {
+                               $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used - 1;
+                               $needUpdate = true;
+                           } else {
+                               return 'Quota Used Not Found !!';
+                           }
+                       }
+                       else if($item->gender == 'F'){
+                          if($dataJobVacancy->female_quota_used > 0) {
+                               $dataJobVacancy->female_quota_used = $dataJobVacancy->female_quota_used - 1;
+                               $needUpdate = true;
+                           } else if($dataJobVacancy->unisex_quota_used > 0) {
+                               $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used - 1;
+                               $needUpdate = true;
+                           } else {
+                               return 'Quota Used Not Found !!';
+                           }
+                       }
+                    }
+                    
+                    if ($needUpdate) {
+                        if (!$this->modelJobVacancy->update($item->job_vacancy_id, $dataJobVacancy)) {
+                            return $this->modelJobVacancy->errors();
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch (\Throwable $th) {
+            return "Exception: " . $th->getMessage();
+        }
     }
 
     public function revert($id = null)
     {
         $data = $this->request->getPost();
-        $data['status'] = 0;
-        $data['id'] = $id;
-        $item = $this->model->find($id);
+        
+        $result = $this->revertItem($id, $data);
 
-        if (!$this->model->update($id, $data)) {
-            return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->model->errors());
+        if ($this->request->isAJAX()) {
+             if ($result === true) {
+                 return $this->response->setJSON(['status' => 'Success', 'message' => 'Applicant Revert successfully']);
+             }
+             return $this->response->setJSON(['status' => 'Error', 'message' => (is_array($result) ? implode(', ', $result) : $result)]);
         }
 
-        $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
+        if ($result === true) {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Revert successfully');
+        } else {
+             return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', is_array($result) ? implode(', ', $result) : $result);
+        }
+    }
 
-        if (!empty($dataJobVacancy)) {
-            if($item->status == 2){
-                $dataJobVacancy->applicant_process = $dataJobVacancy->applicant_process - 1;
-            }
-            else if($item->status == 1){
-                if($item->gender == 'M'){
-                    if($dataJobVacancy->male_quota_used > 0)
-                    {
-                        $dataJobVacancy->male_quota_used = $dataJobVacancy->male_quota_used - 1;
-                    }
-                    else if($dataJobVacancy->unisex_quota_used > 0)
-                    {
-                        $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used - 1;
-                    }
-                    else{
-                        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', 'Quota Used Not Found !!');
-                    }
-                }
-                else if($item->gender == 'F'){
-                    if($dataJobVacancy->female_quota_used > 0)
-                    {
-                        $dataJobVacancy->female_quota_used = $dataJobVacancy->female_quota_used - 1;
-                    }
-                    else if($dataJobVacancy->unisex_quota_used > 0)
-                    {
-                        $dataJobVacancy->unisex_quota_used = $dataJobVacancy->unisex_quota_used - 1;
-                    }
-                    else{
-                        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', 'Quota Used Not Found !!');
-                    }
-                }
-            }
-            
-            if (!$this->modelJobVacancy->update($item->job_vacancy_id, $dataJobVacancy)) {
-                return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('error-backend', $this->modelJobVacancy->errors());
+    public function massRevert()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected'
+            ]);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            $data = ['key' => $key];
+            $result = $this->revertItem($id, $data);
+            if ($result === true) {
+                $successCount++;
+            } else {
+                $errors[] = "ID $id: " . (is_array($result) ? json_encode($result) : $result);
             }
         }
-        return redirect()->to('/back-end/applicant')->with('key', $data['key'])->with('message-backend', 'Applicant Revert successfully');
+
+        if ($successCount > 0) {
+            $msg = "$successCount items reverted successfully.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to revert items. ' . implode(', ', $errors)
+            ]);
+        }
     }
 }

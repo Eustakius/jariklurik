@@ -162,9 +162,9 @@ class JobSeekerModel extends Model
         return $builder;
     }
 
-    public function countFiltered(?string $search = null): int
+    public function countFiltered(?string $search = null, $filter = null): int
     {
-        return $this->getDataTableQuery($search)->countAllResults();
+        return $this->getDataTableQuery($search, null, null, null, null, $filter)->countAllResults();
     }
 
     public function getData(?string $search = null, ?array $order = null, ?array $columns = null, ?int $start = null, ?int $length = null, $filter = null)

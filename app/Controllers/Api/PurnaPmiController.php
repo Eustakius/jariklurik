@@ -35,11 +35,12 @@ class PurnaPmiController extends BaseController
             'education_level =' => $request->getVar('educationlevelnew'),
             'created_at >=' => $request->getVar('submitfromnew'),
             'created_at <=' => $request->getVar('submittonew'),
+            'purna_pmi.status =' => 0,
         ];
 
-        $data            = $this->model->where('purna_pmi.status', 0)->getData($search, $order, $columns, $start, $length, $filter);
-        $recordsFiltered = $this->model->where('purna_pmi.status', 0)->countFiltered($search);
-        $recordsTotal    = $this->model->where('purna_pmi.status', 0)->countAll();
+        $data            = $this->model->getData($search, $order, $columns, $start, $length, $filter);
+        $recordsFiltered = $this->model->countFiltered($search, $filter);
+        $recordsTotal    = $this->model->getDataTableQuery(null, null, null, null, null, ['purna_pmi.status =' => 0])->countAllResults();
         $formatted = array_map(fn($item) => $item->formatDataTableModel(), $data);
 
         return $this->response->setJSON([
@@ -66,10 +67,11 @@ class PurnaPmiController extends BaseController
             'education_level =' => $request->getVar('educationlevelapproved'),
             'created_at >=' => $request->getVar('submitfromapproved'),
             'created_at <=' => $request->getVar('submittoapproved'),
+            'purna_pmi.status =' => 1,
         ];
-        $data            = $this->model->where('purna_pmi.status', 1)->getData($search, $order, $columns, $start, $length, $filter);
-        $recordsFiltered = $this->model->where('purna_pmi.status', 1)->countFiltered($search);
-        $recordsTotal    = $this->model->where('purna_pmi.status', 1)->countAll();
+        $data            = $this->model->getData($search, $order, $columns, $start, $length, $filter);
+        $recordsFiltered = $this->model->countFiltered($search, $filter);
+        $recordsTotal    = $this->model->getDataTableQuery(null, null, null, null, null, ['purna_pmi.status =' => 1])->countAllResults();
         $formatted = array_map(fn($item) => $item->formatDataTableModel(), $data);
 
         return $this->response->setJSON([
@@ -96,10 +98,11 @@ class PurnaPmiController extends BaseController
             'education_level =' => $request->getVar('educationlevelrejected'),
             'created_at >=' => $request->getVar('submitfromrejected'),
             'created_at <=' => $request->getVar('submittorejected'),
+            'purna_pmi.status =' => -1,
         ];
-        $data            = $this->model->where('purna_pmi.status', -1)->getData($search, $order, $columns, $start, $length, $filter);
-        $recordsFiltered = $this->model->where('purna_pmi.status', -1)->countFiltered($search);
-        $recordsTotal    = $this->model->where('purna_pmi.status', -1)->countAll();
+        $data            = $this->model->getData($search, $order, $columns, $start, $length, $filter);
+        $recordsFiltered = $this->model->countFiltered($search, $filter);
+        $recordsTotal    = $this->model->getDataTableQuery(null, null, null, null, null, ['purna_pmi.status =' => -1])->countAllResults();
         $formatted = array_map(fn($item) => $item->formatDataTableModel(), $data);
 
         return $this->response->setJSON([
@@ -179,5 +182,177 @@ class PurnaPmiController extends BaseController
             return redirect()->to('/back-end/training/purna-pmi')->with('key', $data['key'])->with('error-backend', 'Training Type Not Found !!');
         }
         return redirect()->to('/thank-you-registered')->with('message', 'Terima kasih sudah Mendaftar!');
+    }
+
+    public function massRevert()
+    {
+        $request = service('request');
+        // Handle both JSON and Form Data
+        $data = $request->getJSON(true);
+        $ids = $data['ids'] ?? $request->getVar('ids');
+        
+        // Ensure ids is an array (Handle comma separated string if any)
+        if (!empty($ids) && !is_array($ids)) {
+            // Should be array from getVar('ids') if submitted as ids[]
+            // But if submitted as ids=1,2,3
+            $ids = explode(',', $ids);
+        }
+        
+        $ids = $ids ?? [];
+
+        if (empty($ids)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+
+                $currentStatus = (int)$item->status;
+                $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+                
+                if (!empty($dataTriningType) && $currentStatus == -1) {
+                     // Only increment if coming from Rejected
+                     if($dataTriningType->quota_used < $dataTriningType->quota && $dataTriningType->quota > 0)
+                     {
+                         $dataTriningType->quota_used = $dataTriningType->quota_used + 1;
+                         $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                     }
+                     else{
+                         // Quota Full
+                         $errors[] = "Item ID $id: Training Quota Full.";
+                         continue;
+                     } 
+                }
+                
+                $this->model->update($id, ['status' => 0]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => "$successCount items reverted.",
+            'errors' => $errors
+        ]);
+    }
+
+    public function massProcess()
+    {
+        return $this->massRevert();
+    }
+
+    public function massApprove()
+    {
+        $request = service('request');
+        $data = $request->getJSON(true);
+        $ids = $data['ids'] ?? $request->getVar('ids');
+        $ids = $ids ?? [];
+
+        if (empty($ids)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+                
+                $currentStatus = (int)$item->status;
+                if ($currentStatus == -1) {
+                     $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+                     if (!empty($dataTriningType)) {
+                         if($dataTriningType->quota_used < $dataTriningType->quota && $dataTriningType->quota > 0)
+                         {
+                             $dataTriningType->quota_used = $dataTriningType->quota_used + 1;
+                             $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                         } else {
+                             $errors[] = "Item ID $id: Quota Full.";
+                             continue;
+                         }
+                     }
+                }
+
+                $this->model->update($id, ['status' => 1]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => "$successCount items approved.",
+            'errors' => $errors
+        ]);
+    }
+
+    public function massReject()
+    {
+        $request = service('request');
+        $data = $request->getJSON(true);
+        $ids = $data['ids'] ?? $request->getVar('ids');
+        $ids = $ids ?? [];
+
+        if (empty($ids)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+
+                $currentStatus = (int)$item->status;
+                if ($currentStatus == 0 || $currentStatus == 1) {
+                     $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+                     if (!empty($dataTriningType) && $dataTriningType->quota_used > 0) {
+                         $dataTriningType->quota_used = $dataTriningType->quota_used - 1;
+                         $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                     }
+                }
+
+                $this->model->update($id, ['status' => -1]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => "$successCount items rejected.",
+            'errors' => $errors
+        ]);
     }
 }

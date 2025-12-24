@@ -1,9 +1,6 @@
 <?= $this->extend($config->viewLayout) ?>
 <?= $this->section('main') ?>
 
-<!-- <script>
-    var table = {};
-</script> -->
 <div class="dashboard-main-body">
     <?= view('Backend/Partial/page-header', ['title' => getTitleFromUri([2, 3])]) ?>
     <div class="grid grid-cols-12">
@@ -20,10 +17,37 @@
                     </ul>
                 </div>
                 <div class="card-body relative ">
-                    <div id="card-title-tab-content" class="hidden">
+                    <div id="card-title-tab-content">
                         <?php foreach ($tabs as $tab): ?>
-                            <div id="<?= $tab['key'] ?>" role="tabpanel" aria-labelledby="<?= $tab['key'] ?>-tab">
-                                <?= view('Backend/Partial/table/table', ['title' => getTitleFromUri([2, 3]), 'props' => $tab['datatable']]) ?>
+                            <div class="<?= (session('key') == $tab['key'] || (!session('key') && $tab['key'] === 'new')) ? 'animate-fade-in-up' : 'hidden' ?>" id="<?= $tab['key'] ?>" role="tabpanel" aria-labelledby="<?= $tab['key'] ?>-tab">
+                                <?= view('Backend/Partial/table/table', [
+                                    'title' => getTitleFromUri([2, 3]), 
+                                    'props' => $tab['datatable'],
+                                    'mas_actions' => match ($tab['key']) {
+                                        'new' => [
+                                            'process' => [
+                                                'label' => 'Mass Process',
+                                                'type' => 'primary',
+                                                'url' => '/back-end/training/purna-pmi/mass-process' 
+                                            ]
+                                        ],
+                                        'approved' => [
+                                            'revert' => [
+                                                'label' => 'Mass Revert',
+                                                'type' => 'danger',
+                                                'url' => '/back-end/training/purna-pmi/mass-revert' 
+                                            ]
+                                        ],
+                                        'rejected' => [
+                                            'process' => [
+                                                'label' => 'Mass Process',
+                                                'type' => 'primary',
+                                                'url' => '/back-end/training/purna-pmi/mass-process' 
+                                            ]
+                                        ],
+                                        default => []
+                                    }
+                                ]) ?>
                             </div>
                         <?php endforeach ?>
                     </div>

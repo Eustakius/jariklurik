@@ -53,7 +53,17 @@ class PermissionFilter extends BaseFilter implements FilterInterface
         } else if ($method === 'post') { 
             if ($resource == 'import') {
                 return implode('.', array_slice($segments, 0, -1)) . '.import';
-            } 
+            } else if ($resource === 'mass-process') {
+                return implode('.', array_slice($segments, 0, -1)) . '.approve';
+            } else if ($resource === 'mass-approve') {
+                return implode('.', array_slice($segments, 0, -1)) . '.approve';
+            } else if ($resource === 'mass-reject') {
+                return implode('.', array_slice($segments, 0, -1)) . '.reject';
+            } else if ($resource === 'mass-revert') {
+                return implode('.', array_slice($segments, 0, -1)) . '.revert';
+            } else if ($resource === 'mass-delete') {
+                return implode('.', array_slice($segments, 0, -1)) . '.delete';
+            }
             return $prefix . '.create';
         } else if (in_array($method, ['put', 'patch'])) {
              if ($resource == 'approve') {
@@ -64,6 +74,14 @@ class PermissionFilter extends BaseFilter implements FilterInterface
                 return implode('.', array_slice($segments, 0, -2)) . '.reject';
             } else if ($resource == 'revert') {
                 return implode('.', array_slice($segments, 0, -2)) . '.revert';
+            } else if ($resource === 'mass-process') {
+                return implode('.', array_slice($segments, 0, -1)) . '.approve';
+            } else if ($resource === 'mass-approve') {
+                return implode('.', array_slice($segments, 0, -1)) . '.approve';
+            } else if ($resource === 'mass-reject') {
+                return implode('.', array_slice($segments, 0, -1)) . '.reject';
+            } else if ($resource === 'mass-revert') {
+                return implode('.', array_slice($segments, 0, -1)) . '.revert';
             }
             return implode('.', array_slice($segments, 0, -1)) . '.update';
         }

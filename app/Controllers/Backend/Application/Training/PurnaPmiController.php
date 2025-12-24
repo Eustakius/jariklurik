@@ -67,6 +67,7 @@ class PurnaPmiController extends BaseController
                         'fixedcolumns' => 0,
                         'token' => $token,
                         'files' => $files,
+                        'selectable' => true,
                         'columns' => datatableColumns($columns),
                         'permission' => array_filter($permission, fn($p) => str_ends_with($p['permission'], '.approve') || str_ends_with($p['permission'], '.reject')),
                         'filters' => [
@@ -90,6 +91,7 @@ class PurnaPmiController extends BaseController
                         'fixedcolumns' => 0,
                         'token' => $token,
                         'files' => $files,
+                        'selectable' => true,
                         'columns' => datatableColumns($columns),
                         'permission' => array_filter($permission, fn($p) => str_ends_with($p['permission'], '.revert')),
                         'filters' => [
@@ -113,6 +115,7 @@ class PurnaPmiController extends BaseController
                         'fixedcolumns' => 0,
                         'token' => $token,
                         'files' => $files,
+                        'selectable' => true,
                         'columns' => datatableColumns($columns),
                         'permission' => array_filter($permission, fn($p) => str_ends_with($p['permission'], '.revert')),'filters' => [
                             ['label' => 'Gender', 'id' => 'genderrejected', 'input' => 'select', 'data' => [
@@ -356,5 +359,190 @@ class PurnaPmiController extends BaseController
         }
 
         return redirect()->to('/back-end/training/purna-pmi')->with('key', $data['key'])->with('message-backend', 'Job Seeker Revert successfully');
+    }
+
+    public function massApprove()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+                
+                $currentStatus = (int)$item->status;
+                if ($currentStatus == -1) {
+                     $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+                     if (!empty($dataTriningType)) {
+                         if($dataTriningType->quota_used < $dataTriningType->quota && $dataTriningType->quota > 0)
+                         {
+                             $dataTriningType->quota_used = $dataTriningType->quota_used + 1;
+                             $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                         } else {
+                             $errors[] = "Item ID $id: Quota Full.";
+                             continue;
+                         }
+                     }
+                }
+
+                $this->model->update($id, ['status' => 1]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items approved.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to approve items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    public function massReject()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+
+                $currentStatus = (int)$item->status;
+                if ($currentStatus == 0 || $currentStatus == 1) {
+                     $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+                     if (!empty($dataTriningType) && $dataTriningType->quota_used > 0) {
+                         $dataTriningType->quota_used = $dataTriningType->quota_used - 1;
+                         $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                     }
+                }
+
+                $this->model->update($id, ['status' => -1]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items rejected.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to reject items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    public function massRevert()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                    continue;
+                }
+
+                $currentStatus = (int)$item->status;
+                $dataTriningType = $this->modelTriningType->where('id', $item->training_type_id)->first();
+
+                if (!empty($dataTriningType) && $currentStatus == -1) {
+                     if($dataTriningType->quota_used < $dataTriningType->quota && $dataTriningType->quota > 0)
+                     {
+                         $dataTriningType->quota_used = $dataTriningType->quota_used + 1;
+                         $this->modelTriningType->update($item->training_type_id, $dataTriningType);
+                     }
+                     else{
+                         $errors[] = "Item ID $id: Quota Full.";
+                         continue;
+                     } 
+                }
+                
+                $this->model->update($id, ['status' => 0]);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items reverted.";
+            if (count($errors) > 0) {
+                $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to revert items. ' . implode(', ', $errors)
+            ]);
+        }
+    }
+
+    public function massProcess()
+    {
+        return $this->massRevert();
     }
 }

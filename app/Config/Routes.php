@@ -36,6 +36,10 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     $routes->get('job-vacancy/template-import', 'Backend\Application\JobVacancyController::templateImport', ['filter' => 'permission']);
     $routes->post('job-vacancy/import', 'Backend\Application\JobVacancyController::import', ['filter' => 'permission']);
     $routes->resource('job-vacancy', ['controller' => 'Backend\Application\JobVacancyController', 'filter' => 'permission']);
+    $routes->put('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
+    $routes->put('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
+    $routes->put('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
+    $routes->put('applicant/mass-revert', 'Backend\Application\ApplicantController::massRevert', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/process', 'Backend\Application\ApplicantController::process/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/approve', 'Backend\Application\ApplicantController::approve/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/reject', 'Backend\Application\ApplicantController::reject/$1', ['filter' => 'permission']);
@@ -43,14 +47,29 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
 
     $routes->resource('applicant', ['controller' => 'Backend\Application\ApplicantController', 'filter' => 'permission']);
     $routes->group('training', static function ($routes) {
+        // Job Seeker Mass Actions
+        $routes->put('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
+        $routes->put('job-seekers/mass-process', 'Backend\Application\Training\JobSeekerController::massProcess', ['filter' => 'permission']);
+        $routes->put('job-seekers/mass-reject', 'Backend\Application\Training\JobSeekerController::massReject', ['filter' => 'permission']);
+        $routes->put('job-seekers/mass-revert', 'Backend\Application\Training\JobSeekerController::massRevert', ['filter' => 'permission']);
+        
         $routes->put('job-seekers/(:segment)/approve', 'Backend\Application\Training\JobSeekerController::approve/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/reject', 'Backend\Application\Training\JobSeekerController::reject/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/revert', 'Backend\Application\Training\JobSeekerController::revert/$1', ['filter' => 'permission']);
         $routes->resource('job-seekers', ['controller' => 'Backend\Application\Training\JobSeekerController', 'filter' => 'permission']);
+        
+        // Purna PMI Mass Actions
+        $routes->put('purna-pmi/mass-approve', 'Backend\Application\Training\PurnaPmiController::massApprove', ['filter' => 'permission']);
+        $routes->put('purna-pmi/mass-process', 'Backend\Application\Training\PurnaPmiController::massProcess', ['filter' => 'permission']);
+        $routes->put('purna-pmi/mass-reject', 'Backend\Application\Training\PurnaPmiController::massReject', ['filter' => 'permission']);
+        $routes->put('purna-pmi/mass-revert', 'Backend\Application\Training\PurnaPmiController::massRevert', ['filter' => 'permission']);
+
         $routes->put('purna-pmi/(:segment)/approve', 'Backend\Application\Training\PurnaPmiController::approve/$1', ['filter' => 'permission']);
         $routes->put('purna-pmi/(:segment)/reject', 'Backend\Application\Training\PurnaPmiController::reject/$1', ['filter' => 'permission']);
         $routes->put('purna-pmi/(:segment)/revert', 'Backend\Application\Training\PurnaPmiController::revert/$1', ['filter' => 'permission']);
         $routes->resource('purna-pmi', ['controller' => 'Backend\Application\Training\PurnaPmiController', 'filter' => 'permission']);
+        
+        $routes->put('training-type/mass-delete', 'Backend\Application\Training\TrainingTypeController::massDelete', ['filter' => 'permission']);
         $routes->resource('training-type', ['controller' => 'Backend\Application\Training\TrainingTypeController', 'filter' => 'permission']);
     });
     $routes->group('api', ['filter' => 'jwt'], function ($routes) {

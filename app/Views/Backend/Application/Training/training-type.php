@@ -13,7 +13,18 @@
             <h6 class="card-title mb-0 text-lg">List</h6>
             </div>
             <div class="card-body relative ">
-                <?= view('Backend/Partial/table/table', ['title' => getTitleFromUri([2,3]), 'props' => $datatable]) ?>
+                <?= view('Backend/Partial/table/table', [
+                    'title' => getTitleFromUri([2,3]), 
+                    'props' => $datatable,
+                    'mas_actions' => [
+                        'delete' => [
+                            'label' => 'Mass Delete',
+                            'type' => 'danger',
+                            'url' => '/back-end/training/training-type/mass-delete',
+                            'confirm' => true
+                        ]
+                    ]
+                ]) ?>
             </div>
         </div>
         </div>

@@ -77,4 +77,50 @@ class TrainingTypeController extends BaseController
             'pagination' => ['more' => ($page * $perPage) < $total]
         ]);
     }
+
+    public function massDelete()
+    {
+        $request = service('request');
+        // Handle both JSON and Form Data
+        $data = $request->getJSON(true);
+        $ids = $data['ids'] ?? $request->getVar('ids');
+        $ids = $ids ?? [];
+
+        if (empty($ids)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+        $model = new TrainingTypeModel();
+
+        foreach ($ids as $id) {
+            try {
+                $item = $model->find($id);
+                if (!$item) {
+                    continue;
+                }
+                
+                if ($item->quota_used > 0) {
+                     $errors[] = "Item '{$item->name}': Cannot delete because it has {$item->quota_used} active applicants.";
+                     continue;
+                }
+
+                $model->delete($id);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => "$successCount items deleted.",
+            'errors' => $errors
+        ]);
+    }
 }

@@ -47,6 +47,7 @@ class TrainingTypeController extends BaseController
                 'api' => $this->configApp->baseBackendURL . '/api/training-type/data-table',
                 'fixedcolumns' => 0,
                 'token' => $token,
+                'selectable' => true,
                 'columns' => datatableColumns($columns),
                 'permission' => $permission,
                 'filters' => [
@@ -207,5 +208,56 @@ class TrainingTypeController extends BaseController
             ],
             'path' => $this->request->getPath(),
         ]);
+    }
+    public function massDelete()
+    {
+        $ids = $this->request->getVar('ids');
+        $key = $this->request->getVar('key');
+
+        if (empty($ids) || !is_array($ids)) {
+            return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No items selected.'
+            ])->setStatusCode(400);
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $item = $this->model->find($id);
+                if (!$item) {
+                     continue;
+                }
+
+                if ($item->quota_used > 0) {
+                     $errors[] = "Item ID $id: Cannot delete because Quota Used > 0 (Used: " . $item->quota_used . ")";
+                     continue;
+                }
+
+                $this->model->delete($id);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $errors[] = "Item ID $id: " . $e->getMessage();
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "$successCount items deleted successfully.";
+            if (count($errors) > 0) {
+                 $msg .= " " . count($errors) . " failed. Details: " . implode(', ', $errors);
+            }
+            return $this->response->setJSON([
+                'status' => 'Success',
+                'message' => $msg
+            ]); 
+        } else {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Failed to delete items. ' . implode(', ', $errors)
+            ]);
+        }
     }
 }
