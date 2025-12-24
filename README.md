@@ -217,7 +217,7 @@ Masalah **CORS**. Domain di browser beda sama domain di config aplikasi.
 
 ## 📝 CHANGELOG - Recent Updates
 
-### 🎯 December 24, 2024 - Mass Action System Overhaul
+### 🎯 December 24, 2025 - Mass Action System Overhaul
 
 **✨ Fitur Baru & Perbaikan Besar:**
 
