@@ -212,3 +212,86 @@ Masalah **CORS**. Domain di browser beda sama domain di config aplikasi.
 3.  Pastikan isinya SAMA PERSIS dengan link di browser.
     *   Kalo di browser `http://localhost:8081`, di .env juga harus `http://localhost:8081/`.
     *   Jangan lupa akhiri dengan garis miring `/`.
+
+---
+
+## 📝 CHANGELOG - Recent Updates
+
+### 🎯 December 24, 2024 - Mass Action System Overhaul
+
+**✨ Fitur Baru & Perbaikan Besar:**
+
+#### 1. 🔧 **Mass Action Functionality (Bulk Operations)**
+Sekarang admin bisa melakukan aksi massal (approve, reject, revert, delete) untuk banyak data sekaligus!
+
+**Modul yang Ditingkatkan:**
+- ✅ **Job Seeker** - Mass Process, Mass Approve, Mass Reject, Mass Revert
+- ✅ **Purna PMI** - Mass Process, Mass Approve, Mass Reject, Mass Revert  
+- ✅ **Training Type** - Mass Delete (dengan validasi quota)
+- ✅ **Applicant** - Mass Process, Mass Approve, Mass Reject, Mass Revert
+
+**Fitur Unggulan:**
+- 📦 **Checkbox Selection** - Pilih banyak item sekaligus
+- 🎯 **Smart Quota Management** - Otomatis update quota saat approve/reject/revert
+- ⚡ **Real-time Feedback** - Pesan error detail (misal: "Quota Full" untuk item tertentu)
+- 🔄 **Auto-refresh Table** - Tabel otomatis reload setelah aksi berhasil
+
+#### 2. 🔐 **Permission System Fix (403 Forbidden Errors)**
+Diperbaiki semua masalah permission yang menyebabkan error 403 saat mass action.
+
+**Yang Diperbaiki:**
+- ✅ `mass-process` → sekarang pakai permission `.approve` (sebelumnya salah pakai `.process`)
+- ✅ `mass-approve` → sekarang pakai permission `.approve`
+- ✅ `mass-reject` → sekarang pakai permission `.reject`
+- ✅ `mass-revert` → sekarang pakai permission `.revert` (sebelumnya salah pakai `.process`)
+- ✅ `mass-delete` → sekarang pakai permission `.delete`
+
+**File yang Diupdate:**
+- `app/Filters/PermissionFilter.php` - Mapping permission yang benar
+- `app/Config/Routes.php` - Semua route mass action pakai filter `permission`
+
+#### 3. 💬 **Error Messaging Improvement**
+Pesan error sekarang super detail dan user-friendly!
+
+**Sebelum:**
+```
+❌ Error occurred
+```
+
+**Sekarang:**
+```
+✅ 3 items approved. 2 failed. Details: Item ID 5: Quota Full., Item ID 7: Training Type Not Found.
+```
+
+**Yang Diperbaiki:**
+- ✅ Standardisasi format JSON response (`Success`/`Error` dengan TitleCase)
+- ✅ Error details langsung muncul di alert message
+- ✅ Console logging super detail untuk debugging
+- ✅ Partial success handling (beberapa berhasil, beberapa gagal)
+
+#### 4. 🎨 **UI/UX Enhancements**
+- ✅ **Decision Modal** untuk Mass Process (pilih Approve atau Reject)
+- ✅ **Flowbite Modal** initialization yang aman (no more console errors)
+- ✅ **Mass Action Buttons** dengan warna berbeda per aksi (primary, danger, success)
+- ✅ **URL Generation Priority** - Manual config prioritas lebih tinggi dari auto-generate
+
+#### 5. 🛡️ **Data Integrity & Validation**
+- ✅ **Quota Validation** - Cek quota sebelum approve/revert
+- ✅ **Training Type Validation** - Cek training type exists sebelum update
+- ✅ **Cascade Delete Prevention** - Training Type dengan `quota_used > 0` tidak bisa dihapus
+- ✅ **Transaction Safety** - Error di satu item tidak affect item lain
+
+---
+
+**📊 Technical Details:**
+- **Files Modified**: 10+ files (Controllers, Views, Filters, Routes)
+- **Lines Changed**: 500+ lines
+- **Bugs Fixed**: 7 critical issues (403 errors, URL generation, error messaging, etc.)
+- **Testing**: All mass actions verified across all modules and tabs
+
+**🔗 Full Documentation:**
+- Lihat `TECHNICAL_CHANGELOG.md` untuk detail teknis lengkap
+- Permission audit report tersedia di dokumentasi internal
+
+---
+
