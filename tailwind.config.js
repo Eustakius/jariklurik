@@ -6,6 +6,17 @@ module.exports = {
     "./public/**/*.js",
     "./src/**/*.js"
   ],
+  safelist: [
+    // Dynamic color classes for mass actions
+    { pattern: /^(bg|text|hover:bg|hover:text|border)-(success|danger|warning|info|primary)-(50|100|600|700|800)$/ },
+    // Arbitrary selector patterns
+    { pattern: /^\[&_/ },
+    // Common dynamic classes
+    'btn-mass-action',
+    'hidden',
+    'flex',
+    'inset-0',
+  ],
   theme: {
     extend: {
       colors: {

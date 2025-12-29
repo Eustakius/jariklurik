@@ -1,6 +1,19 @@
 # Disable directory browsing
 Options -Indexes
 
+# Allow access to public directory
+<IfModule authz_core_module>
+	Require all granted
+</IfModule>
+
+# Additional security headers
+<IfModule mod_headers.c>
+	Header set X-Frame-Options "SAMEORIGIN"
+	Header set X-Content-Type-Options "nosniff"
+	Header set X-XSS-Protection "1; mode=block"
+	Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 # ----------------------------------------------------------------------
 # Rewrite engine
 # ----------------------------------------------------------------------
@@ -14,7 +27,7 @@ Options -Indexes
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
-	# RewriteBase /
+	RewriteBase /
 
 	# Redirect Trailing Slashes...
 	RewriteCond %{REQUEST_FILENAME} !-d

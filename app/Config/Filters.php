@@ -80,7 +80,8 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             'csrf' => ['except' => [
-                'back-end/api/*', // contoh endpoint-mu
+                'back-end/api/*', // API endpoints
+                'back-end/*/mass-*', // Mass action endpoints
             ]],
         ],
         'after' => [

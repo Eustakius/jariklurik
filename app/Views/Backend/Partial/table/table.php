@@ -540,12 +540,13 @@ if (!empty($importPerm)): ?>
                     [10, 25, 50, 100, 200, 500, 1000],
                     [10, 25, 50, 100, 200, 500, 1000]
                 ],
-                columnDefs: [{
-                        className: "dt-nowrap",
-                        targets: "_all",
-                    },
-                    <?php if (isset($props['selectable']) && $props['selectable']): ?>
+                columnDefs: [
                     {
+                        className: "dt-nowrap",
+                        targets: "_all"
+                    }
+                    <?php if (isset($props['selectable']) && $props['selectable']): ?>
+                    ,{
                         className: 'text-center',
                         targets: 0, 
                         orderable: false,
@@ -554,10 +555,10 @@ if (!empty($importPerm)): ?>
                             var isChecked = selectedIds<?= $props['key'] ?>.has(row.id.toString()) ? 'checked' : '';
                             return '<input type="checkbox" class="row-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" value="' + row.id + '" ' + isChecked + '>';
                         }
-                    },
-                    {
+                    }
+                    ,{
                         className: 'dtr-control',
-                        targets: 1, // Shifted to 1
+                        targets: 1,
                         orderable: false,
                         searchable: false,
                         searchBuilder: false,
@@ -566,9 +567,9 @@ if (!empty($importPerm)): ?>
                         render: function(data, type, row, meta) {
                             return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
                         }
-                    },
+                    }
                     <?php else: ?>
-                    {
+                    ,{
                         className: 'dtr-control',
                         targets: 0,
                         orderable: false,
@@ -579,9 +580,9 @@ if (!empty($importPerm)): ?>
                         render: function(data, type, row, meta) {
                             return '<span class="ml-2">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
                         }
-                    },
+                    }
                     <?php endif; ?>
-                    {
+                    ,{
                         targets: -1,
                         orderable: false,
                         searchable: false,
@@ -755,6 +756,11 @@ if (!empty($importPerm)): ?>
                     showProcess(false);
                 });
                 $('#tbl<?= $props['key'] ?> td.dtr-hidden input, #tbljobvacancy td.dtr-hidden [id]').remove();
+                
+                // Reinitialize Flowbite components after table redraw
+                if (typeof Flowbite !== 'undefined' && Flowbite.initModals) {
+                    Flowbite.initModals();
+                }
             });
             // MODAL INITIALIZATION & MASS ACTIONS
             const $modalElement = document.getElementById('confirm-modal<?= $props['key'] ?>');
@@ -785,9 +791,10 @@ if (!empty($importPerm)): ?>
                 
                 $('#formConfirm<?= $props['key'] ?>').off('submit').on('submit', function(e) {
                      e.preventDefault();
+                     const methodField = $('#method<?= $props['key'] ?>').val();
                      $.ajax({
                         url: url,
-                        method: 'POST',
+                        method: methodField || 'POST',
                         data: $(this).serialize(),
                         headers: {
                             'Authorization': 'Bearer <?= esc($props['token']) ?>',
@@ -877,16 +884,16 @@ if (!empty($importPerm)): ?>
                      e.preventDefault();
                      $.ajax({
                         url: url,
-                        method: 'POST', 
-                        data: {
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
                             ids: ids,
-                            key: '<?= $props['key'] ?>',
-                            _method: 'PUT', 
-                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                        },
+                            key: '<?= $props['key'] ?>'
+                        }),
                         headers: {
                             'Authorization': 'Bearer <?= esc($props['token']) ?>',
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            '<?= csrf_header() ?>': '<?= csrf_hash() ?>'
                         },
                          success: function(response) {
                              console.log('=== MASS ACTION RESPONSE ===');

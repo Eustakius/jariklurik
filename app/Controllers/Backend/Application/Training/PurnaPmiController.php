@@ -363,7 +363,15 @@ class PurnaPmiController extends BaseController
 
     public function massApprove()
     {
+        // Handle both form-encoded and JSON data
         $ids = $this->request->getVar('ids');
+        
+        // If not found, try to get from JSON body
+        if (empty($ids) && strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $json = $this->request->getJSON();
+            $ids = $json->ids ?? null;
+        }
+        
         $key = $this->request->getVar('key');
 
         if (empty($ids) || !is_array($ids)) {
@@ -425,7 +433,15 @@ class PurnaPmiController extends BaseController
 
     public function massReject()
     {
+        // Handle both form-encoded and JSON data
         $ids = $this->request->getVar('ids');
+        
+        // If not found, try to get from JSON body
+        if (empty($ids) && strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $json = $this->request->getJSON();
+            $ids = $json->ids ?? null;
+        }
+        
         $key = $this->request->getVar('key');
 
         if (empty($ids) || !is_array($ids)) {
@@ -481,7 +497,15 @@ class PurnaPmiController extends BaseController
 
     public function massRevert()
     {
+        // Handle both form-encoded and JSON data
         $ids = $this->request->getVar('ids');
+        
+        // If not found, try to get from JSON body
+        if (empty($ids) && strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $json = $this->request->getJSON();
+            $ids = $json->ids ?? null;
+        }
+        
         $key = $this->request->getVar('key');
 
         if (empty($ids) || !is_array($ids)) {
