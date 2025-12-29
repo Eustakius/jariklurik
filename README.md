@@ -20,49 +20,340 @@ Sebelum mulai, pastikan laptop kalian udah terinstall alat-alat tempur ini biar 
     *   Biar bisa pake script `recommit_changes.bat`.
 5.  **🌐 Web Browser**: Chrome, Firefox, atau Edge (bebas dah).
 
+## ⚡ Panduan Lengkap: Clone & Run di Localhost
+
+Ikutin step-step di bawah ini dengan teliti. Jangan lompat-lompat! 😄
+
+---
+
+### 🔰 **STEP 1: Persiapan Awal (Cek Semua Tool Terinstall)**
+
+Sebelum memulai, pastikan semua ini sudah terinstall di komputer Anda:
+
+#### Cek PHP Version
+1. Buka **Command Prompt** atau **PowerShell**
+2. Ketik: `php -v`
+3. Pastikan version PHP-nya **8.1 atau lebih tinggi**
+   ```
+   PHP 8.2.12 (cli) - OK ✅
+   ```
+   Jika error "php is not recognized", artinya PHP belum di-add ke PATH Windows
+
+#### Cek Composer
+1. Ketik: `composer --version`
+2. Pastikan Composer sudah terinstall
+   ```
+   Composer 2.x.x - OK ✅
+   ```
+
+#### Cek Node.js
+1. Ketik: `node --version` dan `npm --version`
+2. Pastikan keduanya terinstall
+   ```
+   v18.x.x dan npm 9.x.x - OK ✅
+   ```
+
+#### Cek Git
+1. Ketik: `git --version`
+2. Pastikan Git sudah terinstall
+   ```
+   git version 2.x.x - OK ✅
+   ```
+
+#### Cek MySQL di XAMPP
+1. Buka **XAMPP Control Panel**
+2. Klik **Start** pada **MySQL** (biarkan running di background)
+3. Status harus **Running** (hijau) ✅
+
+**Jika ada yang belum terinstall, download & install dulu sebelum lanjut ke step berikutnya!**
+
+---
+
+### 📥 **STEP 2: Clone Repository Jariklurik**
+
+Pilih satu dari 2 cara di bawah ini:
+
+#### Cara A: Clone via Git (Recommended)
+```bash
+# 1. Tentukan folder dimana project akan disimpan
+# Misal: D:\Projects atau C:\Users\YourName\Documents
+
+cd D:\Projects
+
+# 2. Clone repository
+git clone https://github.com/[REPO_URL] jariklurik
+
+# 3. Masuk ke folder project
+cd jariklurik
+```
+
+#### Cara B: Download ZIP Manual
+1. Kunjungi repository GitHub
+2. Klik tombol **Code** → **Download ZIP**
+3. Extract ZIP ke folder pilihan Anda
+4. Rename folder hasil extract menjadi `jariklurik` (supaya konsisten)
+
+---
+
+### ⚙️ **STEP 3: Setup Database MySQL**
+
+Database adalah jantung aplikasi. Ikutin langkah ini dengan teliti!
+
+#### 3.1 Buka phpMyAdmin
+1. **XAMPP Control Panel** → Klik **Admin** pada MySQL
+   - Atau buka browser ke: `http://localhost/phpmyadmin`
+2. Jika berhasil, halaman phpMyAdmin akan terbuka
+
+#### 3.2 Buat Database Baru
+1. Di phpMyAdmin, klik menu **Databases** (sebelah kiri atas)
+2. Di bagian "Create database", ketik nama: `jariklurik`
+3. Pilih Collation: **utf8mb4_unicode_ci**
+4. Klik **Create** ✅
+
+#### 3.3 Import Database Schema & Data
+1. Klik database **jariklurik** yang baru dibuat (di sidebar kiri)
+2. Klik tab **Import**
+3. Klik **Choose File** dan pilih file:
+   - **`jariklurik.sql`** (untuk data production)
+   - Atau **`database.sql`** (untuk fresh setup)
+   - File ini ada di root folder project
+4. Scroll ke bawah, klik **Import**
+5. Tunggu sampai muncul pesan **"Import has been successfully completed"** ✅
+
+#### 3.4 Verifikasi Database
+1. Refresh halaman phpMyAdmin
+2. Di sidebar kiri, klik database **jariklurik**
+3. Pastikan ada banyak tabel:
+   - `users` ✅
+   - `applicants` ✅
+   - `job_vacancies` ✅
+   - `training_types` ✅
+   - dll (total ~20+ tabel)
+
+**Jika tabel tidak muncul, import gagal. Coba import lagi!**
+
+---
+
+### 📦 **STEP 4: Install PHP Dependencies (Composer)**
+
+Backend membutuhkan banyak library. Composer yang akan mengunduhnya.
+
+```bash
+# 1. Masuk ke folder project
+cd D:\Projects\jariklurik
+
+# 2. Install semua PHP dependencies
+composer install
+
+# Tunggu prosesnya (bisa sampai 2-5 menit tergantung koneksi)
+# Output akan terlihat seperti:
+# "Loading composer repositories with package information
+#  Installing dependencies (including require-dev) from lock file"
+
+# 3. Tunggu sampai muncul: "Generating autoload files"
+# Ini berarti composer selesai ✅
+
+# 4. Folder "vendor" akan muncul otomatis (jangan dihapus!)
+```
+
+**Jika ada error "could not find package", pastikan koneksi internet stabil!**
+
+---
+
+### 🎨 **STEP 5: Install Frontend Dependencies (npm)**
+
+Frontend juga butuh library untuk CSS & JavaScript.
+
+```bash
+# 1. Pastikan masih di folder project
+cd D:\Projects\jariklurik
+
+# 2. Install npm dependencies
+npm install
+
+# Tunggu prosesnya (bisa sampai 3-5 menit)
+# Output akan terlihat seperti:
+# "added 300+ packages, and audited 350 packages in 2m"
+
+# 3. Folder "node_modules" akan muncul (jangan dihapus!)
+```
+
+**Jika ada warning, abaikan aja. Yang penting command selesai tanpa error!**
+
+---
+
+### 🔧 **STEP 6: Setup Environment Variables**
+
+File `.env` mengatur konfigurasi aplikasi. Sudah ada default, tapi perlu kita cek.
+
+```bash
+# 1. Buka file .env dengan editor (VS Code, Notepad, dll)
+# File ini ada di root folder project
+
+# 2. Cek/sesuaikan konfigurasi ini:
+
+# =========================
+# BASE URL
+# =========================
+app.baseURL = 'http://localhost:8081/'
+
+# =========================
+# DATABASE
+# =========================
+database.default.hostname = localhost
+database.default.database = jariklurik
+database.default.username = root
+database.default.password = 
+# (kosongkan saja, itu default XAMPP)
+
+# =========================
+# FILE UPLOAD
+# =========================
+file.upload_path = './public/file/'
+
+# 3. Save file .env
+# Jangan rename atau hapus file ini!
+```
+
+**Jika ada perubahan di .env, HARUS restart server CodeIgniter agar perubahan terdeteksi!**
+
+---
+
+### ▶️ **STEP 7: Menjalankan Aplikasi**
+
+Ada 2 cara menjalankan aplikasi. Pilih salah satu:
+
+#### **Cara A: Menggunakan Script (Recommended - Mudah!)**
+
+```bash
+# 1. Buka terminal di folder project
+cd D:\Projects\jariklurik
+
+# 2. Jalankan script run.bat (Windows)
+.\run.bat
+
+# Jika muncul: "Development Server started on http://localhost:8081"
+# Berarti server sedang running ✅
+
+# 3. Buka browser
+# Ketik URL: http://localhost:8081
+```
+
+**Jika double-click `run.bat` tidak bekerja, gunakan Cara B di bawah.**
+
+---
+
+#### **Cara B: Manual dengan CodeIgniter Spark (Alternatif)**
+
+```bash
+# 1. Masuk ke folder ci (CodeIgniter 4)
+cd D:\Projects\jariklurik\ci
+
+# 2. Jalankan spark serve
+php spark serve --port 8081
+
+# Output akan seperti:
+# "CodeIgniter v4.x development server started on http://localhost:8081 in 0.1 seconds"
+
+# 3. Server sekarang running! Buka browser:
+# http://localhost:8081
+```
+
+**Jangan tutup terminal selama server running!** Jika ingin berhenti, tekan `CTRL+C` di terminal.
+
+---
+
+### 🌐 **STEP 8: Akses Aplikasi di Browser**
+
+Sekarang aplikasi sudah live! 🎉
+
+1. **Buka browser** (Chrome, Firefox, Edge, dll)
+2. **Ketik URL**: `http://localhost:8081`
+3. Halaman login akan muncul
+
+---
+
+### 🔐 **STEP 9: Login Pertama Kali**
+
+Kami sudah siapin akun developer untuk testing:
+
+```
+📧 Email/Username: developer
+🔑 Password: password
+
+2️⃣ 2FA (Google Authenticator): Cari "2FA Secret Key" di database
+   - Atau cek file TECHNICAL_CHANGELOG.md untuk mendapatkan recovery code
+```
+
+**Cara Login:**
+1. Di halaman login, masuk email/username: `developer`
+2. Password: `P@ssw0rd!@#`
+3. Jika ada "2FA Required", masuk akun Google Authenticator Anda
+4. Jika tidak ada akun 2FA, cek di TECHNICAL_CHANGELOG.md untuk cara disable
+
+---
+
+### ✅ **STEP 10: Verifikasi Semuanya Berjalan Normal**
+
+Setelah login, pastikan fitur utama berfungsi:
+
+1. **Navigate ke Menu** → "Applicant" atau "Job Seekers"
+2. **Lihat Data Table** dengan daftar pelamar
+3. **Test Mass Action**:
+   - Pilih beberapa checkbox di table
+   - Klik tombol "Approve", "Reject", atau "Revert"
+   - Pastikan tidak ada error 403 atau JavaScript error
+4. **Cek Console** (F12 → Console tab):
+   - Jangan ada error merah
+   - Jika ada warning kuning, itu normal
+
+**Jika semuanya OK tanpa error, SELAMAT! 🎉 Aplikasi sudah siap!**
+
+---
+
+### 🛠️ **Troubleshooting Setup**
+
+#### ❌ Error: "Cannot find module 'mythauth'"
+**Penyebab**: Composer install belum selesai
+**Solusi**:
+```bash
+rm -r vendor
+composer install
+```
+
+#### ❌ Error: "Database connection refused"
+**Penyebab**: MySQL tidak running
+**Solusi**:
+1. Buka XAMPP Control Panel
+2. Klik **Start** pada MySQL
+3. Tunggu 5 detik, lalu restart server CodeIgniter
+
+#### ❌ Error: "Port 8081 already in use"
+**Penyebab**: Ada aplikasi lain yang pakai port 8081
+**Solusi**:
+```bash
+# Gunakan port berbeda
+php spark serve --port 8082
+# Atau buka http://localhost:8082
+```
+
+#### ❌ Error: "npm not found"
+**Penyebab**: Node.js belum terinstall atau tidak di PATH
+**Solusi**:
+1. Download & install Node.js dari nodejs.org
+2. Restart terminal
+3. Coba `npm install` lagi
+
+#### ❌ Halaman blank / loading terus
+**Penyebab**: Browser cache atau database belum ready
+**Solusi**:
+1. Hard refresh browser: `CTRL+SHIFT+R` (Windows) atau `CMD+SHIFT+R` (Mac)
+2. Pastikan MySQL masih running
+3. Cek console (F12) ada error apa
+
+---
+
 ## ⚡ Cara Install & Setup
-
-### 1. 📂 Setup Database
-1.  Buka **XAMPP Control Panel** terus nyalain **MySQL** (Apache opsional sih kalo kalian pake `spark serve`, tapi nyalain aja gapapa).
-2.  Buka browser terus ke `http://localhost/phpmyadmin`.
-3.  Klik **New** buat bikin database baru.
-4.  Kasih nama databasenya: `jariklurik`
-5.  Klik **Create**.
-6.  Pilih database `jariklurik` yang baru dibuat tadi di sidebar kiri.
-7.  Klik tab **Import**.
-8.  Pilih file `jariklurik.sql` yang ada di folder project ini.
-9.  Klik **Import** di paling bawah.
-
-### 2. ⚙️ Install Library & Konfigurasi
-Sebelum jalanin app, kita harus download semua "bumbu" pelengkapnya dulu.
-
-1.  **Install Dependency Backend**:
-    *   Buka terminal di folder project.
-    *   Ketik: `composer install`
-    *   Tunggu sampe selesai. Ini bakal download library PHP di folder `vendor`.
-2.  **Install Dependency Frontend**:
-    *   Ketik: `npm install`
-    *   Tunggu beres (folder `node_modules` bakal muncul).
-3.  **Setup Environment**:
-    *   File `.env` udah kita settingin buat local development, jadi aman guys.
-    *   **🔗 Base URL**: `http://localhost:8081/`
-    *   **💾 Database**: `jariklurik` (User: `root`, Password: kosongin aja)
-
-### 3. ▶️ Jalanin Aplikasi (Rekomendasi)
-Pake script yang udah kita siapin biar gampang dan port-nya konsisten di 8081.
-
-1.  Buka terminal kalian (Command Prompt atau PowerShell).
-2.  Masuk ke folder project kalian.
-3.  Jalanin perintah ini:
-    ```bash
-    .\run.bat
-    ```
-4.  Buka browser terus akses: `http://localhost:8081`
-
-### 4. 🤓 Cara Manual (Alternatif)
-Kalo script `run.bat` gabisa jalan:
-1.  Masuk ke folder `ci`: `cd ci`
-2.  Jalanin manual: `php spark serve --port 8081`
 
 ## 🧙‍♂️ Script Bantuan (Tools)
 Kita udah buatin beberapa script ajaib biar hidup kalian lebih mudah:
