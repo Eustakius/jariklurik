@@ -4,6 +4,7 @@
 <div class="dashboard-main-body min-h-screen bg-neutral-50 dark:bg-neutral-900">
     <?= view('Backend/Partial/page-header', ['title' => getTitleFromUri([2, 3])]) ?>
     <div class="grid grid-cols-12 gap-6 mt-6">
+        <!-- Applicant Lists -->
         <div class="col-span-12">
             <!-- Modern Card with Solid Background & Shadow -->
             <div class="card border border-neutral-200 dark:border-neutral-600 shadow-md rounded-2xl bg-white dark:bg-neutral-800">

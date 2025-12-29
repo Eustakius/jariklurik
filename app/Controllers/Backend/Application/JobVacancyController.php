@@ -63,6 +63,7 @@ class JobVacancyController extends BaseController
                 ['title' => 'Country', 'data' => 'country'],
                 ['title' => 'Company', 'data' => 'company'],
                 ['title' => 'Duration', 'data' => 'duration'],
+                ['title' => 'Status', 'data' => 'status', 'name' => 'status', 'className' => 'col-status'],
                 ['title' => 'Selection Date', 'data' => 'selection_date'],
                 ['title' => 'Pinned', 'data' => 'is_pin'],
                 ['title' => 'Visitor', 'data' => 'visitor'],
@@ -70,7 +71,6 @@ class JobVacancyController extends BaseController
                 ['title' => 'Applicant Process', 'data' => 'applicant_process'],
                 ['title' => 'Quota', 'data' => 'quota'],
                 ['title' => 'Quota Used', 'data' => 'quota_used'],
-                ['title' => 'Status', 'data' => 'status', 'name' => 'status', 'className' => 'col-status'],
                 ['title' => 'Code', 'data' => 'code'],
             ];
         }

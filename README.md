@@ -642,3 +642,411 @@ headers: {
 
 ---
 
+## 🔧 Admin Panel - Comprehensive Settings Form
+
+Sistem Jariklurik sekarang dilengkapi dengan **Centralized Settings Panel** yang memungkinkan administrator mengelola seluruh konfigurasi aplikasi dari satu tempat. Fitur ini mengikuti best practice modern admin panels dengan terorganisir per kategori.
+
+### 📍 Akses Settings Panel
+
+**URL**: `http://localhost:8081/back-end/administrator/setting`
+
+**Persyaratan Akses**:
+- Anda harus login sebagai user dengan role **Administrator**
+- Memiliki permission **administrator.setting.view** dan **administrator.setting.update**
+
+### 📋 Struktur Settings Form
+
+Settings form dibagi menjadi **7 section** utama, masing-masing dengan icon dan color coding untuk kemudahan navigasi:
+
+---
+
+#### **1️⃣ Global Site Configurations** 🏢
+
+Section ini mengelola identitas dan informasi umum website:
+
+| Field | Tipe | Deskripsi | Contoh |
+|-------|------|-----------|---------|
+| **Site Name** | Text | Nama website/aplikasi | `Jariklurik Job Portal` |
+| **Company Logo** | File | Logo perusahaan (JPG/PNG/GIF/SVG) | max 2 MB |
+| **Company Email** | Email | Email resmi perusahaan | `info@jariklurik.com` |
+| **Company Phone** | Tel | Nomor telepon kantor | `+62-21-1234567` |
+| **Company Address** | Textarea | Alamat lengkap kantor | `Jl. Sudirman No. 123...` |
+
+**Kegunaan**:
+- Menampilkan informasi di frontend website
+- Email digunakan untuk contact form & system notifications
+- Nomor telepon untuk halaman kontak
+- Logo ditampilkan di header/footer website
+
+**Validation**:
+- Site Name: Required (wajib diisi)
+- Company Email: Valid email format
+- Company Logo: Max 2 MB, format gambar saja
+
+---
+
+#### **2️⃣ SEO & Metadata** 🔍
+
+Mengoptimalkan visibilitas website di mesin pencari (Google, Bing, dll):
+
+| Field | Tipe | Rekomendasi | Contoh |
+|-------|------|------------|---------|
+| **Meta Title** | Text | 50-60 karakter | `Jariklurik - Job Portal Indonesia` |
+| **Meta Keywords** | Text | Pisahkan dengan koma | `job, career, indonesia, employment` |
+| **Meta Description** | Textarea | 150-160 karakter | `Platform kerja terlengkap di Indonesia...` |
+| **OG Title** | Text | Title untuk social share | `Jariklurik Job Portal` |
+| **OG Type** | Select | website/article/business | `website` |
+| **OG Description** | Textarea | Deskripsi saat share ke FB/LinkedIn | `Temukan pekerjaan impianmu...` |
+| **OG Image** | File | Gambar saat di-share (JPG/PNG) | max 2 MB |
+| **Canonical URL** | URL | URL standar halaman | `https://jariklurik.com` |
+| **Google Analytics Code** | Textarea | GA4 tracking code | `<!-- GA Code -->` |
+| **Google Site Verification** | Text | Verification dari Google Search Console | `google-site-verification=xxx` |
+
+**Kegunaan**:
+- Meta Title & Description muncul di Google Search Results
+- Meta Keywords membantu SEO ranking
+- OG fields mempengaruhi cara website tampil saat dibagikan di social media
+- Analytics Code melacak traffic dan perilaku user
+- Canonical URL mencegah duplicate content issues
+
+**Tips SEO**:
+```
+✅ Meta Title: Harus unik, menarik, dan mengandung keyword utama
+✅ Meta Description: Actionable, mengajak click
+✅ Keywords: Pilih 5-10 keyword relevan yang banyak dicari
+✅ Canonical URL: Gunakan https, bukan http
+```
+
+---
+
+#### **3️⃣ Localization** 🌍
+
+Pengaturan bahasa, mata uang, dan timezone aplikasi:
+
+| Field | Tipe | Pilihan | Default |
+|-------|------|---------|---------|
+| **Default Language** | Select | EN, ID (Bahasa Indonesia), MS (Bahasa Melayu) | `id` |
+| **Default Currency** | Text | Kode mata uang ISO | `IDR` |
+| **Default Timezone** | Select | UTC, Asia/Jakarta, Asia/Kuala_Lumpur | `Asia/Jakarta` |
+
+**Kegunaan**:
+- Default Language: Bahasa tampilan untuk user baru
+- Default Currency: Format & simbol uang di halaman (Rp, $, RM)
+- Timezone: Pengaturan waktu untuk timestamp di database & email
+
+**Contoh Implementasi**:
+```php
+// Di Controller atau View
+$currency = setting('default_currency'); // IDR
+echo format_currency(50000, $currency); // Output: Rp 50.000
+```
+
+---
+
+#### **4️⃣ System & Maintenance** ⚙️
+
+Pengaturan sistem dan maintenance aplikasi:
+
+| Field | Tipe | Deskripsi |
+|-------|------|-----------|
+| **Maintenance Mode** | Toggle | Enable untuk mode offline (user lihat pesan) |
+| **Maintenance Message** | Textarea | Pesan yang ditampilkan saat maintenance |
+| **Enable Automatic Backups** | Toggle | Aktifkan backup otomatis database |
+| **Backup Frequency** | Select | Daily / Weekly / Monthly |
+
+**Kegunaan**:
+- Maintenance Mode: Useful saat update, tanpa perlu downtime
+- User akan lihat pesan custom dan maintenance timer (jika ada)
+- Auto Backup: Jaga data aman dengan backup berkala
+- Frequency bisa disesuaikan dengan traffic aplikasi
+
+**Contoh Maintenance Message**:
+```
+Kami sedang melakukan pembaruan sistem untuk memberikan layanan yang lebih baik.
+Aplikasi akan kembali normal dalam 2 jam.
+Terima kasih atas kesabaran Anda! 🙏
+```
+
+---
+
+#### **5️⃣ Email Server Configuration** 📧
+
+Pengaturan SMTP untuk mengirim email otomatis (notifikasi, reset password, dll):
+
+| Field | Tipe | Deskripsi | Contoh |
+|-------|------|-----------|---------|
+| **SMTP Host** | Text | Server mail | `smtp.gmail.com` |
+| **SMTP Port** | Number | Port server | `587` (TLS) atau `465` (SSL) |
+| **SMTP Username** | Text | Username/email SMTP | `your-email@gmail.com` |
+| **SMTP Password** | Password | Password SMTP | `xxxx xxxx xxxx xxxx` |
+| **SMTP Encryption** | Select | TLS atau SSL | `tls` |
+| **From Email** | Email | Email pengirim notifikasi | `noreply@jariklurik.com` |
+| **From Name** | Text | Nama pengirim | `Jariklurik Admin` |
+
+**Kegunaan**:
+- Mengirim email notifikasi ke applicants
+- Password reset emails
+- System alerts ke admin
+- Job notifications
+
+**Setup Gmail (Recommended)**:
+```
+1. Enable 2-Factor Authentication di akun Gmail
+2. Buat "App Password" (bukan password akun biasa)
+3. Host: smtp.gmail.com
+4. Port: 587
+5. Username: your-email@gmail.com
+6. Password: [App Password - 16 karakter]
+7. Encryption: TLS
+```
+
+**Test Email**:
+Setelah setup, test dengan mengirim email dari aplikasi untuk pastikan konfigurasi benar.
+
+---
+
+#### **6️⃣ Security & Authentication** 🔒
+
+Pengaturan keamanan dan policy autentikasi:
+
+| Field | Tipe | Deskripsi |
+|-------|------|-----------|
+| **Require Strong Passwords** | Toggle | Enforce kompleksitas password (uppercase, lowercase, number, symbol) |
+| **Minimum Password Length** | Number | Panjang minimum password (default: 8 karakter) |
+| **Enable MFA** | Toggle | Aktifkan Multi-Factor Authentication (2FA) |
+| **Session Timeout** | Number | Auto logout setelah X menit idle (default: 30 menit) |
+
+**Kegunaan**:
+- **Strong Passwords**: Melindungi akun dari brute force attack
+- **Minimum Length**: Semakin panjang = semakin aman, tapi jangan > 32
+- **MFA/2FA**: Lapisan keamanan ekstra dengan OTP/authenticator app
+- **Session Timeout**: Proteksi jika user lupa logout
+
+**Best Practices**:
+```
+✅ Require Strong Passwords: ON
+✅ Min Length: 10-12 karakter untuk admin
+✅ Enable MFA: ON (wajib untuk admin)
+✅ Session Timeout: 30-60 menit (tergantung penggunaan)
+```
+
+**Contoh Policy**:
+```
+Password harus mengandung:
+- Minimal 12 karakter
+- 1 huruf besar (A-Z)
+- 1 huruf kecil (a-z)
+- 1 angka (0-9)
+- 1 simbol (!@#$%^&*)
+```
+
+---
+
+#### **7️⃣ Applicant Settings** 📄
+
+Pengaturan spesifik untuk fitur applicant/pelamar:
+
+| Field | Tipe | Deskripsi |
+|-------|------|-----------|
+| **Statement Letter Template** | File | File template surat pernyataan untuk diunduh pelamar |
+
+**Kegunaan**:
+- Admin bisa upload template surat pernyataan
+- Pelamar bisa download & lengkapi offline
+- File didukung: PDF, DOC, DOCX, JPG, PNG
+- Max file size: 1 MB
+
+---
+
+### 💾 Menyimpan Settings
+
+**Langkah-langkah**:
+
+1. Isi atau update field yang diperlukan
+2. Scroll ke bawah untuk melihat tombol **Save Settings**
+3. Klik tombol **Save Settings** (warna hijau dengan icon save)
+4. Tunggu loading selesai, akan muncul notifikasi sukses
+
+**Validasi Real-Time**:
+- Form menggunakan Parsley.js untuk validasi
+- Error akan ditampilkan langsung di field
+- Tidak bisa save jika ada field yang invalid
+
+---
+
+### 🔐 Fitur Keamanan
+
+Settings form dilengkapi dengan beberapa lapisan keamanan:
+
+1. **CSRF Protection**: Setiap form submit dilindungi CSRF token
+2. **Permission Check**: Hanya admin dengan permission yang tepat bisa akses
+3. **Input Validation**: Semua input divalidasi server-side
+4. **Sensitive Data**: Password SMTP tidak ditampilkan di form (hidden field)
+5. **Audit Trail**: Setiap perubahan settings tercatat siapa yang mengubah & kapan
+
+---
+
+### 🎯 Panduan Penggunaan by Role
+
+#### **Admin Panel (Full Access)**
+```
+✅ Bisa view semua settings
+✅ Bisa edit semua settings
+✅ Bisa restore settings ke default
+```
+
+#### **Editor (Limited Access)**
+```
+⚠️ Hanya bisa edit tertentu (SEO, localization)
+❌ Tidak bisa akses security settings
+❌ Tidak bisa akses SMTP configuration
+```
+
+---
+
+### 📱 Responsive Design
+
+Settings form fully responsive:
+- **Desktop** (≥1024px): Kolom 2 atau 3 tergantung field
+- **Tablet** (768px - 1023px): Kolom 2
+- **Mobile** (< 768px): Full width (1 kolom)
+
+---
+
+### 🛠️ Technical Implementation
+
+#### **Backend Structure**
+
+```
+App/
+├── Config/
+│   └── Backend.php          ← Settings definition array
+├── Models/
+│   └── SettingModel.php     ← Database operations
+├── Controllers/Backend/
+│   └── SettingsController.php ← Handle CRUD
+└── Views/Backend/
+    └── setting.php          ← Form UI
+```
+
+#### **Database Table: `settings`**
+
+```sql
+CREATE TABLE settings (
+    id INT PRIMARY KEY,
+    type VARCHAR(50),          -- text, email, password, select, toggle, file, textarea
+    name VARCHAR(255),         -- Display name
+    key VARCHAR(255) UNIQUE,   -- Identifier (site_name, smtp_host, etc)
+    values TEXT,               -- Stored value
+    status BOOLEAN,            -- Active/Inactive
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    created_by INT,
+    updated_by INT
+);
+```
+
+#### **Accessing Settings in Code**
+
+```php
+// Di Controller
+$siteName = setting('site_name');
+$smtpHost = setting('smtp_host');
+
+// Di View
+<title><?= setting('meta_title') ?></title>
+
+// Di Helper/Library
+$currency = config('Backend')->default_currency; // atau setting('default_currency');
+```
+
+---
+
+### ⚠️ Important Notes
+
+1. **Password Field**: Password SMTP disimpan terenkripsi di database
+2. **Sensitive Settings**: Jangan share screenshot yang mengandung API keys atau passwords
+3. **Backup First**: Sebelum setup SMTP, backup database dulu
+4. **Test Email**: Selalu test konfigurasi SMTP dengan mengirim email test
+5. **Timezone**: Sesuaikan dengan zona waktu lokal server/aplikasi
+
+---
+
+### 🔄 Troubleshooting
+
+#### ❌ Error "Email not sending"
+```
+Kemungkinan Penyebab:
+1. SMTP host/port salah
+2. Username/password salah
+3. Less secure apps tidak diaktifkan (Gmail)
+4. Firewall/antivirus block port 587/465
+5. SSL/TLS setting salah
+
+Solusi:
+- Double check semua SMTP field
+- Coba dengan port berbeda (587 vs 465)
+- Enable "Less secure app access" (Gmail)
+- Check firewall settings
+```
+
+#### ❌ Error "Permission Denied"
+```
+Penyebab:
+- User tidak memiliki role Administrator
+- Permission "administrator.setting.update" belum diberikan
+
+Solusi:
+- Berikan role Administrator ke user
+- Atau assign permission secara manual di Role Management
+```
+
+#### ❌ Settings tidak tersimpan
+```
+Kemungkinan:
+- Form validation gagal (cek error message)
+- Session timeout
+- CSRF token expired
+
+Solusi:
+- Refresh halaman & coba lagi
+- Login ulang
+- Check browser console untuk error details
+```
+
+---
+
+### 📚 Relasi Dengan Modul Lain
+
+Settings form terintegrasi dengan beberapa modul:
+
+| Modul | Setting yang Digunakan |
+|-------|------------------------|
+| **Email Notifications** | SMTP config, from_email, from_name |
+| **Applicant Processing** | file_statement_letter |
+| **Frontend** | site_name, company_logo, meta_tags |
+| **Security** | require_password_strength, session_timeout, enable_mfa |
+| **Analytics** | google_analytics_code |
+
+---
+
+### 🚀 Best Practices
+
+```php
+✅ DO:
+- Update settings melalui admin panel, bukan edit database
+- Test setiap setting perubahan sebelum go-live
+- Backup database sebelum perubahan critical settings
+- Dokumentasikan alasan setiap perubahan di memo admin
+- Periodically review settings security
+
+❌ DON'T:
+- Share password SMTP via chat/email
+- Edit settings table langsung tanpa backup
+- Gunakan default/weak passwords
+- Lupa update settings saat migrate ke server baru
+- Enable maintenance mode di production tanpa notification
+```
+
+---
+

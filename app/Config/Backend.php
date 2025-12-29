@@ -381,50 +381,190 @@ class Backend extends BaseConfig
     ];
 
     public $settings = [
+        // Global Site Configurations - Company Information
         [
-            'key' => "file_statement_letter",
-            'name' => "File Statement Letter",
+            'key' => "site_name",
+            'name' => "Site Name",
+            'type' => "text"
+        ],
+        [
+            'key' => "company_logo",
+            'name' => "Company Logo",
             'type' => "file"
-        ],        
+        ],
+        [
+            'key' => "company_email",
+            'name' => "Company Email",
+            'type' => "email"
+        ],
+        [
+            'key' => "company_phone",
+            'name' => "Company Phone",
+            'type' => "text"
+        ],
+        [
+            'key' => "company_address",
+            'name' => "Company Address",
+            'type' => "textarea"
+        ],
+
+        // SEO & Metadata
         [
             'key' => "meta_title",
             'name' => "Meta Title",
             'type' => "text"
-        ],        
+        ],
         [
             'key' => "meta_description",
             'name' => "Meta Description",
-            'type' => "text"
-        ],        
+            'type' => "textarea"
+        ],
         [
             'key' => "meta_keywords",
             'name' => "Meta Keywords",
             'type' => "text"
-        ],        
+        ],
         [
             'key' => "og_title",
             'name' => "OG Title",
             'type' => "text"
-        ],        
+        ],
         [
             'key' => "og_description",
             'name' => "OG Description",
-            'type' => "text"
-        ],        
+            'type' => "textarea"
+        ],
         [
             'key' => "og_image_url",
             'name' => "OG Image URL",
             'type' => "file"
-        ],        
+        ],
         [
             'key' => "og_type",
             'name' => "OG Type",
             'type' => "text"
-        ],        
+        ],
         [
             'key' => "canonical_url",
             'name' => "Canonical URL",
             'type' => "text"
+        ],
+        [
+            'key' => "google_analytics_code",
+            'name' => "Google Analytics Code",
+            'type' => "textarea"
+        ],
+        [
+            'key' => "google_site_verification",
+            'name' => "Google Site Verification",
+            'type' => "text"
+        ],
+
+        // Localization
+        [
+            'key' => "default_language",
+            'name' => "Default Language",
+            'type' => "select"
+        ],
+        [
+            'key' => "default_currency",
+            'name' => "Default Currency",
+            'type' => "text"
+        ],
+        [
+            'key' => "default_timezone",
+            'name' => "Default Timezone",
+            'type' => "select"
+        ],
+
+        // System & Maintenance
+        [
+            'key' => "maintenance_mode",
+            'name' => "Maintenance Mode",
+            'type' => "toggle"
+        ],
+        [
+            'key' => "maintenance_message",
+            'name' => "Maintenance Message",
+            'type' => "textarea"
+        ],
+
+        // Email Server (SMTP)
+        [
+            'key' => "smtp_host",
+            'name' => "SMTP Host",
+            'type' => "text"
+        ],
+        [
+            'key' => "smtp_port",
+            'name' => "SMTP Port",
+            'type' => "number"
+        ],
+        [
+            'key' => "smtp_username",
+            'name' => "SMTP Username",
+            'type' => "text"
+        ],
+        [
+            'key' => "smtp_password",
+            'name' => "SMTP Password",
+            'type' => "password"
+        ],
+        [
+            'key' => "smtp_encryption",
+            'name' => "SMTP Encryption",
+            'type' => "select"
+        ],
+        [
+            'key' => "from_email",
+            'name' => "From Email Address",
+            'type' => "email"
+        ],
+        [
+            'key' => "from_name",
+            'name' => "From Name",
+            'type' => "text"
+        ],
+
+        // Security & Authentication
+        [
+            'key' => "require_password_strength",
+            'name' => "Require Strong Passwords",
+            'type' => "toggle"
+        ],
+        [
+            'key' => "password_min_length",
+            'name' => "Minimum Password Length",
+            'type' => "number"
+        ],
+        [
+            'key' => "enable_mfa",
+            'name' => "Enable Multi-Factor Authentication",
+            'type' => "toggle"
+        ],
+        [
+            'key' => "session_timeout",
+            'name' => "Session Timeout (minutes)",
+            'type' => "number"
+        ],
+
+        // Backup & Export
+        [
+            'key' => "auto_backup_enabled",
+            'name' => "Enable Automatic Backups",
+            'type' => "toggle"
+        ],
+        [
+            'key' => "backup_frequency",
+            'name' => "Backup Frequency",
+            'type' => "select"
+        ],
+
+        // Legacy/Additional
+        [
+            'key' => "file_statement_letter",
+            'name' => "File Statement Letter",
+            'type' => "file"
         ]
     ];
 
