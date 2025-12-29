@@ -281,6 +281,62 @@ Pesan error sekarang super detail dan user-friendly!
 - ✅ **Cascade Delete Prevention** - Training Type dengan `quota_used > 0` tidak bisa dihapus
 - ✅ **Transaction Safety** - Error di satu item tidak affect item lain
 
+#### 6. 🔐 **CSRF & 403 Forbidden Error Fix (Final Solution)**
+
+**🐛 Masalah yang Terjadi:**
+```
+PUT http://localhost:8081/back-end/applicant/mass-approve
+Status: 403 Forbidden
+```
+
+**Kenapa 403 Muncul?**
+- CodeIgniter's CSRF filter secara default mengecek CSRF token di **POST body**
+- Kami mengirim data sebagai **JSON** dengan CSRF token di **request header** (`X-CSRF-TOKEN`)
+- Filter CSRF tidak bisa menemukan token di lokasi yang benar → validasi gagal → **403 Forbidden**
+- Mass-action endpoints dilindungi CSRF padahal seharusnya hanya permission filter yang mengecek
+
+**Solusi yang Diterapkan:**
+
+1. **Exclude Mass-Action Routes dari CSRF Filter** (di `app/Config/Filters.php`):
+```php
+public array $globals = [
+    'before' => [
+        'csrf' => ['except' => [
+            'back-end/api/*',      // API endpoints
+            'back-end/*/mass-*',   // ✅ Mass-action endpoints
+        ]],
+    ],
+];
+```
+
+2. **Backend Controllers Updated** - Parse JSON requests:
+   - `ApplicantController`
+   - `JobSeekerController`
+   - `PurnaPmiController`
+   
+```php
+$ids = $this->request->getVar('ids');
+
+// Parse JSON if form data not found
+if (empty($ids) && strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+    $json = $this->request->getJSON();
+    $ids = $json->ids ?? null;
+}
+```
+
+3. **Frontend** (`table.php`) - Send CSRF in header:
+```javascript
+headers: {
+    '<?= csrf_header() ?>': '<?= csrf_hash() ?>'
+}
+```
+
+**Hasil:**
+- ✅ No more 403 Forbidden errors
+- ✅ Permission check masih jalan normal
+- ✅ JSON data aman terkirim
+- ✅ Support both form-encoded & JSON formats
+
 ---
 
 **📊 Technical Details:**
