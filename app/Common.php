@@ -380,7 +380,7 @@ if (!function_exists('pathBack')) {
 if (!function_exists('fixEditorHtml')) {
     function fixEditorHtml($content) : string
     {
-        $content = preg_replace('/font-family\s*:\s*[^;"]+;?/i', '', $content);
+        $content = preg_replace('/font-family\s*:\s*[^;"]+;?/iu', '', $content);
 
         return $content;
     }
