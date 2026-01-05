@@ -10,8 +10,8 @@ echo ========================================
 echo.
 
 REM Check if CHANGELOG file exists
-if not exist "CHANGELOG_2026-01-05.md" (
-    echo [ERROR] CHANGELOG_2026-01-05.md not found!
+if not exist "CHANGELOG_2026-01-05_ROLE_PAGE.md" (
+    echo [ERROR] CHANGELOG_2026-01-05_ROLE_PAGE.md not found!
     echo Please make sure the changelog file exists in the project root.
     pause
     exit /b 1
@@ -25,13 +25,13 @@ if not exist "README.md" (
     exit /b 1
 )
 
-echo [INFO] Found CHANGELOG_2026-01-05.md
+echo [INFO] Found CHANGELOG_2026-01-05_ROLE_PAGE.md
 echo [INFO] Found README.md
 echo.
 
 REM Append changelog to README
 echo [PROCESS] Appending changelog to README.md...
-type "CHANGELOG_2026-01-05.md" >> "README.md"
+type "CHANGELOG_2026-01-05_ROLE_PAGE.md" >> "README.md"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
