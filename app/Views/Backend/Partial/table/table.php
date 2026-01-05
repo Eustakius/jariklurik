@@ -591,41 +591,45 @@ if (!empty($importPerm)): ?>
                                         && !str_ends_with($p['permission'], '.view')
                                 );
                                 foreach ($filtereds as $permission):
-                                    $route = base_url($permission['route']); ?>
+                                    $routeKey = $permission['route'];
+                                    if (!str_starts_with($routeKey, 'back-end')) {
+                                        $routeKey = 'back-end/' . ltrim($routeKey, '/');
+                                    }
+                                    $route = rtrim(base_url($routeKey), '/'); ?>
                                     <?php if (str_ends_with($permission['permission'], '.detail')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}" 
-                                        class="w-8 h-8 bg-info-50 dark:bg-info-600/10 text-info-600 dark:text-info-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="iconamoon:eye-light"></iconify-icon>
+                                        class="w-9 h-9 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 dark:bg-cyan-900/20 dark:hover:bg-cyan-900/30 dark:text-cyan-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:eye-broken" class="text-lg"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.update')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}/edit" 
-                                        class="w-8 h-8 bg-warning-100 dark:bg-warning-600/25 text-warning-600 dark:text-warning-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="lucide:edit"></iconify-icon>
+                                        class="w-9 h-9 bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:pen-new-square-broken" class="text-lg"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.delete')): ?>
                                         <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:trash-bin-trash-broken" class="text-lg"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.process')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="mingcute:check-line"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:check-circle-broken" class="text-lg"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.approve')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-success-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="mingcute:check-line"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:check-circle-broken" class="text-lg"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.reject')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="mingcute:close-line"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:close-circle-broken" class="text-lg"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.revert')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-8 h-8 bg-warning-100 dark:bg-warning-600/25 text-warning-600 dark:text-warning-400 rounded-full inline-flex items-center justify-center">
-                                            <iconify-icon icon="mingcute:back-line"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
+                                            <iconify-icon icon="solar:restart-broken" class="text-lg"></iconify-icon>
                                         </button>
                                     <?php endif; ?>
                                 <?php endforeach; ?>

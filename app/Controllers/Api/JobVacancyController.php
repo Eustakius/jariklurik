@@ -155,7 +155,14 @@ class JobVacancyController extends BaseController
             ->join('countries', "countries.id = {$table}.country_id", 'left');
 
         if ($this->auth->user()->user_type == 'company') {
-            $model->where("{$table}.user_id", $this->auth->user()->id);
+            $companyModel = new \App\Models\CompanyModel();
+            $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+            if ($company) {
+                $model->where("{$table}.company_id", $company->id);
+            } else {
+                 // User is 'company' type but has no company record? Hide everything.
+                 $model->where("{$table}.company_id", -1);
+            }
         }
 
         // Jika ada ID spesifik

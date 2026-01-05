@@ -81,6 +81,7 @@
                     <div class="card-body">
                         <?= view('Backend/Partial/form/select-multiple', ['attribute' =>  [
                             'field' => 'roles',
+                            'label' => 'Roles',
                             'source' => $data->getRolesSet(),
                             'required' => true,
                             'placeholder' => 'Select Roles'

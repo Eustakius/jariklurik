@@ -101,10 +101,11 @@ class ApplicantModel extends Model
 
             $company = $companyModel->where('user_id', $auth->user()->id)->first();
             if (!empty($company)) {
-                $builder->where('company_id', $company->id);
+                // Explicitly use table alias to avoid ambiguity
+                $builder->where('job_vacancy.company_id', $company->id);
             }
             else{
-                $builder->where('company_id', -99);
+                $builder->where('job_vacancy.company_id', -99);
             }
         }
         

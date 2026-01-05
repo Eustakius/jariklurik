@@ -6,6 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
+
+
 $routes->group('back-end', static function ($routes) {
     $routes->get('login', 'AuthController::login', ['as' => 'login']);
     $routes->post('login', 'AuthController::attemptLogin');
@@ -27,15 +29,69 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     $routes->get('/', 'Backend\DashboardController::index');
     $routes->get('dashboard', 'Backend\DashboardController::index');
     $routes->group('administrator', static function ($routes) {
-        $routes->resource('user', ['controller' => 'Backend\Administrator\UserController', 'filter' => 'permission']);
-        $routes->resource('role', ['controller' => 'Backend\Administrator\RoleController', 'filter' => 'permission']);
-        $routes->resource('setting', ['controller' => 'Backend\SettingsController', 'filter' => 'permission']);
+        // User Routes
+        $routes->get('user', 'Backend\Administrator\UserController::index', ['filter' => 'permission']);
+        $routes->get('user/new', 'Backend\Administrator\UserController::new', ['filter' => 'permission']);
+        $routes->post('user', 'Backend\Administrator\UserController::create', ['filter' => 'permission']);
+        $routes->get('user/(:segment)/edit', 'Backend\Administrator\UserController::edit/$1', ['filter' => 'permission']);
+        $routes->get('user/(:segment)', 'Backend\Administrator\UserController::show/$1', ['filter' => 'permission']);
+        $routes->put('user/(:segment)', 'Backend\Administrator\UserController::update/$1', ['filter' => 'permission']);
+        $routes->patch('user/(:segment)', 'Backend\Administrator\UserController::update/$1', ['filter' => 'permission']);
+        $routes->delete('user/(:segment)', 'Backend\Administrator\UserController::delete/$1', ['filter' => 'permission']);
+
+        // Role Routes
+        $routes->get('role', 'Backend\Administrator\RoleController::index', ['filter' => 'permission']);
+        $routes->get('role/new', 'Backend\Administrator\RoleController::new', ['filter' => 'permission']);
+        $routes->post('role', 'Backend\Administrator\RoleController::create', ['filter' => 'permission']);
+        $routes->get('role/(:segment)/edit', 'Backend\Administrator\RoleController::edit/$1', ['filter' => 'permission']);
+        $routes->get('role/(:segment)', 'Backend\Administrator\RoleController::show/$1', ['filter' => 'permission']);
+        $routes->put('role/(:segment)', 'Backend\Administrator\RoleController::update/$1', ['filter' => 'permission']);
+        $routes->patch('role/(:segment)', 'Backend\Administrator\RoleController::update/$1', ['filter' => 'permission']);
+        $routes->delete('role/(:segment)', 'Backend\Administrator\RoleController::delete/$1', ['filter' => 'permission']);
+
+        // Setting Routes
+        $routes->get('setting', 'Backend\SettingsController::index', ['filter' => 'permission']);
+        $routes->get('setting/new', 'Backend\SettingsController::new', ['filter' => 'permission']);
+        $routes->post('setting', 'Backend\SettingsController::create', ['filter' => 'permission']);
+        $routes->get('setting/(:segment)/edit', 'Backend\SettingsController::edit/$1', ['filter' => 'permission']);
+        $routes->get('setting/(:segment)', 'Backend\SettingsController::show/$1', ['filter' => 'permission']);
+        $routes->put('setting/(:segment)', 'Backend\SettingsController::update/$1', ['filter' => 'permission']);
+        $routes->patch('setting/(:segment)', 'Backend\SettingsController::update/$1', ['filter' => 'permission']);
+        $routes->delete('setting/(:segment)', 'Backend\SettingsController::delete/$1', ['filter' => 'permission']);
     });
-    $routes->resource('my-profile', ['controller' => 'Backend\MyProfileController', 'filter' => 'permission']);
-    $routes->resource('company', ['controller' => 'Backend\Application\CompanyController', 'filter' => 'permission']);
+    // My Profile Routes
+    // My Profile Routes
+    $routes->get('my-profile', 'Backend\MyProfileController::index');
+    $routes->get('my-profile/new', 'Backend\MyProfileController::new');
+    $routes->post('my-profile', 'Backend\MyProfileController::create');
+    $routes->get('my-profile/(:segment)/edit', 'Backend\MyProfileController::edit/$1');
+    $routes->get('my-profile/(:segment)', 'Backend\MyProfileController::show/$1');
+    $routes->put('my-profile/(:segment)', 'Backend\MyProfileController::update/$1');
+    $routes->patch('my-profile/(:segment)', 'Backend\MyProfileController::update/$1');
+    $routes->delete('my-profile/(:segment)', 'Backend\MyProfileController::delete/$1');
+
+    // Company Routes
+    $routes->get('company', 'Backend\Application\CompanyController::index', ['filter' => 'permission']);
+    $routes->get('company/new', 'Backend\Application\CompanyController::new', ['filter' => 'permission']);
+    $routes->post('company', 'Backend\Application\CompanyController::create', ['filter' => 'permission']);
+    $routes->get('company/(:segment)/edit', 'Backend\Application\CompanyController::edit/$1', ['filter' => 'permission']);
+    $routes->get('company/(:segment)', 'Backend\Application\CompanyController::show/$1', ['filter' => 'permission']);
+    $routes->put('company/(:segment)', 'Backend\Application\CompanyController::update/$1', ['filter' => 'permission']);
+    $routes->patch('company/(:segment)', 'Backend\Application\CompanyController::update/$1', ['filter' => 'permission']);
+    $routes->delete('company/(:segment)', 'Backend\Application\CompanyController::delete/$1', ['filter' => 'permission']);
+
+    // Job Vacancy Routes
     $routes->get('job-vacancy/template-import', 'Backend\Application\JobVacancyController::templateImport', ['filter' => 'permission']);
     $routes->post('job-vacancy/import', 'Backend\Application\JobVacancyController::import', ['filter' => 'permission']);
-    $routes->resource('job-vacancy', ['controller' => 'Backend\Application\JobVacancyController', 'filter' => 'permission']);
+    
+    $routes->get('job-vacancy', 'Backend\Application\JobVacancyController::index', ['filter' => 'permission']);
+    $routes->get('job-vacancy/new', 'Backend\Application\JobVacancyController::new', ['filter' => 'permission']);
+    $routes->post('job-vacancy', 'Backend\Application\JobVacancyController::create', ['filter' => 'permission']);
+    $routes->get('job-vacancy/(:segment)/edit', 'Backend\Application\JobVacancyController::edit/$1', ['filter' => 'permission']);
+    $routes->get('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::show/$1', ['filter' => 'permission']);
+    $routes->put('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
+    $routes->patch('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
+    $routes->delete('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::delete/$1', ['filter' => 'permission']);
     $routes->put('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
     $routes->put('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
     $routes->put('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
@@ -45,7 +101,15 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     $routes->put('applicant/(:segment)/reject', 'Backend\Application\ApplicantController::reject/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/revert', 'Backend\Application\ApplicantController::revert/$1', ['filter' => 'permission']);
 
-    $routes->resource('applicant', ['controller' => 'Backend\Application\ApplicantController', 'filter' => 'permission']);
+    // Applicant Routes
+    $routes->get('applicant', 'Backend\Application\ApplicantController::index', ['filter' => 'permission']);
+    $routes->get('applicant/new', 'Backend\Application\ApplicantController::new', ['filter' => 'permission']);
+    $routes->post('applicant', 'Backend\Application\ApplicantController::create', ['filter' => 'permission']);
+    $routes->get('applicant/(:segment)/edit', 'Backend\Application\ApplicantController::edit/$1', ['filter' => 'permission']);
+    $routes->get('applicant/(:segment)', 'Backend\Application\ApplicantController::show/$1', ['filter' => 'permission']);
+    $routes->put('applicant/(:segment)', 'Backend\Application\ApplicantController::update/$1', ['filter' => 'permission']);
+    $routes->patch('applicant/(:segment)', 'Backend\Application\ApplicantController::update/$1', ['filter' => 'permission']);
+    $routes->delete('applicant/(:segment)', 'Backend\Application\ApplicantController::delete/$1', ['filter' => 'permission']);
     $routes->group('training', static function ($routes) {
         // Job Seeker Mass Actions
         $routes->put('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
@@ -56,7 +120,15 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
         $routes->put('job-seekers/(:segment)/approve', 'Backend\Application\Training\JobSeekerController::approve/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/reject', 'Backend\Application\Training\JobSeekerController::reject/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/revert', 'Backend\Application\Training\JobSeekerController::revert/$1', ['filter' => 'permission']);
-        $routes->resource('job-seekers', ['controller' => 'Backend\Application\Training\JobSeekerController', 'filter' => 'permission']);
+        // Job Seekers Routes
+        $routes->get('job-seekers', 'Backend\Application\Training\JobSeekerController::index', ['filter' => 'permission']);
+        $routes->get('job-seekers/new', 'Backend\Application\Training\JobSeekerController::new', ['filter' => 'permission']);
+        $routes->post('job-seekers', 'Backend\Application\Training\JobSeekerController::create', ['filter' => 'permission']);
+        $routes->get('job-seekers/(:segment)/edit', 'Backend\Application\Training\JobSeekerController::edit/$1', ['filter' => 'permission']);
+        $routes->get('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::show/$1', ['filter' => 'permission']);
+        $routes->put('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::update/$1', ['filter' => 'permission']);
+        $routes->patch('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::update/$1', ['filter' => 'permission']);
+        $routes->delete('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::delete/$1', ['filter' => 'permission']);
         
         // Purna PMI Mass Actions
         $routes->put('purna-pmi/mass-approve', 'Backend\Application\Training\PurnaPmiController::massApprove', ['filter' => 'permission']);
@@ -67,10 +139,28 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
         $routes->put('purna-pmi/(:segment)/approve', 'Backend\Application\Training\PurnaPmiController::approve/$1', ['filter' => 'permission']);
         $routes->put('purna-pmi/(:segment)/reject', 'Backend\Application\Training\PurnaPmiController::reject/$1', ['filter' => 'permission']);
         $routes->put('purna-pmi/(:segment)/revert', 'Backend\Application\Training\PurnaPmiController::revert/$1', ['filter' => 'permission']);
-        $routes->resource('purna-pmi', ['controller' => 'Backend\Application\Training\PurnaPmiController', 'filter' => 'permission']);
+        
+        // Purna PMI Routes
+        $routes->get('purna-pmi', 'Backend\Application\Training\PurnaPmiController::index', ['filter' => 'permission']);
+        $routes->get('purna-pmi/new', 'Backend\Application\Training\PurnaPmiController::new', ['filter' => 'permission']);
+        $routes->post('purna-pmi', 'Backend\Application\Training\PurnaPmiController::create', ['filter' => 'permission']);
+        $routes->get('purna-pmi/(:segment)/edit', 'Backend\Application\Training\PurnaPmiController::edit/$1', ['filter' => 'permission']);
+        $routes->get('purna-pmi/(:segment)', 'Backend\Application\Training\PurnaPmiController::show/$1', ['filter' => 'permission']);
+        $routes->put('purna-pmi/(:segment)', 'Backend\Application\Training\PurnaPmiController::update/$1', ['filter' => 'permission']);
+        $routes->patch('purna-pmi/(:segment)', 'Backend\Application\Training\PurnaPmiController::update/$1', ['filter' => 'permission']);
+        $routes->delete('purna-pmi/(:segment)', 'Backend\Application\Training\PurnaPmiController::delete/$1', ['filter' => 'permission']);
         
         $routes->put('training-type/mass-delete', 'Backend\Application\Training\TrainingTypeController::massDelete', ['filter' => 'permission']);
-        $routes->resource('training-type', ['controller' => 'Backend\Application\Training\TrainingTypeController', 'filter' => 'permission']);
+        
+        // Training Type Routes
+        $routes->get('training-type', 'Backend\Application\Training\TrainingTypeController::index', ['filter' => 'permission']);
+        $routes->get('training-type/new', 'Backend\Application\Training\TrainingTypeController::new', ['filter' => 'permission']);
+        $routes->post('training-type', 'Backend\Application\Training\TrainingTypeController::create', ['filter' => 'permission']);
+        $routes->get('training-type/(:segment)/edit', 'Backend\Application\Training\TrainingTypeController::edit/$1', ['filter' => 'permission']);
+        $routes->get('training-type/(:segment)', 'Backend\Application\Training\TrainingTypeController::show/$1', ['filter' => 'permission']);
+        $routes->put('training-type/(:segment)', 'Backend\Application\Training\TrainingTypeController::update/$1', ['filter' => 'permission']);
+        $routes->patch('training-type/(:segment)', 'Backend\Application\Training\TrainingTypeController::update/$1', ['filter' => 'permission']);
+        $routes->delete('training-type/(:segment)', 'Backend\Application\Training\TrainingTypeController::delete/$1', ['filter' => 'permission']);
     });
     $routes->group('api', ['filter' => 'jwt'], function ($routes) {
         $routes->group('user', static function ($routes) {
