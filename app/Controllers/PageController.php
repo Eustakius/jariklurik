@@ -106,4 +106,59 @@ class PageController extends BaseController
             'loading' => view('Sections/spinner')
         ]);
     }
+    public function thankYou()
+    {
+        // session()->setFlashdata('message', 'Terima kasih, lamaran Anda telah kami terima.');
+        
+        // Render the page using the 'thank-you-registered' section from configuration
+        $page = 'thank-you-registered';
+        
+        $meta = (object)[   
+            'title' => 'Jariklurik - Terima Kasih',
+            'description' => 'Terima kasih telah mendaftar di Jariklurik.',
+            'keywords' => 'jariklurik, terima kasih, lamaran'
+        ];
+
+        // Basic Token Logic (reused from index) - simplified
+        $jwt = new \App\Libraries\JWTService();
+        $payload = (object)[
+            'ip_address'    => $this->request->getIPAddress(),
+            'user_agent'    => 'frontend-' . (string) $this->request->getUserAgent(),
+        ];
+        $token = $jwt->generateToken([
+            'ip_address' => $payload->ip_address,
+            'user_agent' => $payload->user_agent,
+            'time' => date('Y-m-d H:i:s')
+        ]);
+        
+        // Ideally we should reuse the auth tracking logic or extract it to a private method, 
+        // but for now keeping it inline to avoid breaking changes in other methods.
+        
+        $sections = array_filter($this->config->sections, function ($key) use ($page) {
+            return $key === $page;
+        }, ARRAY_FILTER_USE_KEY);
+        $sectionList = reset($sections);
+        
+        if (empty($sectionList)) {
+            // Should not happen if config is correct
+            throw PageNotFoundException::forPageNotFound();
+        }
+        
+         // Add the message manually to the data passed to the view, 
+         // since sending it via Flashdata on a separate redirect request might be tricky if session is lost 
+         // But notification.php uses session()->getFlashdata('message').
+         // So we MUST set it here.
+         session()->setFlashdata('message', 'Terima kasih, formulir Anda berhasil dikirim! Tim kami akan segera meninjau lamaran Anda.');
+
+        return view('page', [
+            'token' => $token,
+            'config' => $this->config,
+            'page' => $page,
+            'meta' => $meta,
+            'data' => null, // No specific data needed for static thank you
+            'sections' => $sectionList,
+            'data_master' => null,
+            'loading' => view('Sections/spinner')
+        ]);
+    }
 }

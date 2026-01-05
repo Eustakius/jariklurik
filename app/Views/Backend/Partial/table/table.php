@@ -1,3 +1,10 @@
+<style>
+    /* Force checkmark visibility when input is checked */
+    input.peer:checked + div svg {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+    }
+</style>
 <?php if (session()->has('key') && session('key') == $props['key'] || !session()->has('key')): ?>
     <?php if (session()->has('message-backend')): ?>
         <div class="mb-4 alert alert-success bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-white border-success-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert">
@@ -24,11 +31,19 @@ if (isset($props['selectable']) && $props['selectable']) {
     // Check if we haven't already added it (in case of re-renders or shared props weirdness)
     // Actually props are local to this view render.
     array_unshift($props['columns'], [
-        'title' => '<input type="checkbox" id="selectAll' . $props['key'] . '" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">',
+        'title' => '<label class="inline-flex items-center cursor-pointer relative">
+                        <input type="checkbox" id="selectAll' . $props['key'] . '" class="peer sr-only">
+                        <div class="w-5 h-5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 rounded transition-all duration-200 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:[&>svg]:opacity-100 peer-checked:[&>svg]:scale-100 flex items-center justify-center shadow-sm hover:shadow-md">
+                            <svg class="w-3.5 h-3.5 text-white opacity-0 scale-50 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>',
         'data' => null,
+        'defaultContent' => '',
         'orderable' => false,
         'searchable' => false,
-        'width' => '10px'
+        'width' => '50px'
     ]);
 }
 ?>
@@ -64,6 +79,22 @@ if (isset($props['selectable']) && $props['selectable']) {
     </div>
 </div>
 <?php
+// ... [Using a large match block because multiple occurrences need replacement or context matching is safer for 'body' replacement too]
+// Actually, I should split this. The prompt allows multiple edits? No. "Use this tool ONLY when you are making... MULTIPLE NON_CONTIGUOUS...".
+// Wait, replace_file_content is for SINGLE CONTIGUOUS.
+// multi_replace_file_content is for multiple.
+// I will use `multi_replace_file_content` to update both Header and Body in one go.
+
+
+$buttons = [];
+// ... (rest of file content logic is managed by line replacement, I don't need to repeat it all here if I target correctly)
+// Wait, replace_file_content replaces a block. I need to be careful not to overwrite huge chunks unnecessarily.
+// Let's split this into two calls or be precise.
+// Call 1: Update the width in PHP block.
+// Call 2: Update the columnDefs in JS block.
+// Actually, I can do it in one replace if the distance is small, but lines 26 to 500+ is too big.
+// I will use multi_replace.
+
 
 $buttons = [];
 $buttons[] = [
@@ -506,29 +537,8 @@ if (!empty($importPerm)): ?>
                         }
                     }
                 },
-                responsive: {
-                    details: {
-                        // display: DataTable.Responsive.display.childRowImmediate,
-                        type: 'column',
-                        target: <?= (isset($props['selectable']) && $props['selectable']) ? 1 : 0 ?>,
-                        renderer: function (api, rowIdx, columns) {
-                            var data = $.map(columns, function (col, i) {
-                                return col.hidden ?
-                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
-                                    '<td class="px-4 py-2 font-semibold text-gray-500 text-xs uppercase dark:text-gray-400">' + col.title + ':' + '</td> ' +
-                                    '<td class="px-4 py-2 text-gray-700 dark:text-gray-200">' + col.data + '</td>' +
-                                    '</tr>' :
-                                    '';
-                            }).join('');
-
-                            return data ?
-                                $('<div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg shadow-inner border border-neutral-200 dark:border-neutral-700"/>').append(
-                                    $('<table class="w-full text-sm text-left"/>').append(data)
-                                ) :
-                                false;
-                        }
-                    }
-                },
+                scrollX: true,
+                autoWidth: false,
                 columns: <?= json_encode($props['columns']) ?>,
                 lengthMenu: [
                     [10, 25, 50, 100, 200, 500, 1000],
@@ -543,15 +553,23 @@ if (!empty($importPerm)): ?>
                     ,{
                         className: 'text-center',
                         targets: 0, 
+                        width: '50px',
+                        visible: true,
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row, meta) {
                             var isChecked = selectedIds<?= $props['key'] ?>.has(row.id.toString()) ? 'checked' : '';
-                            return '<input type="checkbox" class="row-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" value="' + row.id + '" ' + isChecked + '>';
+                            return '<label class="inline-flex items-center cursor-pointer relative">' +
+                                        '<input type="checkbox" class="row-checkbox peer sr-only" value="' + row.id + '" ' + isChecked + '>' +
+                                        '<div class="w-5 h-5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-500 rounded transition-all duration-200 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:[&>svg]:opacity-100 peer-checked:[&>svg]:scale-100 flex items-center justify-center shadow-sm hover:shadow-md">' +
+                                            '<svg class="w-3.5 h-3.5 text-white opacity-0 scale-50 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">' +
+                                                '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />' +
+                                            '</svg>' +
+                                        '</div>' +
+                                   '</label>';
                         }
                     }
                     ,{
-                        className: 'dtr-control',
                         targets: 1,
                         orderable: false,
                         searchable: false,
@@ -564,7 +582,6 @@ if (!empty($importPerm)): ?>
                     }
                     <?php else: ?>
                     ,{
-                        className: 'dtr-control',
                         targets: 0,
                         orderable: false,
                         searchable: false,

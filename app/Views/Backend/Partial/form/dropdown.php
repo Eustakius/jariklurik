@@ -21,10 +21,80 @@ $attribute['disabled']  = (isset($attribute['disabled']) && $attribute['disabled
 <script>
     $(document).ready(function() {
         const $select = $('#<?= esc($attribute['field']) ?>');
+        
+        // Function to format status badges with colors using inline styles
+        function formatStatusBadge(item) {
+            if (!item.id) {
+                return item.text;
+            }
+            
+            const text = item.text || '';
+            
+            // Check for Active status
+            if (text.includes('[✓ Active]')) {
+                const parts = text.split('[✓ Active]');
+                const mainText = parts[0].trim();
+                const $result = $('<span></span>');
+                
+                // Main text with white color for visibility
+                $result.append($('<span></span>').text(mainText + ' ').css({
+                    'color': '#ffffff'
+                }));
+                
+                // Active badge with inline styles
+                $result.append($('<span></span>').text('✓ Active').css({
+                    'margin-left': '4px',
+                    'padding': '3px 10px',
+                    'background-color': '#10b981',
+                    'color': '#ffffff',
+                    'font-size': '11px',
+                    'font-weight': '700',
+                    'border-radius': '6px',
+                    'display': 'inline-block',
+                    'vertical-align': 'middle'
+                }));
+                
+                return $result;
+            }
+            // Check for Inactive status
+            else if (text.includes('[✕ Inactive]')) {
+                const parts = text.split('[✕ Inactive]');
+                const mainText = parts[0].trim();
+                const $result = $('<span></span>');
+                
+                // Main text with lighter color for inactive items
+                $result.append($('<span></span>').text(mainText + ' ').css({
+                    'color': '#d1d5db'
+                }));
+                
+                // Inactive badge with inline styles
+                $result.append($('<span></span>').text('✕ Inactive').css({
+                    'margin-left': '4px',
+                    'padding': '3px 10px',
+                    'background-color': '#ef4444',
+                    'color': '#ffffff',
+                    'font-size': '11px',
+                    'font-weight': '700',
+                    'border-radius': '6px',
+                    'display': 'inline-block',
+                    'vertical-align': 'middle'
+                }));
+                
+                return $result;
+            }
+            
+            // Default: return text with white color
+            return $('<span></span>').text(text).css({
+                'color': '#ffffff'
+            });
+        }
+        
         $select.select2({
             placeholder: 'Select a <?= esc($attribute['placeholder']) ?>',
             allowClear: true,
             width: '100%',
+            templateResult: formatStatusBadge,
+            templateSelection: formatStatusBadge,
             ajax: {
                 url: '<?= site_url($attribute['api']) ?>',
                 headers: {

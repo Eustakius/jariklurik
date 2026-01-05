@@ -42,7 +42,8 @@ class JobVacancyModel extends Model
         'deleted_at',
         'created_by',
         'updated_by',
-        'deleted_by'
+        'deleted_by',
+        'required_documents',
     ];
     protected $useTimestamps   = true;
     protected $skipValidation     = false;

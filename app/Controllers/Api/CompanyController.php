@@ -74,9 +74,16 @@ class CompanyController extends BaseController
         }
 
         $results = array_map(function ($company) {
+            $text = $company->name;
+            // Add dynamic status indicator
+            if ($company->status == 1) {
+                $text .= ' [✓ Active]';
+            } else {
+                $text .= ' [✕ Inactive]';
+            }
             return [
                 'id'   => $company->id,
-                'text' => $company->name,
+                'text' => $text,
             ];
         }, $companies);
 

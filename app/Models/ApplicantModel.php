@@ -46,7 +46,8 @@ class ApplicantModel extends Model
         'processed_by',
         'approved_by',
         'rejected_by',
-        'reverted_by'
+        'reverted_by',
+        'documents'
     ];
 
     

@@ -180,6 +180,7 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
             $routes->get('data-table', 'Api\JobVacancyController::dataTable');
             $routes->put('data-table-update', 'Api\JobVacancyController::dataTableUpdate');
             $routes->get('select', 'Api\JobVacancyController::select2');
+            $routes->get('(:num)', 'Api\JobVacancyController::show/$1');
         });
         $routes->group('applicant', static function ($routes) {
             $routes->get('data-table-new', 'Api\ApplicantController::dataTableNew');
@@ -224,5 +225,6 @@ $routes->get('cv/(:any)', 'FilePreviewController::CV/$1', ['filter' => 'auth']);
 $routes->get('statement-letter/(:any)', 'FilePreviewController::statementLetter/$1', ['filter' => 'auth']);
 $routes->get('stamp-passport-imigrasi/(:any)', 'FilePreviewController::stampPassportImigrasi/$1', ['filter' => 'auth']);
 $routes->get('captcha', 'CaptchaController::index');
+$routes->get('thank-you-registered', 'PageController::thankYou');
 $routes->get('/(:any)', 'PageController::index/$1');
 // $routes->get('image/(:any)', 'ImageController::show/$1');

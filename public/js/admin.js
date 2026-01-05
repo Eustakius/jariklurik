@@ -354,11 +354,13 @@ $(function () {
     });
 
     const fadeDiv = document.getElementById('fadeDiv');
-    window.addEventListener('scroll', () => {
-        const maxScroll = 200; // scroll sejauh ini akan 100% hilang
-        const opacity = Math.max(0, 1 - window.scrollY / maxScroll);
-        fadeDiv.style.opacity = opacity;
-    });
+    if (fadeDiv) {
+        window.addEventListener('scroll', () => {
+            const maxScroll = 200; // scroll sejauh ini akan 100% hilang
+            const opacity = Math.max(0, 1 - window.scrollY / maxScroll);
+            fadeDiv.style.opacity = opacity;
+        });
+    }
 
     // $(window).on('load', function () {
     //     $('.preloaderpage').addClass('hidden');

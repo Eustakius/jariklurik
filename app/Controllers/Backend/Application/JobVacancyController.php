@@ -75,37 +75,61 @@ class JobVacancyController extends BaseController
             ];
         }
 
+        $filters = [
+            ['label' => 'Country', 'id' => 'country', 'input' => 'select', 'api' => 'back-end/api/country/select'],
+            ['label' => 'Company', 'id' => 'company', 'input' => 'select', 'api' => 'back-end/api/company/select'],
+            ['label' => 'Selection From', 'id' => 'selectionfrom', 'input' => 'date', 'type' => 'date'],
+            ['label' => 'Selection To', 'id' => 'selectionto', 'input' => 'date', 'type' => 'date'],
+            ['label' => 'Duration', 'id' => 'duration', 'input' => 'textgroup', 'group' => ['id' => 'durationtype', 'input' => 'select', 'data' => [
+                "",
+                "Bulan",
+                "Tahun"
+            ]]],
+            ['label' => 'Pinned', 'id' => 'pinned', 'input' => 'select', 'data' => [
+                ["value" => 0, "label" => "Not Pinned"],
+                ["value" => 1, "label" => "Pinned"]
+            ]],
+        ];
+
         return view('Backend/Application/job-vacancy', [
             'config'     => $this->config,
-            'datatable'  => [
-                'key' => 'jobvacancy',
-                'api' => $this->configApp->baseBackendURL . '/api/job-vacancy/data-table',
-                'fixedcolumns' => 0,
-                'token' => $token,
-                'columns' => datatableColumns($columns),
-                'page' => $this->request->getPath(),
-                'permission' => $permission,
-                'filters' => [
-                    ['label' => 'Country', 'id' => 'country', 'input' => 'select', 'api' => 'back-end/api/country/select'],
-                    ['label' => 'Company', 'id' => 'company', 'input' => 'select', 'api' => 'back-end/api/company/select'],
-                    ['label' => 'Selection From', 'id' => 'selectionfrom', 'input' => 'date', 'type' => 'date'],
-                    ['label' => 'Selection To', 'id' => 'selectionto', 'input' => 'date', 'type' => 'date'],
-                    ['label' => 'Duration', 'id' => 'duration', 'input' => 'textgroup', 'group' => ['id' => 'durationtype', 'input' => 'select', 'data' => [
-                        "",
-                        "Bulan",
-                        "Tahun"
-                    ]]],
-                    ['label' => 'Active', 'id' => 'status', 'input' => 'select', 'data' => [
-                        ["value" => 0, "label" => "Inactive"],
-                        ["value" => 1, "label" => "Aactive"]
-                    ]],
-                    ['label' => 'Pinned', 'id' => 'pinned', 'input' => 'select', 'data' => [
-                        ["value" => 0, "label" => "Not Pinned"],
-                        ["value" => 1, "label" => "Pinned"]
-                    ]],
-                ],
-            ],
             'token' => $token,
+            'tabs' => [
+                [
+                    'key' => 'active',
+                    'label' => 'Active',
+                    'icon' => 'mingcute:check-circle-line',
+                    'datatable' => [
+                        'key' => 'active',
+                        'selectable' => true,
+                        // status=1 for Active
+                        'api' => $this->configApp->baseBackendURL . '/api/job-vacancy/data-table?status=1',
+                        'fixedcolumns' => 0,
+                        'token' => $token,
+                        'columns' => datatableColumns($columns),
+                        'page' => $this->request->getPath(),
+                        'permission' => $permission,
+                        'filters' => $filters,
+                    ]
+                ],
+                [
+                    'key' => 'inactive',
+                    'label' => 'Inactive',
+                    'icon' => 'mingcute:close-circle-line',
+                    'datatable' => [
+                        'key' => 'inactive',
+                        'selectable' => true,
+                        // status=0 for Inactive
+                        'api' => $this->configApp->baseBackendURL . '/api/job-vacancy/data-table?status=0',
+                        'fixedcolumns' => 0,
+                        'token' => $token,
+                        'columns' => datatableColumns($columns),
+                        'page' => $this->request->getPath(),
+                        'permission' => $permission,
+                        'filters' => $filters,
+                    ]
+                ]
+            ],
             'loading'    => false,
             'error-backend'      => null,
         ]);
@@ -166,6 +190,13 @@ class JobVacancyController extends BaseController
 
         // $data['status'] = $this->auth->user()->user_type === 'admin' ? 1 : 9;
         $data['status'] = 1;
+        
+        $reqDocs = $this->request->getPost('required_documents');
+        if (empty($reqDocs) || count($reqDocs) > 2) {
+             return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'Please select at most 2 required documents (CV is mandatory).']);
+        }
+        $data['required_documents'] = json_encode($reqDocs);
+
         $id = $this->model->insert($data);
         if (! $id) {
             return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', $this->model->errors());
@@ -180,6 +211,13 @@ class JobVacancyController extends BaseController
     public function update($id = null)
     {
         $data = $this->request->getPost();
+        
+        $reqDocs = $this->request->getPost('required_documents');
+        if (empty($reqDocs) || count($reqDocs) > 2) {
+             return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'Please select at most 2 required documents (CV is mandatory).']);
+        }
+        $data['required_documents'] = json_encode($reqDocs);
+
         $data['id'] = $id;
 
         if (!$this->model->update($id, $data)) {

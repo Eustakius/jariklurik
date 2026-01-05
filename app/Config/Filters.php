@@ -84,6 +84,7 @@ class Filters extends BaseFilters
                 'back-end/api/*', // API endpoints
                 'back-end/*/mass-*', // Mass action endpoints
                 'submit/*', // Allow submission endpoints
+                'api/submit/*', // Allow API submission endpoints
             ]],
         ],
         'after' => [

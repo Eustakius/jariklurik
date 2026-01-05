@@ -208,16 +208,61 @@ class ApplicantController extends BaseController
             ]);
         }
 
-        // FILE UPLOAD
-        $filePath = upload_file_confidential('file_cv', 'storage/file/applicant/cv', $request->getPost('first_name') . '-' . slugify($request->getPost('email')) . '-cv', 5242880);
-        if (!$filePath['success']) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => $filePath['error']
-            ]);
+        // FILE UPLOAD LOGIC
+        $uploadedDocs = [];
+        $allowedKeys = ['cv', 'language_cert', 'skill_cert', 'other'];
+        $requiredDocs = !empty($dataJobVacancy->required_documents) ? $dataJobVacancy->getNormalizedRequiredDocuments() : ['cv']; // Default to CV if empty
+        
+        foreach ($allowedKeys as $key) {
+            $file = $request->getFile($key);
+            if ($file && $file->isValid()) {
+                $filePath = upload_file_confidential($key, 'storage/file/applicant/' . $key, $request->getPost('first_name') . '-' . slugify($request->getPost('email')) . '-' . $key, 5242880);
+                
+                if (!$filePath['success']) {
+                     // Check if this file was required. If so, fail. If optional, maybe skip? 
+                     // Usually upload errors like 'size' should fail the whole request.
+                     return $this->response->setJSON([
+                        'success' => false,
+                        'message' => "Upload failed for $key: " . $filePath['error']
+                    ]);
+                }
+                
+                // normalize path
+                $storedPath = str_replace('storage/file/applicant/', '', $filePath['path']);
+                // Actually upload_file_confidential returns full path. 
+                // The original code did: str_replace('storage/file/applicant/', '', $filePath['path']);
+                // This implies 'storage/file/applicant/cv/...' -> 'cv/...' ?
+                // We should store consistent paths. 
+                // Let's store relative path as expected by frontend/backend.
+                // Replicating original behavior:
+                // $data['file_cv'] = str_replace('storage/file/applicant/', '', $filePath['path']);
+                // This seems to assume 'file_cv' stores relative path from 'storage/file/applicant/'?
+                // But Wait! upload_file_confidential second arg is target dir 'storage/file/applicant/cv'.
+                // So str_replace 'storage/file/applicant/' leaves 'cv/filename'.
+                
+                // Let's stick to full logic, but we need to know what directory we uploaded to.
+                // We uploaded to "storage/file/applicant/$key".
+                // So removing 'storage/file/applicant/' results in "$key/filename".
+                
+                $uploadedDocs[$key] = str_replace('storage/file/applicant/', '', $filePath['path']);
+                
+                if ($key === 'cv') {
+                    $data['file_cv'] = $uploadedDocs[$key];
+                }
+            }
         }
-
-        $data['file_cv'] = str_replace('storage/file/applicant/', '', $filePath['path']);
+        
+        // Validation: Check if all required docs are present
+        foreach ($requiredDocs as $req) {
+            if (!isset($uploadedDocs[$req])) {
+                 return $this->response->setJSON([
+                    'success' => false,
+                    'message' => "Dokumen wajib belum diunggah: " . $req
+                ]);
+            }
+        }
+        
+        $data['documents'] = json_encode($uploadedDocs);
         $data['job_vacancy_id'] = (int)shortDecrypt($id);
         
         // INSERT APPLICANT

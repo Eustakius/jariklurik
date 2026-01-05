@@ -164,7 +164,7 @@ $lastPart = end($parts);
                 </div>
                 <?php if ($data->malequota > 0 || $data->femalequota > 0 || $data->unisexquota > 0): ?>
                     <div id="fadeJobApply" class="<?= session()->getFlashdata('error') ? 'opacity-1' : 'hidden opacity-0' ?> transition-opacity duration-500 ease-in-out">
-                        <form class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('submit/applicant') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
+                        <form class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('api/submit/applicant') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
                             <input type="hidden" name="token" value="<?= $token ?>">
                             <input type="hidden" name="slug" value="<?= $data->slug ?>">
                             <?= csrf_field() ?>
@@ -250,30 +250,61 @@ $lastPart = end($parts);
                                     </div>
                                 </div>
                             </div>
-                            <h2 class="text-lg md:text-2xl font-bold mt-16">Upload CV</h2>
-                            <div class="flex flex-wrap gap-x-[60px] gap-y-8 mb-16 w-full">
-                                <div class="w-full">
-                                    <div class="form-group form-float">
-                                        <div class="form-line">
-                                            <label for="upload-file" class="file-upload w-full justify-between flex form-control focused cursor-pointer items-center" id="trigger-upload">
-                                                <div id="file-info" class="mt-2 flex">
-                                                    <span id="file-name"></span>
-                                                    <span id="remove-file" class="ml-2 text-red-600 cursor-pointer hover:underline hidden">Remove</span>
-                                                </div>
-                                                <img src="/icon/jariklurik-upload.png" class="h-[1.563rem] md:h-[1.563rem] w-auto">
-                                            </label>
-                                            <input type="file" id="upload-file" name="file_cv" class="form-control hidden" required
-                                                data-parsley-maxfilesize="5242880"
-                                                data-parsley-maxfilesize-message="Maksimal 5 MB"
-                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                data-parsley-fileextension="pdf,doc,docx,jpg,jpeg,png"
-                                                data-parsley-fileextension-message="Tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png">
-                                            <label for="upload-file" class="form-label">Upload CV Anda</label>
+                            <h2 class="text-lg md:text-2xl font-bold mt-16">Upload Dokumen</h2>
+                            <div class="flex flex-col gap-6 mb-16 w-full">
+                                <?php 
+                                    $reqDocs = !empty($data->required_documents) ? $data->required_documents : ['cv'];
+                                    // Handle case if empty
+                                    if(empty($reqDocs)) $reqDocs = ['cv'];
+                                    
+                                    $docLabels = [
+                                        'cv' => 'CV / Resume',
+                                        'language_cert' => 'Sertifikat Bahasa',
+                                        'skill_cert' => 'Sertifikat Keahlian',
+                                        'other' => 'Dokumen Pendukung Lainnya'
+                                    ];
+                                ?>
+                                <?php foreach($reqDocs as $key): ?>
+                                    <?php $label = $docLabels[$key] ?? $key; ?>
+                                    <div class="w-full">
+                                        <div class="form-group form-float">
+                                            <div class="form-line">
+                                                <label for="file_<?= $key ?>" class="file-upload w-full justify-between flex form-control focused cursor-pointer items-center" id="trigger-<?= $key ?>">
+                                                    <div id="file-info-<?= $key ?>" class="mt-2 flex">
+                                                        <span id="file-name-<?= $key ?>"></span>
+                                                        <span id="remove-file-<?= $key ?>" class="ml-2 text-red-600 cursor-pointer hover:underline hidden" onclick="removeFile('<?= $key ?>'); return false;">Remove</span>
+                                                    </div>
+                                                    <img src="/icon/jariklurik-upload.png" class="h-[1.563rem] md:h-[1.563rem] w-auto">
+                                                </label>
+                                                <input type="file" id="file_<?= $key ?>" name="<?= $key ?>" class="form-control hidden doc-input" required
+                                                    data-parsley-maxfilesize="5242880"
+                                                    data-parsley-maxfilesize-message="Maksimal 5 MB"
+                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    data-parsley-fileextension="pdf,doc,docx,jpg,jpeg,png"
+                                                    data-parsley-fileextension-message="Tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png"
+                                                    onchange="handleFileSelect(this, '<?= $key ?>')">
+                                                <label for="file_<?= $key ?>" class="form-label">Upload <?= $label ?></label>
+                                            </div>
+                                            <i class="text-xs md:text-sm text-[#B94A48]">Maksimal 5 MB dan tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png</i>
                                         </div>
-                                        <i class="text-xs md:text-sm text-[#B94A48]">Maksimal 5 MB dan tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png</i>
                                     </div>
-                                </div>
+                                <?php endforeach; ?>
                             </div>
+                            <script>
+                                function handleFileSelect(input, key) {
+                                    const file = input.files[0];
+                                    if (file) {
+                                        document.getElementById('file-name-' + key).textContent = file.name;
+                                        document.getElementById('remove-file-' + key).classList.remove('hidden');
+                                    }
+                                }
+                                function removeFile(key) {
+                                    const input = document.getElementById('file_' + key);
+                                    input.value = '';
+                                    document.getElementById('file-name-' + key).textContent = '';
+                                    document.getElementById('remove-file-' + key).classList.add('hidden');
+                                }
+                            </script>
                             <div class="flex flex-col">
                                 <label>Captcha</label>
                                 <div class="flex flex-row gap-4">

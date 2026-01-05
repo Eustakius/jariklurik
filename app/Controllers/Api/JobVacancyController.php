@@ -149,10 +149,11 @@ class JobVacancyController extends BaseController
         $model = new JobVacancyModel();
         $table = $model->table; // pastikan nama tabel utama benar
 
-        // Tambahkan kolom dari tabel relasi
+        // Tambahkan kolom dari tabel relasi - Show ALL job vacancies with status indicator
         $model->select("{$table}.*, companies.name AS company_name, countries.name AS country_name")
             ->join('companies', "companies.id = {$table}.company_id", 'left')
             ->join('countries', "countries.id = {$table}.country_id", 'left');
+            // Removed status filter - now showing both active and inactive
 
         if ($this->auth->user()->user_type == 'company') {
             $companyModel = new \App\Models\CompanyModel();
@@ -182,18 +183,26 @@ class JobVacancyController extends BaseController
         // Ambil data hasil paginasi
         $jobVacancys = $model->paginate($perPage, 'default', $page);
 
-        // Ubah ke format Select2
+        // Ubah ke format Select2 dengan indikator status dinamis
         $results = array_map(function ($item) {
+            $text = trim(($item->position ?? '') . ' - ' . ($item->company_name ?? '') . ' - ' . ($item->country_name ?? ''));
+            // Add dynamic status indicator
+            if ($item->status == 1) {
+                $text .= ' [✓ Active]';
+            } else {
+                $text .= ' [✕ Inactive]';
+            }
             return [
                 'id'   => $item->id,
-                'text' => trim(($item->position ?? '') . ' ' . ($item->company_name ?? '') . ' ' . ($item->country_name ?? '')),
+                'text' => $text,
             ];
         }, $jobVacancys);
 
-        // Hitung total hasil
+        // Hitung total hasil - Count ALL job vacancies
         $countModel = new JobVacancyModel();
         $countModel->join('companies', "companies.id = {$table}.company_id", 'left')
             ->join('countries', "countries.id = {$table}.country_id", 'left');
+            // Removed status filter
 
         if (!empty($term)) {
             $countModel->groupStart()
@@ -209,5 +218,31 @@ class JobVacancyController extends BaseController
             'results' => $results,
             'pagination' => ['more' => ($page * $perPage) < $total]
         ]);
+    }
+    public function show($id = null)
+    {
+        $model = new JobVacancyModel();
+        $data = $model->find($id);
+
+        if (!$data) {
+            return $this->failNotFound('Job Vacancy not found');
+        }
+        
+        // Format response to include company_name and country_name for easier frontend consumption
+        $response = [
+            'id' => $data->id,
+            'position' => $data->position,
+            'company_name' => $data->company?->name ?? null,
+            'country_name' => $data->country?->name ?? null,
+            'company_id' => $data->company_id,
+            'country_id' => $data->country_id,
+            'duration' => $data->duration,
+            'duration_type' => $data->duration_type,
+            'selection_date' => $data->selection_date,
+            'status' => $data->status,
+            'required_documents' => $data->required_documents,
+        ];
+        
+        return $this->respond($response);
     }
 }

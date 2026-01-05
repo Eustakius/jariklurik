@@ -32,13 +32,91 @@
                         <?php endif; ?>
                         <div class="grid grid-cols-12 gap-4">
                             <div class="md:col-span-4 col-span-12">
-                                <?= view('Backend/Partial/form/file-upload', ['attribute' => [
-                                    'field' => 'file',
-                                    'label' => 'Attachment (PDF/Image)',
-                                    'info' => 'Max 2 MB',
-                                    'accept' => ".pdf,.jpg,.jpeg,.png",
-                                    'required' => (strtolower($param['action']) == "create" ? true : false),
-                                ]]) ?>
+                                <div id="document-uploads" class="flex flex-col gap-4">
+                                    <!-- Dynamic Uploads will appear here -->
+                                    <div class="text-gray-500 text-sm italic">Select a Job Vacancy to see required documents.</div>
+                                </div>
+                                <script>
+                                    $(function() {
+                                        const documents = <?= !empty($data->documents) ? json_encode($data->documents) : '{}' ?>; // PHP array to JSON string
+                                        const docLabels = {
+                                            'cv': 'CV / Resume',
+                                            'language_cert': 'Language Certificate',
+                                            'skill_cert': 'Skill Certificate',
+                                            'other': 'Other Support Documents'
+                                        };
+
+                                        function renderUpload(key, label, required, existing) {
+                                            const reqAttr = required ? 'required' : '';
+                                            const previewHidden = existing ? '' : 'hidden';
+                                            const previewSrc = existing ? '<?= base_url() ?>/' + existing : '';
+                                            
+                                            // Simple structure mimicking file-upload.php
+                                            return `
+                                                <div class="upload-group" data-key="${key}">
+                                                    <label class="form-label text-sm">${label} ${required ? '<span class="text-danger-600">*</span>' : ''}</label>
+                                                    <div class="upload-image-wrapper flex flex-col items-center gap-3">
+                                                        <label class="w-full border border-primary-600 font-medium text-primary-600 px-4 py-2 rounded-xl inline-flex items-center gap-2 cursor-pointer hover:bg-primary-50">
+                                                            <iconify-icon icon="solar:upload-linear" class="text-xl"></iconify-icon>
+                                                            <span>Click to upload ${label}</span>
+                                                            <input type="file" hidden name="${key}" id="file_${key}" ${ (!existing && required) ? 'required' : '' } accept=".pdf,.jpg,.jpeg,.png" onchange="previewFile(this)">
+                                                        </label>
+                                                        <div class="uploaded-img ${previewHidden} relative w-full h-auto border input-form-light rounded-lg overflow-hidden border-dashed bg-neutral-50 dark:bg-neutral-600">
+                                                            ${existing ? `<a href="${previewSrc}" target="_blank" class="block text-xs text-center py-2 text-primary-600 underline">View Existing File</a>` : ''}
+                                                            <div id="preview_${key}" class="text-xs text-center py-1 text-gray-500"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }
+
+                                        window.previewFile = function(input) {
+                                            const file = input.files[0];
+                                            if (file) {
+                                                const container = $(input).closest('.upload-image-wrapper').find('.uploaded-img');
+                                                container.removeClass('hidden');
+                                                container.find('div[id^="preview_"]').text('Selected: ' + file.name);
+                                            }
+                                        }
+
+                                        function loadRequirements(id) {
+                                            if(!id) return;
+                                            $.get('<?= base_url('back-end/api/job-vacancy') ?>/' + id, function(res) {
+                                                const container = $('#document-uploads');
+                                                container.empty();
+                                                
+                                                let reqs = [];
+                                                let raw = res.required_documents;
+                                                if (Array.isArray(raw)) {
+                                                    reqs = raw;
+                                                } else if (typeof raw === 'string') {
+                                                    try {
+                                                        reqs = JSON.parse(raw || '[]');
+                                                    } catch(e) {}
+                                                }
+
+                                                if(reqs.length === 0) {
+                                                    container.html('<div class="text-gray-500 text-sm">No specific documents required.</div>');
+                                                    return;
+                                                }
+
+                                                reqs.forEach(key => {
+                                                    const label = docLabels[key] || key;
+                                                    const existing = documents[key] || null;
+                                                    container.append(renderUpload(key, label, true, existing));
+                                                });
+                                            });
+                                        }
+
+                                        $('[name="job_vacancy_id"]').on('change', function() {
+                                            loadRequirements($(this).val());
+                                        });
+                                        
+                                        // Init
+                                        const initialId = $('[name="job_vacancy_id"]').val();
+                                        if(initialId) loadRequirements(initialId);
+                                    });
+                                </script>
                             </div>
                             <div class="md:col-span-8 col-span-12">
                                 <div class="grid grid-cols-12 gap-4">

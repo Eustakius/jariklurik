@@ -217,10 +217,37 @@ class ApplicantController extends BaseController
     {
         $data = $this->request->getPost();
 
-        $logoPath = upload_file('logo', 'assets/images/company/logo', $this->request->getPost('name'));
-        if ($logoPath) {
-            $data['logo'] = $logoPath;
+        $documents = [];
+        // Validate against Job Vacancy Requirements
+        $jobVacancyId = $this->request->getPost('job_vacancy_id');
+        $jobVacancy = $this->modelJobVacancy->find($jobVacancyId);
+        
+        $requiredDocs = [];
+        if ($jobVacancy && !empty($jobVacancy->required_documents)) {
+            $requiredDocs = $jobVacancy->required_documents; // Auto-cast to array
         }
+
+        $documents = [];
+        $docKeys = ['cv', 'language_cert', 'skill_cert', 'other'];
+        
+        // First pass: Upload files
+        foreach ($docKeys as $key) {
+            $path = upload_file($key, 'assets/documents/applicant', $this->request->getPost('name') . '_' . $key);
+            if ($path) {
+                $documents[$key] = $path;
+                if ($key === 'cv') {
+                    $data['file_cv'] = $path;
+                }
+            }
+        }
+
+        // Second pass: Check requirements
+        foreach ($requiredDocs as $req) {
+            if (empty($documents[$req])) {
+                 return redirect()->to('/back-end/applicant')->withInput()->with('errors-backend', ['documents' => "Document '$req' is required."]);
+            }
+        }
+        $data['documents'] = json_encode($documents);
 
         $id = $this->model->insert($data);
         if (! $id) {
@@ -238,10 +265,49 @@ class ApplicantController extends BaseController
         $data = $this->request->getPost();
         $data['id'] = $id;
 
-        $logoPath = upload_file('logo', 'assets/images/company/logo', $this->request->getPost('name'));
-        if ($logoPath) {
-            $data['logo'] = $logoPath;
+        $documents = [];
+        // Decode existing if needed, but usually we just merge or overwrite.
+        // For simple update, let's just handle new files and merge if we can read existing.
+        // But for now, just save what's uploaded. Ideally we should merge with existing.
+        // Let's rely on entity/model to not overwrite if null? No, upload_file returns false if no file.
+        // So we only update entries that are uploaded.
+        
+        $docKeys = ['cv', 'language_cert', 'skill_cert', 'other'];
+        
+        // Fetch existing data to merge documents
+        $existing = $this->model->find($id);
+        $existingDocs = !empty($existing->documents) ? $existing->documents : [];
+        // Handle if existingDocs is object or string unexpectedly (though Cast should handle it, keeping it safe)
+        if(is_string($existingDocs)) $existingDocs = json_decode($existingDocs, true) ?? [];
+        if(!is_array($existingDocs)) $existingDocs = (array)$existingDocs;
+
+        foreach ($docKeys as $key) {
+            $path = upload_file($key, 'assets/documents/applicant', $this->request->getPost('name') . '_' . $key);
+            if ($path) {
+                $existingDocs[$key] = $path;
+                if ($key === 'cv') {
+                    $data['file_cv'] = $path;
+                }
+            }
         }
+
+        // Validate Requirements
+        $jobVacancyId = $this->request->getPost('job_vacancy_id');
+        // If job_vacancy_id not in post, use existing
+        if(empty($jobVacancyId)) $jobVacancyId = $existing->job_vacancy_id;
+
+        $jobVacancy = $this->modelJobVacancy->find($jobVacancyId);
+        $requiredDocs = [];
+        if ($jobVacancy && !empty($jobVacancy->required_documents)) {
+             $requiredDocs = $jobVacancy->required_documents;
+        }
+
+        foreach ($requiredDocs as $req) {
+            if (empty($existingDocs[$req])) {
+                 return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['documents' => "Document '$req' is required."]);
+            }
+        }
+        $data['documents'] = json_encode($existingDocs);
 
         if (!$this->model->update($id, $data)) {
             dd($this->model->errors());

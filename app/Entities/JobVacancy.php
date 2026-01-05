@@ -19,6 +19,9 @@ use CodeIgniter\I18n\Time;
  */
 class JobVacancy extends Entity
 {
+    protected $casts = [
+        'required_documents' => 'json-array',
+    ];
     
     public function formatDataTableModel()
     {
@@ -27,7 +30,7 @@ class JobVacancy extends Entity
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'position' => $this->position,
+            'position' => '<a href="' . base_url('back-end/applicant?jobvacancynew=' . $this->id) . '" class="text-primary-600 hover:text-primary-800 hover:underline transition-all duration-200">' . $this->position . '</a>',
             'selection_date' => $this->selection_date,
             'status' => statusRender($this->status),
             'visitor' => $this->visitor,
@@ -101,7 +104,27 @@ class JobVacancy extends Entity
             ],
             'country' => $this->country?->name,
             'duration' => $this->duration . ' ' . $this->duration_type,
+            'required_documents' => $this->getNormalizedRequiredDocuments(),
         ];
+    }
+
+    public function getNormalizedRequiredDocuments()
+    {
+        $reqDocs = $this->required_documents;
+        $normalizedDocs = [];
+        
+        if (is_array($reqDocs)) {
+            foreach ($reqDocs as $k => $v) {
+                if (is_string($v)) {
+                    $normalizedDocs[] = $v;
+                } elseif (is_array($v)) {
+                    foreach($v as $subK => $subV) {
+                       if(is_string($subV)) $normalizedDocs[] = $subV;
+                    }
+                }
+            }
+        }
+        return array_values(array_unique($normalizedDocs));
     }
 
     public function getCompany()

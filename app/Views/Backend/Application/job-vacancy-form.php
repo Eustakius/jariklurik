@@ -164,6 +164,22 @@
                                     'required' => true,
                                 ]]) ?>
                             </div>
+                            <div class="md:col-span-12 col-span-12">
+                                <?= view('Backend/Partial/form/checkbox-list', ['attribute' => [
+                                    'field' => 'required_documents[]', // Array for multiple selection
+                                    'label' => 'Required Documents (Min 2)',
+                                    'display' => 'box', 
+                                    'required' => true,
+                                    'source' => [
+                                        ['value' => 'cv', 'label' => 'CV / Resume'],
+                                        ['value' => 'language_cert', 'label' => 'Language Certificate'],
+                                        ['value' => 'skill_cert', 'label' => 'Skill Certificate'],
+                                        ['value' => 'other', 'label' => 'Other Support Documents'],
+                                    ],
+                                    // Handle value decoding:
+                                    'selected' => !empty($data->required_documents) ? $data->required_documents : [],
+                                ]]) ?>
+                            </div>
                             <div class="md:col-span-6 col-span-6">
                                 <?= view('Backend/Partial/form/dropdown', ['attribute' => [
                                     'field' => 'company_id',

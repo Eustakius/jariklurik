@@ -20,6 +20,9 @@ use CodeIgniter\I18n\Time;
 class Applicant extends Entity
 {
     protected $dates = ['created_at', 'updated_at'];
+    protected $casts = [
+        'documents' => 'json-array',
+    ];
     
     public function formatDataTableModel()
     {
