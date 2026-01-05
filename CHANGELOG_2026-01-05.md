@@ -1,6 +1,7 @@
 # 📝 CHANGELOG - January 5, 2026 - UX Improvements & Filter Enhancements
 
 ## 🎯 Session Overview
+
 Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan applicant management, termasuk perbaikan clickable filter, info badge dinamis, validasi dokumen, dan status indicators dengan warna.
 
 ---
@@ -10,6 +11,7 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 ### 1. 🔗 **Clickable Job Vacancy Filter dengan Auto-Apply**
 
 **Masalah:**
+
 - Admin harus manual copy-paste nama job vacancy ke filter
 - Tidak ada cara cepat untuk melihat applicant dari job vacancy tertentu
 - User experience kurang intuitif
@@ -19,8 +21,10 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 **A. Backend Changes:**
 
 **File: `app/Entities/JobVacancy.php`**
+
 - Modified `formatDataTableModel()` method
 - Wrapped `position` field dengan clickable link
+
 ```php
 'position' => '<a href="' . base_url('back-end/applicant?jobvacancynew=' . $this->id) . '" 
                class="text-primary-600 hover:text-primary-700 hover:underline font-semibold">
@@ -30,6 +34,7 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 **B. Frontend Changes:**
 
 **File: `app/Views/Backend/Application/applicant.php`**
+
 - Added JavaScript untuk detect `jobvacancynew` query parameter
 - Implemented auto-filter mechanism dengan timing optimization:
   - Wait for Select2 initialization (setInterval check)
@@ -40,6 +45,7 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
   - Visual highlight pada filter container (ring animation 2.5s)
 
 **Features:**
+
 - ✅ Click job name → Auto redirect + filter
 - ✅ JWT authentication untuk API calls
 - ✅ Smooth animations (fade-in, scroll, highlight)
@@ -51,6 +57,7 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 ### 2. 💳 **Dynamic Info Badge dengan Job Details**
 
 **Masalah:**
+
 - User tidak tahu filter apa yang sedang aktif
 - Tidak ada visual feedback setelah filter applied
 - Sulit untuk clear filter yang sedang aktif
@@ -60,7 +67,9 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 **A. API Enhancement:**
 
 **File: `app/Controllers/Api/JobVacancyController.php`**
+
 - Modified `show()` method untuk return formatted data
+
 ```php
 $response = [
     'id' => $data->id,
@@ -76,6 +85,7 @@ $response = [
 **B. UI Design:**
 
 **File: `app/Views/Backend/Application/applicant.php`**
+
 - Added modern fluent card-style info badge
 - Features:
   - Gradient accent bar (primary-400 → primary-600)
@@ -88,6 +98,7 @@ $response = [
   - Smooth fade-in animation (600ms opacity transition)
 
 **Badge Structure:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ ← Gradient bar
@@ -101,6 +112,7 @@ $response = [
 ```
 
 **JavaScript Functions:**
+
 ```javascript
 function clearJobVacancyFilter() {
     // Remove query parameter
@@ -115,6 +127,7 @@ function clearJobVacancyFilter() {
 ### 3. 📄 **Document Requirements Validation Update**
 
 **Masalah:**
+
 - Validasi sebelumnya: **minimal 2 dokumen**
 - User request: **maksimal 2 dokumen** (lebih fleksibel)
 
@@ -123,6 +136,7 @@ function clearJobVacancyFilter() {
 **File: `app/Controllers/Backend/Application/JobVacancyController.php`**
 
 **Sebelum:**
+
 ```php
 if (empty($reqDocs) || count($reqDocs) < 2) {
     return redirect()->to(pathBack($this->request))->withInput()
@@ -131,6 +145,7 @@ if (empty($reqDocs) || count($reqDocs) < 2) {
 ```
 
 **Sesudah:**
+
 ```php
 if (empty($reqDocs) || count($reqDocs) > 2) {
     return redirect()->to(pathBack($this->request))->withInput()
@@ -139,12 +154,14 @@ if (empty($reqDocs) || count($reqDocs) > 2) {
 ```
 
 **Kombinasi yang Diperbolehkan:**
+
 - ✅ CV + Sertifikat Skill
 - ✅ CV + Sertifikat Bahasa
 - ✅ CV + Dokumen Tambahan
 - ✅ CV saja (1 dokumen)
 
 **Kombinasi yang Ditolak:**
+
 - ❌ CV + Skill + Bahasa (3 dokumen)
 - ❌ Tidak pilih apapun (empty)
 
@@ -153,6 +170,7 @@ if (empty($reqDocs) || count($reqDocs) > 2) {
 ### 4. 🎨 **Status Indicators dengan Colored Badges**
 
 **Masalah:**
+
 - Dropdown hanya menampilkan job vacancy/company aktif
 - Tidak ada indikator visual untuk status aktif/non-aktif
 - User tidak bisa lihat data yang inactive
@@ -162,9 +180,11 @@ if (empty($reqDocs) || count($reqDocs) > 2) {
 **A. Backend API Changes:**
 
 **File: `app/Controllers/Api/JobVacancyController.php`**
+
 - Removed `->where('status', 1)` filter
 - Show ALL job vacancies (active + inactive)
 - Added dynamic status badge to text:
+
 ```php
 $results = array_map(function ($item) {
     $text = trim(($item->position ?? '') . ' - ' . ($item->company_name ?? '') . ' - ' . ($item->country_name ?? ''));
@@ -178,7 +198,9 @@ $results = array_map(function ($item) {
 ```
 
 **File: `app/Controllers/Api/CompanyController.php`**
+
 - Same pattern untuk Company dropdown
+
 ```php
 if ($company->status == 1) {
     $text .= ' [✓ Active]';
@@ -190,14 +212,16 @@ if ($company->status == 1) {
 **B. Frontend Formatting:**
 
 **File: `app/Views/Backend/Partial/form/dropdown.php`**
+
 - Added `formatStatusBadge()` function dengan inline styles
 - Integrated dengan Select2 via `templateResult` dan `templateSelection`
 
 **Inline Styles Implementation:**
+
 ```javascript
 function formatStatusBadge(item) {
     const text = item.text || '';
-    
+  
     // Active Badge
     if (text.includes('[✓ Active]')) {
         const mainText = parts[0].trim();
@@ -212,7 +236,7 @@ function formatStatusBadge(item) {
             'font-weight': '700'
         }));
     }
-    
+  
     // Inactive Badge
     else if (text.includes('[✕ Inactive]')) {
         // Similar pattern with red colors
@@ -222,12 +246,14 @@ function formatStatusBadge(item) {
 ```
 
 **Why Inline Styles?**
+
 - ❌ Tailwind classes tidak ter-compile di runtime
 - ✅ Inline styles guaranteed to render
 - ✅ No dependency pada CSS framework
 - ✅ Works across all browsers
 
 **Visual Result:**
+
 ```
 Dropdown Options:
 ┌────────────────────────────────────────────┐
@@ -244,6 +270,7 @@ Dropdown Options:
 ### Files Modified:
 
 **Backend:**
+
 1. `app/Entities/JobVacancy.php` - Clickable link, normalized data
 2. `app/Controllers/Api/JobVacancyController.php` - API formatting, status filter removal
 3. `app/Controllers/Api/CompanyController.php` - Status badge for companies
@@ -260,17 +287,21 @@ Dropdown Options:
 ## 🐛 Problems Faced & Solutions
 
 ### Problem 1: Filter Not Applying Automatically
+
 **Issue:** Clicking job name redirected but filter didn't apply
 **Root Cause:** JavaScript timing - Select2 not initialized when script ran
-**Solution:** 
+**Solution:**
+
 - Implemented `setInterval` to wait for Select2 initialization
 - Added `MutationObserver` as fallback
 - Max wait time: 5 seconds with safety timeout
 
 ### Problem 2: API Authentication Failed
+
 **Issue:** AJAX call returned 401 Unauthorized
 **Root Cause:** Missing JWT token in request headers
 **Solution:**
+
 ```javascript
 headers: {
     'Authorization': 'Bearer <?= esc($token) ?>'
@@ -278,27 +309,33 @@ headers: {
 ```
 
 ### Problem 3: Info Badge Showing "N/A"
+
 **Issue:** Badge displayed "N/A" for company and country
 **Root Cause:** API returned nested objects (`company.name`) not flat properties
 **Solution:** Modified API to return flat properties:
+
 ```php
 'company_name' => $data->company?->name ?? null,
 'country_name' => $data->country?->name ?? null,
 ```
 
 ### Problem 4: Location Badge Text Not Readable
+
 **Issue:** Text color blended with background (low contrast)
 **Root Cause:** Light background with light text color
 **Solution:** Changed to solid background with white text:
+
 ```css
 background-color: #10b981 (solid green)
 color: #ffffff (white)
 ```
 
 ### Problem 5: Status Badges No Color
+
 **Issue:** Badges showed as plain text without colors
 **Root Cause:** Tailwind CSS classes not compiled/available at runtime
 **Solution:** Switched to inline styles via jQuery `.css()`:
+
 ```javascript
 .css({
     'background-color': '#10b981',
@@ -309,9 +346,11 @@ color: #ffffff (white)
 ```
 
 ### Problem 6: Job Vacancy Text Disappeared
+
 **Issue:** Only badge visible, main text missing
 **Root Cause:** `parts[0]` not properly trimmed and displayed
 **Solution:**
+
 ```javascript
 const mainText = parts[0].trim();
 $result.append($('<span></span>').text(mainText + ' ').css({
@@ -324,12 +363,14 @@ $result.append($('<span></span>').text(mainText + ' ').css({
 ## 🎯 User Experience Improvements
 
 **Before:**
+
 1. Manual filter selection
 2. No visual feedback
 3. Only active items visible
 4. Plain text dropdowns
 
 **After:**
+
 1. ✅ One-click filter from job vacancy list
 2. ✅ Dynamic info badge with job details
 3. ✅ All items visible with status indicators
@@ -379,6 +420,7 @@ All changes were code-level improvements to existing functionality.
 ## 🧪 Testing Recommendations
 
 **Manual Testing:**
+
 1. Click job vacancy name → Verify auto-filter works
 2. Check info badge displays correct data
 3. Test clear filter button
@@ -388,6 +430,7 @@ All changes were code-level improvements to existing functionality.
 7. Test on mobile devices
 
 **Edge Cases:**
+
 - Job vacancy with no company assigned
 - Job vacancy with no country assigned
 - Very long job titles (text truncation)
@@ -399,6 +442,7 @@ All changes were code-level improvements to existing functionality.
 ## 📚 Code Examples
 
 **Example 1: Using the Auto-Filter Feature**
+
 ```html
 <!-- In any DataTable view -->
 <a href="<?= base_url('back-end/applicant?jobvacancynew=' . $jobId) ?>">
@@ -407,6 +451,7 @@ All changes were code-level improvements to existing functionality.
 ```
 
 **Example 2: Accessing Formatted API Data**
+
 ```javascript
 $.ajax({
     url: '<?= base_url("back-end/api/job-vacancy") ?>/' + jobId,
@@ -422,6 +467,7 @@ $.ajax({
 ```
 
 **Example 3: Custom Badge Styling**
+
 ```javascript
 // Apply to any Select2 dropdown
 $('#mySelect').select2({
@@ -443,6 +489,7 @@ $('#mySelect').select2({
 5. **Check console** for any JavaScript errors
 
 **Rollback Plan:**
+
 - Revert `dropdown.php` to remove `formatStatusBadge` function
 - Revert API controllers to add back `->where('status', 1)` filter
 - Remove clickable links from `JobVacancy.php`
@@ -452,6 +499,7 @@ $('#mySelect').select2({
 ## 💡 Future Enhancements
 
 **Potential Improvements:**
+
 1. Add keyboard shortcuts for filter actions
 2. Save filter preferences per user
 3. Export filtered data to Excel/PDF
@@ -464,17 +512,18 @@ $('#mySelect').select2({
 
 ## 👥 Credits
 
-**Session Date:** January 5, 2026  
-**Developer:** Antigravity AI Assistant  
-**Requested By:** User (Eustakius)  
-**Session Duration:** ~2 hours  
-**Total Changes:** 6 files modified, ~300 lines changed  
+**Session Date:** January 5, 2026
+**Developer:** Eustakius
+**Requested By:** User (Eustakius)
+**Session Duration:** ~2 hours
+**Total Changes:** 6 files modified, ~300 lines changed
 
 ---
 
 ## 📞 Support
 
 **If you encounter issues:**
+
 1. Check browser console (F12) for errors
 2. Verify XAMPP MySQL is running
 3. Clear browser cache
@@ -482,6 +531,7 @@ $('#mySelect').select2({
 5. Review this changelog for troubleshooting steps
 
 **Common Issues:**
+
 - Badge colors not showing → Hard refresh (Ctrl + Shift + R)
 - Filter not applying → Check JWT token in `.env`
 - API errors → Verify MySQL connection
