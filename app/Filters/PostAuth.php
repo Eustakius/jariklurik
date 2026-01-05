@@ -15,27 +15,9 @@ class PostAuth implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        $allowedOrigins = [
-            env('app.baseURL'),
-            env('app.baseBackendURL')
-        ];
-
-        $origin = $request->getServer('HTTP_ORIGIN');
-        if (!$origin) {
-            if (!$origin) {
-                $origin = (string)$request->getUri()->getScheme() . '://' . $request->getServer('HTTP_HOST');
-            }
-        }
-
-        if (!$origin || !in_array($origin, $allowedOrigins)) {
-            http_response_code(403); // Forbidden
-            die('CORS: Origin not allowed');
-        }
-
-        if ($request->getMethod(true) === 'OPTIONS') {
-            die();
-        }
-
+        file_put_contents(WRITEPATH . 'logs/debug_custom.log', "[POST-AUTH] Request received: " . $request->getUri()->getPath() . "\n", FILE_APPEND);
+        // Manual CORS check removed to allow global Cors filter to handle permissions.
+        
         $token = $request->getPost('token');
 
         if (! $token) {
@@ -56,11 +38,9 @@ class PostAuth implements FilterInterface
         $authActivationAttempt = $authActivationAttemptModel->findToken($payload);
         $payloadToken = $jwt->verifyToken($authActivationAttempt->token);
 
-        if ($origin === env('app.baseBackendURL')) {
-            if ($payloadToken->user != $payload->username) {
-                return Services::response()->setJSON(['status' => false, 'message' => 'Invalid token'])
-                    ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
-            }
+        if ($payloadToken->user != $payload->username) {
+            return Services::response()->setJSON(['status' => false, 'message' => 'Invalid token'])
+                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
         if (!$authActivationAttempt) {

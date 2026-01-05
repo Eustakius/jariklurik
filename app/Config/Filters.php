@@ -79,9 +79,11 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            'cors', // Enable CORS
             'csrf' => ['except' => [
                 'back-end/api/*', // API endpoints
                 'back-end/*/mass-*', // Mass action endpoints
+                'submit/*', // Allow submission endpoints
             ]],
         ],
         'after' => [

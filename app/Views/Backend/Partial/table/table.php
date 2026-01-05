@@ -103,6 +103,17 @@ $buttons[] = [
                 dt.ajax.reload(null, true);
             }'
 ];
+
+// DATA FILTER BUTTON
+if (isset($props['filters']) && !empty($props['filters'])) {
+    $buttons[] = [
+        'text' => '<div class="px-3.5 py-2 text-primary-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mi:filter" class="text-sm"></iconify-icon> Filter</div>',
+        'className' => 'btn bg-primary-100 text-primary-600 hover:bg-primary-700 hover:text-white rounded-lg text-sm p-0',
+        'action' => 'function(e, dt, node, config) { 
+                    $("#filter-container' . $props['key'] . '").slideToggle();
+                }'
+    ];
+}
 $buttons[] = [
     'extend' => 'collection',
     'text' => '<div class="px-3.5 py-2 text-info-600 flex items-center justify-center gap-2"><iconify-icon icon="material-symbols-light:export-notes-outline-rounded" class="text-lg"></iconify-icon> Export</div>',
@@ -283,45 +294,22 @@ if (!empty($importPerm)): ?>
         <span>Rendering data...</span>
     </div>
 </div>
-<div class="customize-vue3-easy-data-table min-h-full max-w-full">
-    <table class="datatable border border-neutral-200 dark:border-neutral-600 rounded-lg border-separate" id="tbl<?= $props['key'] ?>">
-    </table>
-</div>
-<div id="drawer-contact<?= $props['key'] ?>"
-    class="fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800"
-    tabindex="-1"
-    aria-labelledby="drawer-contact-label">
-
-    <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
-        Filter
-    </h5>
-
-    <button type="button" id="filterClose<?= $props['key'] ?>"
-        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
-        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-        </svg>
-        <span class="sr-only">Close menu</span>
-    </button>
+<div id="filter-container<?= $props['key'] ?>" style="display: none;" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-white p-4 rounded-lg shadow-sm border border-neutral-200 dark:bg-gray-800 dark:border-neutral-700">
     <?php foreach ($props['filters'] as $filter): ?>
-        <?php if ($filter['input'] == "text"): ?>
-            <div class="mb-6">
+        <div class="w-full">
+            <?php if ($filter['input'] == "text"): ?>
                 <?= view('Backend/Partial/form/text-box', ['attribute' => [
                     'type' => 'text',
                     'field' => $filter['id'],
                     'label' => $filter['label'],
                 ]]) ?>
-            </div>
-        <?php elseif ($filter['input'] == "date"): ?>
-            <div class="mb-6">
+            <?php elseif ($filter['input'] == "date"): ?>
                 <?= view('Backend/Partial/form/text-box', ['attribute' => [
                     'type' => 'date',
                     'field' => $filter['id'],
                     'label' => $filter['label'],
                 ]]) ?>
-            </div>
-        <?php elseif ($filter['input'] == "textgroup"): ?>
-            <div class="mb-6">
+            <?php elseif ($filter['input'] == "textgroup"): ?>
                 <?= view('Backend/Partial/form/text-box-group', ['attribute' => [
                     'type' => 'text-select',
                     'field' => $filter['id'],
@@ -333,9 +321,7 @@ if (!empty($importPerm)): ?>
                     ],
                     'required' => true,
                 ]]) ?>
-            </div>
-        <?php elseif ($filter['input'] == "select"): ?>
-            <div class="mb-6">
+            <?php elseif ($filter['input'] == "select"): ?>
                 <?php if (isset($filter['api'])): ?>
                     <?= view('Backend/Partial/form/dropdown', ['attribute' => [
                         'field' => $filter['id'],
@@ -349,21 +335,25 @@ if (!empty($importPerm)): ?>
                         'data' => $filter['data'],
                     ]]) ?>
                 <?php endif; ?>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
     <?php endforeach; ?>
-    <div class="flex flex-row gap-4">
+    <div class="flex flex-row gap-2 h-[42px]">
         <button id="btnFilter<?= $props['key'] ?>"
-            class="dark:text-white bg-success-100 text-success-600 hover:bg-success-700 hover:text-white w-1/2 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+            class="dark:text-white bg-success-100 text-success-600 hover:bg-success-700 hover:text-white w-full focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 h-full flex items-center justify-center">
             Filter
         </button>
         <button id="btnReset<?= $props['key'] ?>"
-            class="text-center dark:text-white bg-warning-100 text-warning-600 hover:bg-warning-700 hover:text-white w-1/2 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+            class="text-center dark:text-white bg-warning-100 text-warning-600 hover:bg-warning-700 hover:text-white w-full focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 h-full flex items-center justify-center">
             Reset
         </button>
-
     </div>
 </div>
+<div class="customize-vue3-easy-data-table min-h-full max-w-full">
+    <table class="datatable border border-neutral-200 dark:border-neutral-600 rounded-lg border-separate" id="tbl<?= $props['key'] ?>">
+    </table>
+</div>
+
 <!-- Mass Decision Modal -->
 <div id="decision-modal<?= $props['key'] ?>" tabindex="-1" class="hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-900/50 backdrop-blur-sm">
     <div class="relative p-4 w-full max-w-md max-h-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -476,11 +466,7 @@ if (!empty($importPerm)): ?>
             });
         });
         $(document).ready(function() {
-            const drawerEl = document.getElementById('drawer-contact<?= $props['key'] ?>');
-            const drawer = new Drawer(drawerEl, {
-                placement: 'right',
-                backdrop: false
-            });
+
             $.extend(true, $.fn.dataTable.Buttons.defaults, {
                 dom: {
                     button: {
@@ -502,6 +488,14 @@ if (!empty($importPerm)): ?>
                         'Authorization': 'Bearer <?= esc($props['token']) ?>'
                     },
                     beforeSend: function() {
+                    },
+                    data: function(d) {
+                         $('#filter-container<?= $props['key'] ?> :input').each(function() {
+                            let key = $(this).attr('name') || $(this).attr('id');
+                            if (key) {
+                                d[key] = $(this).val();
+                            }
+                        });
                     },
                     dataSrc: function(json) {
                         return json.data; // penting! DataTables butuh ini
@@ -643,16 +637,7 @@ if (!empty($importPerm)): ?>
                     topStart: 'buttons',
                     topEnd: {
                         search: true,
-                        buttons: [{
-                            text: '<iconify-icon icon="mdi:filter-outline" width="24" height="24"></iconify-icon>',
-                            className: 'text-success-600 font-medium rounded-lg text-sm ',
-                            attr: {
-                                'type': 'button'
-                            },
-                            action: function() {
-                                drawer.show();
-                            }
-                        }]
+                        buttons: []
                     },
                     bottomEnd: ['pageLength', 'paging'],
                     bottomStart: 'info',
@@ -724,8 +709,16 @@ if (!empty($importPerm)): ?>
             });
             $(document).on('click', '#btnFilter<?= $props['key'] ?>', function(e) {
                 e.preventDefault();
+                $("#tbl<?= $props['key'] ?> tbody").empty();
                 table.<?= $props['key'] ?>.ajax.reload();
-                $('#filterClose<?= $props['key'] ?>').click();
+                $("#filter-container<?= $props['key'] ?>").slideUp();
+            });
+            // Connect Enter key to filter button
+            $(document).on('keypress', '#filter-container<?= $props['key'] ?> input', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#btnFilter<?= $props['key'] ?>').click();
+                }
             });
 
             $(document).on('click', '#btnReset<?= $props['key'] ?>', function(e) {
@@ -740,6 +733,7 @@ if (!empty($importPerm)): ?>
                     }
                 });
                 table.<?= $props['key'] ?>.ajax.reload();
+                $("#filter-container<?= $props['key'] ?>").slideUp();
             });
             $('#tbl<?= $props['key'] ?>').on('length.dt', function(e, settings, len) {
                 $("#tbl<?= $props['key'] ?> tbody").empty();

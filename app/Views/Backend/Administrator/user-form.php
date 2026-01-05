@@ -79,10 +79,11 @@
                         <h5 class="text-lg font-semibold mb-0">Roles</h5>
                     </div>
                     <div class="card-body">
-                        <?= view('Backend/Partial/form/checkbox-list', ['attribute' =>  [
+                        <?= view('Backend/Partial/form/select-multiple', ['attribute' =>  [
                             'field' => 'roles',
                             'source' => $data->getRolesSet(),
                             'required' => true,
+                            'placeholder' => 'Select Roles'
                         ]]) ?>
                     </div>
                 </div>

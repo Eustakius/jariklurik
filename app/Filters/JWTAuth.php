@@ -15,25 +15,8 @@ class JWTAuth implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        $allowedOrigins = [
-            rtrim(env('app.baseURL'), '/'),
-            rtrim(env('app.baseBackendURL'), '/')
-        ];
+        // Manual CORS check removed to allow global Cors filter to handle permissions.
         
-        $origin = $request->getServer('HTTP_ORIGIN');
-        if (!$origin) {            
-            $origin = (string)$request->getUri()->getScheme() . '://' . $request->getServer('HTTP_HOST');
-        }
-
-        if (!$origin || !in_array($origin, $allowedOrigins)) {
-            http_response_code(403); // Forbidden
-            die('CORS: Origin not allowed');
-        }
-
-        if ($request->getMethod(true) === 'OPTIONS') {
-            die('OPTIONS');
-        }
-
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (! $authHeader || ! str_starts_with($authHeader, 'Bearer ')) {
@@ -62,29 +45,22 @@ class JWTAuth implements FilterInterface
 
         $payloadToken = $jwt->verifyToken($authActivationAttempt->token);
 
-        if ($origin === env('app.baseBackendURL')) {
-            if ($payloadToken->user != $payload->username) {
-                return Services::response()->setJSON(['status' => false, 'message' => 'Invalid token'])
-                    ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
-            }
+        if ($payloadToken->user != $payload->username) {
+            return Services::response()->setJSON(['status' => false, 'message' => 'Invalid token'])
+                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
         }
-
 
         if ($payloadToken === 'expired') {
             return Services::response()->setJSON(['status' => false, 'message' => 'Token expired'])
                 ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
-        if ($origin === env('app.baseBackendURL')) {
-            $auth = service('authentication');
+        $auth = service('authentication');
+        if ($auth->check()) {
             $user = $auth->user();
-            
-            if ($user->username != $payload->username) {
-                return Services::response()->setJSON(['status' => false, 'message' => 'Invalid token'])
-                    ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+            if ($user && $user->username == $payload->username) {
+                 $request->username = $payload->username;
             }
-            // simpan user id ke request untuk controller
-            $request->username = $payload->username;
         }
     }
 

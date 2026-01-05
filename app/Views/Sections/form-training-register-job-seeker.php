@@ -30,7 +30,7 @@
         <p class="text-lg md:text-2xl font-bold">Mohon maaf saat ini pelatihan Pencari Kerja belum tersedia.</p>
       </div>
     <?php else: ?>
-      <form class="px-7 md:px-14 text-sm md:text-lg flex flex-col gap-8" action="/submit/job-seeker" method="post" enctype="multipart/form-data" data-parsley-validate>
+      <form class="px-7 md:px-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('submit/job-seeker') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
         <input type="hidden" name="token" value="<?= $token ?>">
         <?= csrf_field() ?>
 

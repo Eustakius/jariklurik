@@ -31,11 +31,11 @@ $title = urlencode("Lihat halaman menarik ini!");
     <link href="<?= base_url('css/parsley.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/materialize.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/flatpickr.min.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('css/jquery-ui.css') ?>" rel="stylesheet">
+    <!-- jQuery UI CSS removed (file missing) -->
     <link href="<?= base_url('css/app.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
     <script src="<?= base_url('assets/js/lib/jquery-3.7.1.min.js') ?>"></script>
-    <script src="<?= base_url('js/jquery-ui.min.js') ?>"></script>
+    <!-- jQuery UI JS removed (file missing) -->
     <script src="<?= base_url('js/materialize.min.js') ?>"></script>
     <script src="<?= base_url('js/parsleyjs.js') ?>"></script>
     <script src="<?= base_url('js/flatpickr.js') ?>"></script>

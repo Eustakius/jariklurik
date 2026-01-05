@@ -164,7 +164,7 @@ $lastPart = end($parts);
                 </div>
                 <?php if ($data->malequota > 0 || $data->femalequota > 0 || $data->unisexquota > 0): ?>
                     <div id="fadeJobApply" class="<?= session()->getFlashdata('error') ? 'opacity-1' : 'hidden opacity-0' ?> transition-opacity duration-500 ease-in-out">
-                        <form class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="/submit/applicant" method="post" enctype="multipart/form-data" data-parsley-validate>
+                        <form class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('submit/applicant') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
                             <input type="hidden" name="token" value="<?= $token ?>">
                             <input type="hidden" name="slug" value="<?= $data->slug ?>">
                             <?= csrf_field() ?>
@@ -337,15 +337,80 @@ $lastPart = end($parts);
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+        console.log("Page Loaded. Form script ready.");
+        
         const $fadeJob = $('#fadeJob');
         const $fadeJobApply = $('#fadeJobApply');
         const $btn = $('#toggleBtnApply');
 
-        // Ensure we handle the click cleanly
+        // AJAX Form Submission
+        $('form').on('submit', function(e) {
+            e.preventDefault(); // Stop default submission
+            
+            var $form = $(this);
+            var formData = new FormData(this);
+            var $submitBtn = $form.find('button[type="submit"]'); // Assuming the button inside form is submit
+
+            // Basic Parsley validation check if parsely is used
+            if ($form.parsley && !$form.parsley().isValid()) {
+                return;
+            }
+
+            $submitBtn.prop('disabled', true).text('Processing...');
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    $submitBtn.prop('disabled', false).text('Submit');
+                    
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            confirmButtonColor: '#714D00'
+                        }).then((result) => {
+                            // Redirect to thank you page or reload
+                            window.location.href = '/thank-you-registered'; 
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: response.message,
+                            confirmButtonColor: '#d33'
+                        });
+                        // Refresh captcha if needed
+                        document.getElementById('captcha-img').src='/captcha?'+Date.now();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $submitBtn.prop('disabled', false).text('Submit');
+                    console.error("AJAX Error:", status, error);
+                    console.error("Response:", xhr.responseText);
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan sistem. Silakan coba lagi. (' + xhr.status + ')',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+        });
+
+        // Toggle Button Logic
         $btn.off('click').on('click', function (e) {
             e.preventDefault();
+            console.log("Toggle button clicked");
             
             if ($fadeJob.hasClass('opacity-0') || $fadeJob.is(':hidden')) {
                 // Show Description, Hide Form

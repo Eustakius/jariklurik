@@ -31,7 +31,7 @@
       </div>
     <?php else: ?>
 
-      <form class="px-7 md:px-14 text-sm md:text-lg flex flex-col gap-8" action="/submit/purna-pmi" method="post" enctype="multipart/form-data" data-parsley-validate>
+      <form class="px-7 md:px-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('submit/purna-pmi') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
         <input type="hidden" name="token" value="<?= $token ?>">
         <?= csrf_field() ?>
 

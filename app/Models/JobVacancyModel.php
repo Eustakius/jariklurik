@@ -154,6 +154,11 @@ class JobVacancyModel extends Model
                             ->where($field, $value)
                             ->groupEnd();
                     }
+                    elseif ($field == 'CONCAT(duration,duration_type)') {
+                        $builder->groupStart()
+                            ->like('LOWER(' . $field . ')', strtolower($value), 'both', false)
+                            ->groupEnd();
+                    }
                     else{
                         $builder->groupStart()
                             ->like('LOWER(' . $field . ')', strtolower($value), 'both', null)

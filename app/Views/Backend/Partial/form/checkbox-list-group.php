@@ -3,65 +3,79 @@ $attribute['selected'] = $attribute['selected'] ?? [];
 $attribute['disabled']    = (isset($attribute['disabled']) && $attribute['disabled']) || (strtolower($param['action']) == "detail") ? 'disabled' : '';
 ?>
 
-<?php foreach ($attribute['source'] as $attribute['dataField']): ?>
-    <?php
-    // Tentukan apakah semua child checked
-    $attribute['allChecked'] = true;
-    if (empty($attribute['dataField']['items'])) {
-        $attribute['allChecked'] = false;
-    } else {
-        foreach ($attribute['dataField']['items'] as $item) {
-            if (empty($item['checked'])) {
-                $attribute['allChecked'] = false;
-                break;
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <?php foreach ($attribute['source'] as $attribute['dataField']): ?>
+        <?php
+        // Tentukan apakah semua child checked
+        $attribute['allChecked'] = true;
+        if (empty($attribute['dataField']['items'])) {
+            $attribute['allChecked'] = false;
+        } else {
+            foreach ($attribute['dataField']['items'] as $item) {
+                if (empty($item['checked'])) {
+                    $attribute['allChecked'] = false;
+                    break;
+                }
             }
         }
-    }
-    ?>
-    <div class="mb-8">
-        <!-- PARENT (CHECK ALL) -->
-        <div class="flex items-center space-x-2 font-semibold">
-            <label class="inline-flex items-center cursor-pointer" for="select_all_<?= $attribute['dataField']['id'] ?>">
-                <input type="checkbox"
-                    class="dataField-select-all sr-only peer"
-                    id="select_all_<?= $attribute['dataField']['id'] ?>"
-                    data-field-id="<?= $attribute['dataField']['id'] ?>"
-                    <?= $attribute['allChecked'] ? 'checked' : '' ?>
-                    <?= $attribute['disabled'] ?>>
-                <span class="relative w-11 h-6 bg-gray-400 peer-focus:outline-none rounded-full peer dark:bg-gray-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></span>
-                <span class="line-height-1 font-medium ms-3 peer-checked:text-primary-600 text-sm text-gray-600 dark:text-gray-300">
-                    <b><?= htmlspecialchars($attribute['dataField']['name']) ?></b> Check All
+        ?>
+        <div class="card border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden h-full flex flex-col">
+            <!-- HEADER: Permisson & Check All -->
+            <div class="bg-neutral-100 dark:bg-neutral-700 px-4 py-3 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between shrink-0">
+                <span class="font-bold text-neutral-800 dark:text-white text-sm">
+                    <?= htmlspecialchars($attribute['dataField']['name']) ?>
                 </span>
-            </label>
-        </div>
-
-        <!-- CHILDREN -->
-        <?php if (!empty($attribute['dataField']['items'])): ?>
-            <div class="ml-2 flex flex-wrap items-start justify-start gap-x-6">
-                <?php foreach ($attribute['dataField']['items'] as $item): ?>
-                    <?php
-                    $id = $attribute['dataField']['id'] . '_' . $item['name'];
-                    $checked = !empty($item['checked']) ? 'checked' : '';
-                    ?>
-                    <label class="inline-flex items-center cursor-pointer mt-2" for="<?= $id ?>">
+                
+                <label class="inline-flex items-center cursor-pointer gap-2" for="select_all_<?= $attribute['dataField']['id'] ?>">
+                    <span class="text-xs font-bold text-neutral-600 dark:text-neutral-300">Check All</span>
+                    <div class="relative">
                         <input type="checkbox"
-                            class="sr-only peer"
-                            id="<?= $id ?>"
-                            name="<?= $attribute['field'] ?>[<?= $attribute['dataField']['id'] ?>][]"
-                            value="<?= $item['id'] ?>"
-                            data-field="<?= $attribute['dataField']['id'] ?>"
-                            <?= $checked ?>
+                            class="dataField-select-all sr-only peer"
+                            id="select_all_<?= $attribute['dataField']['id'] ?>"
+                            data-field-id="<?= $attribute['dataField']['id'] ?>"
+                            <?= $attribute['allChecked'] ? 'checked' : '' ?>
                             <?= $attribute['disabled'] ?>>
-                        <span class="relative w-11 h-6 bg-gray-400 peer-focus:outline-none rounded-full peer dark:bg-gray-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></span>
-                        <span class="line-height-1 font-medium ms-3 peer-checked:text-primary-600 text-sm text-gray-600 dark:text-gray-300">
-                            <?= htmlspecialchars($item['label']) ?>
-                        </span>
-                    </label>
-                <?php endforeach; ?>
+                        <span class="block w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-500 peer-checked:bg-primary-600"></span>
+                    </div>
+                </label>
             </div>
-        <?php endif; ?>
-    </div>
-<?php endforeach; ?>
+
+            <!-- BODY: Items -->
+            <div class="p-5 grow">
+                <?php if (!empty($attribute['dataField']['items'])): ?>
+                    <div class="flex flex-wrap gap-3">
+                        <?php foreach ($attribute['dataField']['items'] as $item): ?>
+                            <?php
+                            $id = $attribute['dataField']['id'] . '_' . $item['name'];
+                            $checked = !empty($item['checked']) ? 'checked' : '';
+                            ?>
+                            <div class="relative">
+                                <input type="checkbox"
+                                    id="<?= $id ?>"
+                                    name="<?= $attribute['field'] ?>[<?= $attribute['dataField']['id'] ?>][]"
+                                    value="<?= $item['id'] ?>"
+                                    data-field="<?= $attribute['dataField']['id'] ?>"
+                                    <?= $checked ?>
+                                    <?= $attribute['disabled'] ?>
+                                    class="peer sr-only">
+                                <label for="<?= $id ?>" 
+                                       class="inline-flex px-3 py-1.5 rounded-md text-xs font-bold border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-gray-700 text-neutral-600 dark:text-neutral-300 cursor-pointer transition-all duration-200 ease-out 
+                                       hover:bg-neutral-100 dark:hover:bg-gray-600 hover:scale-105 active:scale-95
+                                       peer-checked:bg-primary-500 peer-checked:text-white peer-checked:border-primary-500 
+                                       dark:peer-checked:bg-primary-600 dark:peer-checked:text-white dark:peer-checked:border-primary-600 
+                                       peer-checked:shadow-[0_0_20px] peer-checked:shadow-primary-500/50 dark:peer-checked:shadow-primary-500/70">
+                                    <?= htmlspecialchars($item['label']) ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="text-xs text-neutral-400 italic">No permission items available.</div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
 <script>
     $(function() {

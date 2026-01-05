@@ -112,6 +112,7 @@ class JobVacancyController extends BaseController
         $model = new JobVacancyModel();
         $data['is_pin'] = $data['pinned'];
 
+        /*
         $model->where('is_pin', 1);
         if ($data['pinned'] == 1) {
             $total = $model->countAllResults(false);
@@ -123,6 +124,7 @@ class JobVacancyController extends BaseController
                 return $this->respond($payload);
             }
         }
+        */
 
         $model = new JobVacancyModel();
         if (!$model->update($data['id'], $data)) {

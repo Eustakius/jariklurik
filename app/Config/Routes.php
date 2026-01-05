@@ -114,6 +114,11 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     });
 });
 $routes->group('api', ['filter' => 'jwt'], function ($routes) {
+    // Protected API routes (if any remain)
+});
+
+// Public API Routes (No JWT required)
+$routes->group('api', function ($routes) {
     $routes->get('job-vacancy', 'Api\JobVacancyController::dataListFrontend');
     $routes->group('company', static function ($routes) {
         $routes->get('autocomplate', 'Api\CompanyController::autocomplate');
@@ -121,14 +126,9 @@ $routes->group('api', ['filter' => 'jwt'], function ($routes) {
     $routes->group('country', static function ($routes) {
         $routes->get('autocomplate', 'Api\CountryController::autocomplate');
     });
-});
-$routes->group('submit', ['filter' => 'post'], function ($routes) {
-    $routes->post('job-seeker', 'Api\JobSeekerController::create');
-    $routes->post('purna-pmi', 'Api\PurnaPmiController::create');
-    $routes->post('applicant', 'Api\ApplicantController::create');
-});
-$routes->group('api', function ($routes) {
+    
     $routes->get('corn-job-vacancy', 'Api\CronController::emailqueuejobvacancy');
+    $routes->post('submit/applicant', 'Api\ApplicantController::create');
 });
 $routes->get('cv/(:any)', 'FilePreviewController::CV/$1', ['filter' => 'auth']);
 $routes->get('statement-letter/(:any)', 'FilePreviewController::statementLetter/$1', ['filter' => 'auth']);

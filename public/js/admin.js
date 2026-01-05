@@ -91,21 +91,6 @@ $.AdminBSB.input = {
                         $fileLine.removeClass('focused');
                     }
                 });
-
-                // Inisialisasi jika sudah ada file (misal saat form di-reload)
-                if ($el.val()) {
-                    $fileLine.addClass('focused');
-                } else {
-                    $fileLine.removeClass('focused');
-                }
-
-                // Opsional: klik tombol remove untuk reset
-                $removeBtn.on('click', function () {
-                    $el.val(''); // reset input file
-                    $fileInfo.text('');
-                    $removeBtn.addClass('hidden');
-                    $fileLine.removeClass('focused');
-                });
             });
         });
         flatpickr('input[type="date"]', {
