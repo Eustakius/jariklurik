@@ -201,6 +201,7 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
         $routes->group('training-type', static function ($routes) {
             $routes->get('data-table', 'Api\TrainingTypeController::dataTable');
             $routes->get('select', 'Api\TrainingTypeController::select2');
+            $routes->get('(:num)', 'Api\TrainingTypeController::show/$1');
         });
     });
 });

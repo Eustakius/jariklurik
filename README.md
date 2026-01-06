@@ -324,59 +324,7 @@ Setelah login, pastikan fitur utama berfungsi:
 
 ---
 
-### 🛠️ **Troubleshooting Setup**
 
-#### ❌ Error: "Cannot find module 'mythauth'"
-
-**Penyebab**: Composer install belum selesai
-**Solusi**:
-
-```bash
-rm -r vendor
-composer install
-```
-
-#### ❌ Error: "Database connection refused"
-
-**Penyebab**: MySQL tidak running
-**Solusi**:
-
-1. Buka XAMPP Control Panel
-2. Klik **Start** pada MySQL
-3. Tunggu 5 detik, lalu restart server CodeIgniter
-
-#### ❌ Error: "Port 8081 already in use"
-
-**Penyebab**: Ada aplikasi lain yang pakai port 8081
-**Solusi**:
-
-```bash
-# Gunakan port berbeda
-php spark serve --port 8082
-# Atau buka http://localhost:8082
-```
-
-#### ❌ Error: "npm not found"
-
-**Penyebab**: Node.js belum terinstall atau tidak di PATH
-**Solusi**:
-
-1. Download & install Node.js dari nodejs.org
-2. Restart terminal
-3. Coba `npm install` lagi
-
-#### ❌ Halaman blank / loading terus
-
-**Penyebab**: Browser cache atau database belum ready
-**Solusi**:
-
-1. Hard refresh browser: `CTRL+SHIFT+R` (Windows) atau `CMD+SHIFT+R` (Mac)
-2. Pastikan MySQL masih running
-3. Cek console (F12) ada error apa
-
----
-
-## ⚡ Cara Install & Setup
 
 ## 🧙‍♂️ Script Bantuan (Tools)
 
@@ -389,16 +337,7 @@ Kita udah buatin beberapa script ajaib biar hidup kalian lebih mudah:
 
 ---
 
-## ⚠️ Masalah yang Sering Muncul (Troubleshooting)
 
-- **🚫 "Inspectable WebContents" di port 8080?**
-  Port 8080 sering dipake aplikasi lain (kayak Steam). Makanya kita default-in pake port **8081** biar ga tabrakan.
-- **❌ Database Error?**
-  Pastiin MySQL di XAMPP udah nyala ya guys.
-- **❓ "Command not found" pas ketik php?**
-  Itu berarti PHP belum masuk PATH Windows. Tambahin folder PHP kalian (misal `C:\xampp\php`) ke Environment Variable Windows.
-
----
 
 ## 📘 PANDUAN PELENGKAP & TROUBLESHOOTING DETAIL
 
@@ -543,17 +482,154 @@ Masalah **CORS**. Domain di browser beda sama domain di config aplikasi.
    * Kalo di browser `http://localhost:8081`, di .env juga harus `http://localhost:8081/`.
    * Jangan lupa akhiri dengan garis miring `/`.
 
+
+### 8. ❌ Error: "Cannot find module 'mythauth'"
+
+**Penyebab**: Composer install belum selesai atau corrupt.
+**Solusi**:
+```bash
+rm -r vendor
+composer install
+```
+
+### 9. ❌ Error: "npm not found"
+
+**Penyebab**: Node.js belum terinstall atau tidak di PATH.
+**Solusi**:
+1. Download & install Node.js dari nodejs.org.
+2. Restart terminal.
+3. Coba `npm install` lagi.
+
+### 10. ❌ Halaman blank / loading terus
+
+**Penyebab**: Browser cache atau database belum ready.
+**Solusi**:
+1. Hard refresh browser: `CTRL+SHIFT+R`.
+2. Pastikan MySQL masih running.
+3. Cek console (F12) ada error apa.
+
 ---
+
 
 ## 📝 CHANGELOG - Recent Updates
 
-### 🎯 December 24, 2025 - Mass Action System Overhaul
 
-**✨ Fitur Baru & Perbaikan Besar:**
+### 📅 January 6, 2026 - Stability & Performance Overhaul 🚀
 
-#### 1. 🔧 **Mass Action Functionality (Bulk Operations)**
+> **✨ Ringkasan Update:**
+> Update besar untuk stabilitas. Memperbaiki *Infinite Refresh Loop*, *Double Refresh* saat load, dan *ClickSpark* positioning.
 
-Sekarang admin bisa melakukan aksi massal (approve, reject, revert, delete) untuk banyak data sekaligus!
+#### 🛠️ **Technical Implementation Details**
+
+##### 1. 🔄 **Fix: Infinite Refresh Loop (Global Sync Lock)**
+
+**Problem**: Multiple tabs active simultaneously caused recursive filter updates.
+**Files Modified**: `app/Views/Backend/Partial/banner/filter-banner.php`
+
+**Code Implementation**:
+Added a global lock to prevent race conditions during filter synchronization.
+
+```javascript
+// filter-banner.php
+window.universalFilterSyncLock = false; // Global Flag
+
+function syncPrimary(val, suffix) {
+    if (window.universalFilterSyncLock) return; // Prevent Recursive Loop
+    window.universalFilterSyncLock = true;
+    
+    // ... sync logic ...
+    
+    setTimeout(() => {
+        window.universalFilterSyncLock = false; // Release Lock
+    }, 50);
+}
+```
+
+##### 2. 🛑 **Fix: Double Refresh on Load (Silent Init Strategy)**
+
+**Problem**: Initializing Select2 filters (`.val(x).trigger('change')`) triggered the banner's listeners, causing an unnecessary second table reload.
+**Files Modified**: 
+- `app/Views/Backend/Partial/table/table.php`
+- `app/Views/Backend/Partial/banner/filter-banner.php`
+
+**Code Implementation**:
+We introduced a "Silent Init" flag (`isInit`) to distinguish between programmatic setups and manual user clicks.
+
+**A. Sender (`table.php`):**
+```php
+// Pass [true] as extra parameter to indicate "This is Initialization"
+$('#<?= $filter['id'] ?>').val(value).trigger('change', [true]); 
+```
+
+**B. Receiver (`filter-banner.php`):**
+```javascript
+$(document).on('change', '#' + keyBase + suffix, function(e, isInit) {
+    // If this change came from Initialization, IGNORE IT
+    if (isInit === true) {
+        return; 
+    }
+    
+    // Normal logic continues...
+    renderAllCards();
+    triggerFilterClick();
+});
+```
+
+##### 3. ⚡ **Performance: Native DataTables Events**
+
+**Problem**: The spinner used an artificial delay (`setTimeout`) which made the app feel slow.
+**Files Modified**: `app/Views/Backend/Partial/table/table.php`
+
+**Code Implementation**:
+Switched to native DataTables `processing.dt` event for 0ms latency.
+
+```javascript
+// Old (Slow):
+// setTimeout(() => { showSpinner() }, 300);
+
+// New (Instant):
+table.on('processing.dt', function(e, settings, processing) {
+    if (processing) {
+        $('#loader').show();
+    } else {
+        $('#loader').hide();
+    }
+});
+```
+
+##### 4. ✨ **Visual: Global ClickSpark Calibration**
+
+**Problem**: ClickSpark particles were appearing off-cursor when scrolled down.
+**Files Modified**: `app/Views/Backend/layout.php`
+
+**Code Implementation**:
+Fixed canvas positioning mapping to account for scroll offset.
+
+```javascript
+// layout.php
+function setCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight; // 1:1 Viewport Mapping
+    canvas.style.position = 'fixed';    // Fix position relative to screen
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.pointerEvents = 'none'; // Click-through
+}
+```
+
+---
+
+### 📅 December 24, 2025 - Mass Action System Overhaul 🎯
+
+> **✨ Ringkasan Update:**
+> Fitur baru untuk melakukan aksi massal (Approve/Reject/Delete) dengan aman dan perbaikan sistem permission.
+
+#### 1. 🔧 **Mass Action Functionality**
+Sekarang admin bisa melakukan aksi massal untuk:
+- ✅ **Job Seeker**
+- ✅ **Purna PMI**
+- ✅ **Training Type**
+- ✅ **Applicant**
 
 **Modul yang Ditingkatkan:**
 
@@ -683,6 +759,8 @@ headers: {
 - ✅ Permission check masih jalan normal
 - ✅ JSON data aman terkirim
 - ✅ Support both form-encoded & JSON formats
+
+
 
 ---
 

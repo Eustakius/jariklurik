@@ -12,6 +12,18 @@ class TrainingTypeController extends BaseController
     {
         $this->config = config('Backend');
     }
+
+    public function show($id = null)
+    {
+        $model = new TrainingTypeModel();
+        $data = $model->find($id);
+
+        if (!$data) {
+            return $this->failNotFound('Training Type not found');
+        }
+
+        return $this->response->setJSON($data);
+    }
     public function dataTable()
     {
         $model = new TrainingTypeModel();

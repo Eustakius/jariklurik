@@ -408,9 +408,6 @@ if (!empty($importPerm)): ?>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">What do you want to do with <span id="decision-count<?= $props['key'] ?>"></span> selected items?</h3>
                 <div class="flex justify-center gap-4">
-                    <button id="btn-decision-approve<?= $props['key'] ?>" type="button" class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
-                        <iconify-icon icon="mingcute:check-line" class="mr-2"></iconify-icon> Approve
-                    </button>
                     <button id="btn-decision-reject<?= $props['key'] ?>" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                         <iconify-icon icon="mingcute:close-line" class="mr-2"></iconify-icon> Reject
                     </button> 
@@ -419,12 +416,9 @@ if (!empty($importPerm)): ?>
         </div>
     </div>
 </div>
+
 <script>
     (function() {
-        let isMobile = window.matchMedia("(max-width: 768px)").matches;
-        if (isMobile) {
-            $.fn.DataTable.ext.pager.numbers_length = 4;
-        }
         var table = {};
         // Persistent Selection Set
         var selectedIds<?= $props['key'] ?> = new Set();
@@ -497,6 +491,51 @@ if (!empty($importPerm)): ?>
             });
         });
         $(document).ready(function() {
+
+            // Read URL parameters and populate filters
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Re-Initialize Buttons Array (Restored)
+            let buttons = <?= json_encode($buttons, JSON_UNESCAPED_SLASHES) ?>;
+            buttons.forEach(b => {
+                b.action = eval("(" + b.action + ")");
+            });
+            <?php if (isset($props['filters']) && is_array($props['filters'])): ?>
+            <?php foreach ($props['filters'] as $filter): ?>
+                const <?= $filter['id'] ?>Value = urlParams.get('<?= $filter['id'] ?>');
+                if (<?= $filter['id'] ?>Value) {
+                    <?php if ($filter['input'] == 'select' && isset($filter['api'])): ?>
+                        // For Select2 dropdowns with API, we need to add the option first
+                        const $<?= $filter['id'] ?>Select = $('#<?= $filter['id'] ?>');
+                        if ($<?= $filter['id'] ?>Select.length && $<?= $filter['id'] ?>Select.hasClass('select2-hidden-accessible')) {
+                            // Add a temporary option and select it
+                            const newOption = new Option('Loading...', <?= $filter['id'] ?>Value, true, true);
+                            $<?= $filter['id'] ?>Select.append(newOption).trigger('change', [true]);
+                            
+                            // Fetch the actual data to get the proper label
+                            $.ajax({
+                                url: '<?= base_url($filter['api']) ?>',
+                                data: { id: <?= $filter['id'] ?>Value },
+                                headers: { 'Authorization': 'Bearer <?= esc($props['token']) ?>' },
+                                success: function(data) {
+                                    if (data.results && data.results.length > 0) {
+                                        const option = new Option(data.results[0].text, data.results[0].id, true, true);
+                                        $<?= $filter['id'] ?>Select.empty().append(option).trigger('change', [true]);
+                                    }
+                                }
+                            });
+                        }
+                    <?php elseif ($filter['input'] == 'select'): ?>
+                        // For static select dropdowns
+                        $('#<?= $filter['id'] ?>').val(<?= $filter['id'] ?>Value).trigger('change', [true]);
+                    <?php else: ?>
+                        // For text and date inputs
+                        $('[name="<?= $filter['id'] ?>"], #<?= $filter['id'] ?>').val(<?= $filter['id'] ?>Value);
+                    <?php endif; ?>
+                }
+            <?php endforeach; ?>
+            <?php endif; ?>
+
 
             $.extend(true, $.fn.dataTable.Buttons.defaults, {
                 dom: {
@@ -601,6 +640,7 @@ if (!empty($importPerm)): ?>
                         searchDropdown: false,
                         render: function(data, type, row, meta) {
                             return `
+                                <div class="flex items-center gap-2">
                                 <?php
                                 $filtereds = array_filter(
                                     $props['permission'],
@@ -615,41 +655,56 @@ if (!empty($importPerm)): ?>
                                     $route = rtrim(base_url($routeKey), '/'); ?>
                                     <?php if (str_ends_with($permission['permission'], '.detail')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}" 
-                                        class="w-9 h-9 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 dark:bg-cyan-900/20 dark:hover:bg-cyan-900/30 dark:text-cyan-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:eye-broken" class="text-lg"></iconify-icon>
+                                        class="group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(6,182,212,0.15); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3);"
+                                        title="View Details">
+                                            <iconify-icon icon="solar:eye-bold-duotone" width="22"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.update')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}/edit" 
-                                        class="w-9 h-9 bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:pen-new-square-broken" class="text-lg"></iconify-icon>
+                                        class="group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);"
+                                        title="Edit">
+                                            <iconify-icon icon="solar:pen-new-square-bold-duotone" width="22"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.delete')): ?>
                                         <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:trash-bin-trash-broken" class="text-lg"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);"
+                                        title="Delete">
+                                            <iconify-icon icon="solar:trash-bin-trash-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.process')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:check-circle-broken" class="text-lg"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);"
+                                        title="Process">
+                                            <iconify-icon icon="solar:check-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.approve')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:check-circle-broken" class="text-lg"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);"
+                                        title="Approve">
+                                            <iconify-icon icon="solar:check-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.reject')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:close-circle-broken" class="text-lg"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);"
+                                        title="Reject">
+                                            <iconify-icon icon="solar:close-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.revert')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" 
-                                        class="btn-open-modal<?= $props['key'] ?> w-9 h-9 bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 rounded-lg inline-flex items-center justify-center transition-all duration-200">
-                                            <iconify-icon icon="solar:restart-broken" class="text-lg"></iconify-icon>
+                                        class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
+                                        style="background-color: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);"
+                                        title="Revert">
+                                            <iconify-icon icon="solar:restart-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
+                                </div>
                             `;
                         }
                     }
@@ -762,14 +817,13 @@ if (!empty($importPerm)): ?>
             $('#tbl<?= $props['key'] ?>').on('page.dt', function(e, settings, len) {
                 $("#tbl<?= $props['key'] ?> tbody").empty();
             });
-            $('#tbl<?= $props['key'] ?>').on('preDraw.dt', function() {
-                // Paksa spinner bawaan tampil
-                showProcess(true);
+            // Optimized Processing Spinner using Native Event
+            $('#tbl<?= $props['key'] ?>').on('processing.dt', function(e, settings, processing) {
+                showProcess(processing);
             });
+
             $('#tbl<?= $props['key'] ?>').on('draw.dt', function() {
-                ensureFullRender(() => {
-                    showProcess(false);
-                });
+                // Responsive cleanup
                 $('#tbl<?= $props['key'] ?> td.dtr-hidden input, #tbljobvacancy td.dtr-hidden [id]').remove();
                 
                 // Reinitialize Flowbite components after table redraw

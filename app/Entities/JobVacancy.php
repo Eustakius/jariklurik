@@ -30,7 +30,7 @@ class JobVacancy extends Entity
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'position' => '<a href="' . base_url('back-end/applicant?jobvacancynew=' . $this->id) . '" class="text-primary-600 hover:text-primary-800 hover:underline transition-all duration-200">' . $this->position . '</a>',
+            'position' => '<a href="' . base_url('back-end/applicant?jobvacancynew=' . $this->id . '&jobvacancyprocess=' . $this->id . '&jobvacancyapproved=' . $this->id . '&jobvacancyrejected=' . $this->id) . '" class="text-primary-600 hover:text-primary-800 hover:underline transition-all duration-200">' . $this->position . '</a>',
             'selection_date' => $this->selection_date,
             'status' => statusRender($this->status),
             'visitor' => $this->visitor,

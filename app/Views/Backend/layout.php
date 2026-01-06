@@ -291,6 +291,92 @@ $auth = service('authentication');
         <polyline id="SvgjsPolyline1003" points="0,0"></polyline>
         <path id="SvgjsPath1004" d="M0 0 "></path>
     </svg>
+    <script>
+        class ClickSpark {
+            constructor() {
+                this.canvas = document.createElement('canvas');
+                this.canvas.style.cssText = 'position:fixed; top:0; left:0; pointer-events:none; width:100%; height:100%; z-index:99999;';
+                document.body.appendChild(this.canvas);
+                this.ctx = this.canvas.getContext('2d');
+                this.sparks = [];
+                this.config = { sparkSize: 10, sparkRadius: 15, sparkCount: 8, duration: 400 };
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                document.addEventListener('click', (e) => this.handleClick(e));
+                requestAnimationFrame((t) => this.animate(t));
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.canvas.style.width = window.innerWidth + 'px';
+                this.canvas.style.height = window.innerHeight + 'px';
+            }
+
+            animate(timestamp) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.sparks = this.sparks.filter(spark => {
+                    const elapsed = performance.now() - spark.startTime;
+                    if (elapsed >= this.config.duration) return false;
+
+                    const progress = elapsed / this.config.duration;
+                    const ease = progress * (2 - progress); // ease-out
+                    
+                    const distance = ease * this.config.sparkRadius;
+                    const lineLength = this.config.sparkSize * (1 - ease);
+                    const alpha = 1 - ease;
+
+                    const x1 = spark.x + distance * Math.cos(spark.angle);
+                    const y1 = spark.y + distance * Math.sin(spark.angle);
+                    const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
+                    const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
+
+                    this.ctx.globalAlpha = alpha;
+                    this.ctx.strokeStyle = spark.color;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x1, y1);
+                    this.ctx.lineTo(x2, y2);
+                    this.ctx.stroke();
+
+                    return true;
+                });
+
+                requestAnimationFrame((t) => this.animate(t));
+            }
+
+            handleClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Active Color Detection
+                let el = e.target;
+                let color = window.getComputedStyle(el).color;
+                
+                // Fallback if color is transparent or weird, check parent
+                if (color === 'rgba(0, 0, 0, 0)' || !color) {
+                     let parent = el.parentElement;
+                     if(parent) color = window.getComputedStyle(parent).color;
+                }
+
+                const now = performance.now();
+                for (let i = 0; i < this.config.sparkCount; i++) {
+                    this.sparks.push({
+                        x, y,
+                        color: color || '#fff',
+                        angle: (2 * Math.PI * i) / this.config.sparkCount,
+                        startTime: now
+                    });
+                }
+            }
+        }
+        
+        // Init Global Spark
+        document.addEventListener('DOMContentLoaded', () => new ClickSpark());
+    </script>
 </body>
 
 </html>

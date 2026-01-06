@@ -8,14 +8,33 @@
         <div class="card border border-neutral-200 dark:border-neutral-600 shadow-md rounded-2xl bg-white dark:bg-neutral-800">
             
             <!-- Card Header -->
-            <div class="card-header pb-0 px-6 py-4 border-b border-neutral-200 dark:border-neutral-600 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                     <div class="p-2 bg-primary-50 text-primary-600 rounded-lg dark:bg-primary-900/50 dark:text-primary-400">
-                        <iconify-icon icon="mingcute:briefcase-line" class="text-xl"></iconify-icon>
-                     </div>
-                     <h6 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-0">Job Vacancy Lists</h6>
+            <div class="card-header pb-0 px-6 py-4 border-b border-neutral-200 dark:border-neutral-600 space-y-4">
+                <!-- Title & Header -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                         <div class="p-2 bg-primary-50 text-primary-600 rounded-lg dark:bg-primary-900/50 dark:text-primary-400">
+                            <iconify-icon icon="mingcute:briefcase-line" class="text-xl"></iconify-icon>
+                         </div>
+                         <h6 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-0">Job Vacancy Lists</h6>
+                    </div>
                 </div>
                 
+                <!-- Filter Banner (Full Width) -->
+                <div class="w-full">
+                    <?= view('Backend/Partial/banner/filter-banner', [
+                        'key_base' => 'jobvacancy', 
+                        'api_url' => 'back-end/api/job-vacancy',
+                        'title_label' => 'Job Vacancy',
+                        'mappings' => [
+                            'title' => 'position',
+                            'subtitle' => 'company_name', 
+                            'tertiary' => 'country_name'
+                        ],
+                        'token' => $token ?? '', 
+                        'filter_config' => $tabs[0]['datatable']['filters'] ?? [] 
+                    ]) ?>
+                </div>
+
                 <!-- Modern Pill Tabs -->
                 <ul data-toggle="tab" class="flex flex-wrap p-1 bg-neutral-100 dark:bg-neutral-700/50 rounded-xl" id="card-title-tab" data-tabs-toggle="#card-title-tab-content" role="tablist">
                     <?php if(isset($tabs)): foreach ($tabs as $tab): ?>
