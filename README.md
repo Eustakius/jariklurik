@@ -2442,3 +2442,153 @@ Berikut adalah detail kode sebelum dan sesudah untuk perbaikan UI yang sulit dib
 - **Authentication**: `myth/auth` (Composer).
 - **2FA**: Custom Logic (Google Authenticator) di `AuthController` yang menghasilkan Secret Key manual.
 
+---
+
+### 📋 Poin-Poin Utama (Requirements & Perbaikan Sistem)
+
+Berikut adalah dokumentasi teknis terkait pemenuhan persyaratan sistem dan perbaikan yang telah dilakukan.
+
+#### 1. 🔍 Filter Tampilan Pengguna (User Interface Filtering)
+
+**Persyaratan**: Tampilan utama wajib memfilter hanya perusahaan/lowongan yang **AKTIF** (Status = 1).
+**Tujuan**: Efisiensi informasi bagi pengguna.
+
+**Implementasi Teknis**:
+*File: `app/Controllers/Api/CompanyController.php`*
+
+```php
+$builder = $model->like('name', $term ?? '')
+    ->where('companies.status', 1) // ✅ FILTER AKTIF DEFAULT
+    ->orderBy('name', 'ASC');
+```
+*Logic ini memastikan dropdown perusahaan di frontend hanya memunculkan yang statusnya aktif.*
+
+#### 2. 🛡️ Perbaikan Bug Validasi Lowongan (Job Vacancy Validation)
+
+**Persyaratan**:
+- Batasi pilihan dokumen wajib **Maksimal 2**.
+- Peringatan jelas jika persyaratan tidak terpenuhi (termasuk CV).
+
+**Implementasi Teknis**:
+*File: `app/Controllers/Backend/Application/JobVacancyController.php`*
+
+```php
+// Validasi Sisi Server (Backend)
+$reqDocs = $this->request->getPost('required_documents');
+if (empty($reqDocs) || count($reqDocs) > 2) {
+     return redirect()->to(pathBack($this->request))
+        ->withInput()
+        ->with('errors-backend', [
+            // ✅ PERINGATAN KONTRAS & JELAS
+            'required_documents' => 'Please select at most 2 required documents (CV is mandatory).'
+        ]);
+}
+```
+
+#### 3. 🎨 Perbaikan Tampilan (UI/UX Improvement)
+
+**Persyaratan**: Audit dan perbaikan kontras warna tombol untuk aksesibilitas (Readability).
+
+**Implementasi Teknis**:
+*File: `app/Views/Backend/Administrator/role-form.php` (dan form lainnya)*
+
+**Before (Low Contrast/Invisible in Dark Mode):**
+```html
+<button class="btn ... text-neutral-700 dark:text-neutral-300">
+    Cancel
+</button>
+```
+
+**After (High Contrast Standard):**
+```html
+<button class="btn ... text-neutral-700 dark:text-white dark:bg-neutral-600">
+    Cancel
+</button>
+```
+*Perubahan ini menjamin tombol tetap terlihat jelas di latar belakang gelap (Dark Mode).*
+
+#### 4. 📈 Detail Teknis Chart (Real-Time Analytics)
+
+Berikut adalah detail implementasi untuk 3 chart baru yang menggunakan data real-time dari tabel `web_visitors`.
+
+**A. Visitor Growth (Pertumbuhan Pengunjung)**
+*Menampilkan grafik batang jumlah pengunjung per bulan.*
+
+*Controller Logic (`DashboardController.php`)*:
+```php
+// Query untuk mengelompokkan pengunjung berdasarkan bulan (YYYY-MM)
+$growthQuery = $webVisitorModel->select("DATE_FORMAT(created_at, '%Y-%m') as ym, DATE_FORMAT(created_at, '%b') as month, COUNT(*) as count")
+                                ->groupBy('ym')
+                                ->orderBy('ym', 'ASC')
+                                ->findAll(12); // Ambil 12 bulan terakhir
+
+// Format data untuk ApexCharts
+$visitorGrowth['categories'] = [];
+$visitorGrowth['data'] = [];
+foreach ($growthQuery as $row) {
+    $visitorGrowth['categories'][] = $row['month']; // Label sumbu X (Jan, Feb, ...)
+    $visitorGrowth['data'][] = (int)$row['count'];  // Data sumbu Y
+}
+```
+
+*Frontend Config (`dashboard.php`)*:
+```javascript
+var growthOptions = {
+    // ... styling configuration
+    xaxis: {
+        categories: <?= json_encode($visitorGrowth['categories']) ?> // ['Jan', 'Feb', ...]
+    },
+    series: [{
+        name: 'Visitors',
+        data: <?= json_encode($visitorGrowth['data']) ?> // [120, 300, ...]
+    }]
+};
+new ApexCharts(document.querySelector("#visitorGrowthChart"), growthOptions).render();
+```
+
+**B. Traffic Sources (Sumber Platform)**
+*Menampilkan Donut Chart distribusi platform/device pengunjung.*
+
+*Controller Logic*:
+```php
+// Query aggregasi berdasarkan platform (Windows, Android, dll)
+$platformQuery = $webVisitorModel->select("platform, COUNT(*) as count")
+                                ->groupBy('platform')
+                                ->orderBy('count', 'DESC')
+                                ->findAll();
+
+$trafficSources['labels'] = [];
+$trafficSources['series'] = [];
+foreach ($platformQuery as $row) {
+    $trafficSources['labels'][] = $row['platform'] ?: 'Unknown';
+    $trafficSources['series'][] = (int)$row['count'];
+}
+```
+
+**C. Application Trends (Area Chart - Big Data)**
+*Chart utama dengan kemampuan Zoom & Pan (Tahun 2024 - Sekarang).*
+
+*Key Feature*: Menggunakan `DatePeriod` untuk mengisi tanggal kosong (Gap Filling) agar grafik tidak terputus.
+
+```php
+// Loop setiap hari dari Start Date ke End Date
+foreach ($period as $dt) {
+    $dateKey = $dt->format('Y-m-d');
+    
+    // Jika ada data di tanggal ini, pakai datanya
+    if (isset($dataMap[$dateKey])) {
+        $echartsData[] = [
+            'date' => $timestamp, 
+            'approved' => (int)$dataMap[$dateKey]['approved'],
+            // ...
+        ];
+    } else {
+        // Jika kosong, isi dengan 0 (Zero Padding)
+        $echartsData[] = ['date' => $timestamp, 'approved' => 0, ...];
+    }
+}
+```
+*Logic ini memastikan grafik "Area" terbentuk sempurna tanpa garis putus-putus.*
+
+
+
