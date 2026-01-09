@@ -188,8 +188,11 @@ class JobVacancyController extends BaseController
     {
         $data = $this->request->getPost();
 
-        // $data['status'] = $this->auth->user()->user_type === 'admin' ? 1 : 9;
-        $data['status'] = 1;
+        if ($this->auth->user()->user_type == 'company') {
+            $data['status'] = 9; // Pending
+        } else {
+            $data['status'] = 1; // Active (Admin)
+        }
         
         $reqDocs = $this->request->getPost('required_documents');
         if (empty($reqDocs) || count($reqDocs) > 2) {
@@ -220,6 +223,21 @@ class JobVacancyController extends BaseController
 
         $data['id'] = $id;
 
+        // Security Check for Company
+        if ($this->auth->user()->user_type == 'company') {
+            $vacancy = $this->model->find($id);
+            if (!$vacancy) {
+                 return redirect()->to(pathBack($this->request))->with('error-backend', "Job Vacancy not found");
+            }
+            // Ensure the vacancy belongs to the company owned by this user
+            $companyModel = new CompanyModel();
+            $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+            
+            if (!$company || $vacancy->company_id != $company->id) {
+                return redirect()->to(pathBack($this->request))->with('forbiden', "You do not have permission to update this vacancy.");
+            }
+        }
+
         if (!$this->model->update($id, $data)) {
             return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', $this->model->errors());
         }
@@ -232,6 +250,20 @@ class JobVacancyController extends BaseController
      */
     public function delete($id = null)
     {
+        // Security Check for Company
+        if ($this->auth->user()->user_type == 'company') {
+            $vacancy = $this->model->find($id);
+            if (!$vacancy) {
+                 return redirect()->to(pathBack($this->request))->with('error-backend', "Job Vacancy not found");
+            }
+            $companyModel = new CompanyModel();
+            $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+            
+            if (!$company || $vacancy->company_id != $company->id) {
+                return redirect()->to(pathBack($this->request))->with('forbiden', "You do not have permission to delete this vacancy.");
+            }
+        }
+
         $this->model->delete($id);
 
         return redirect()->to('/back-end/job-vacancy')->with('message-backend', 'Job Vacancy delete successfully');

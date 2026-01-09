@@ -5,66 +5,65 @@
             <h2 class="font-bold text-xl md:text-[2rem] text-[#74430D]">Daftar Lowongan Kerja Terbaru</h2>
         </div>
         <div class="flex flex-row items-center justify-center gap-2">
-            <div class="relative z-20">
-                <button id="country" data-dropdown-toggle="dropdownCountry" class="w-auto text-xs md:text-base text-[#714D00] font-bold rounded-[10px] border md:border-[3px] border-[#714D00] py-2 px-2 md:px-3 text-center flex flex-wrap items-center justify-between" type="button">Negara <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <div class="relative z-30">
+                <button id="country" data-dropdown-toggle="dropdownCountry" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                    Negara 
+                    <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
                 <div id="dropdownCountry"
-                    class="z-50 hidden min-w-[300px] bg-white absolute top-full left-0 mt-2 divide-y divide-gray-100 rounded-lg shadow-2xl dark:bg-gray-700 dark:divide-gray-600 border border-gray-200">
-                    <ul class="py-3 space-y-3 text-sm bg-white rounded-lg text-gray-700" aria-labelledby="dropdownRadioButton">
-                        <li class="relative">
-                            <div class="form-group form-float relative">
-                                <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
-                                </div>
-                                <div class="form-line ps-10 mr-3">
-                                    <input type="text" autocomplete="off" name="country" id="countryFilter"
-                                        class="!text-lg form-control w-full border rounded-lg px-3 py-2" placeholder="Cari negara...">
-                                </div>
+                    style="background-color: #ffffff !important; opacity: 1 !important; width: 320px !important;"
+                    class="z-50 hidden w-[320px] !bg-white absolute top-full left-0 mt-3 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 !border !border-gray-100 ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
+                    <div class="p-4 bg-gray-50">
+                        <div class="relative w-full block">
+                            <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+                                <svg class="w-5 h-5 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
                             </div>
-                            <ul id="countryResult"
-                                class="!text-lg z-50 bg-white border border-gray-200 w-full mt-1 hidden max-h-48 overflow-y-auto">
-                            </ul>
-                        </li>
+                            <input type="text" autocomplete="off" name="country" id="countryFilter"
+                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1rem !important; height: auto !important; min-height: 48px !important; border: 1px solid #e5e7eb !important; border-radius: 9999px !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
+                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#EBC470] focus:!border-[#EBC470] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari negara...">
+                        </div>
+                    </div>
+                    <ul id="countryResult" class="px-2 pb-2 text-sm text-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
                     </ul>
                 </div>
             </div>
-            <div class="relative z-20">
-                <button id="company" data-dropdown-toggle="dropdownCompany" class="w-auto text-xs md:text-base text-[#714D00] font-bold rounded-[10px] border md:border-[3px] border-[#714D00] py-2 px-2 md:px-3 text-center flex flex-wrap items-center justify-between" type="button">Perusahaan <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <div class="relative z-30">
+                <button id="company" data-dropdown-toggle="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                    Perusahaan 
+                    <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
-                <div id="dropdownCompany" class="z-20 hidden w-[20.75rem] bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-3 space-y-3 text-sm bg-white rounded-lg text-gray-700" aria-labelledby="dropdownRadioButton">
-                        <li class="relative">
-                            <div class="form-group form-float relative">
-                                <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
-                                </div>
-                                <div class="form-line ps-10 mr-3">
-                                    <input type="text" autocomplete="off" name="company" id="companyFilter"
-                                        class="!text-lg form-control w-full border rounded-lg px-3 py-2" placeholder="Cari perusahaan...">
-                                </div>
+                <div id="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important; width: 420px !important;" class="z-50 hidden w-[420px] max-w-[90vw] !bg-white absolute top-full left-0 mt-3 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 !border !border-gray-100 ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
+                    <div class="p-4 bg-gray-50">
+                        <div class="relative w-full block">
+                            <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+                                <svg class="w-5 h-5 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
                             </div>
-                            <ul id="companyResult"
-                                class="!text-lg z-50 bg-white border border-gray-200 w-full mt-1 hidden max-h-48 overflow-y-auto">
-                            </ul>
-                        </li>
+                            <input type="text" autocomplete="off" name="company" id="companyFilter"
+                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1.5rem !important; height: auto !important; min-height: 48px !important; border: 1px solid #e5e7eb !important; border-radius: 9999px !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
+                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#EBC470] focus:!border-[#EBC470] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari perusahaan...">
+                        </div>
+                    </div>
+                    <ul id="companyResult" class="px-2 pb-2 text-sm text-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
                     </ul>
                 </div>
             </div>
-            <div class="relative z-20">
-                <button id="sorting" data-dropdown-toggle="dropdownSorting" class="w-auto text-xs md:text-base text-[#714D00] font-bold rounded-[10px] border md:border-[3px] border-[#714D00] py-2 px-2 md:px-3 text-center flex flex-wrap items-center justify-between" type="button">Urutkan <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <div class="relative z-30">
+                <button id="sorting" data-dropdown-toggle="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                    Urutkan 
+                    <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
-                <div id="dropdownSorting" class="z-20 hidden w-[20.75rem] md:!right-[-103px] bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="p-3 space-y-3 text-sm bg-white rounded-lg text-gray-700" aria-labelledby="dropdownSorting">
+                <div id="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important;" class="z-20 hidden w-[240px] !bg-white divide-y divide-gray-100 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 dark:divide-gray-600 mt-3 animate-fade-in-down !border !border-gray-100 ring-1 ring-black/5 overflow-hidden">
+                    <ul class="p-4 space-y-3 text-sm bg-transparent rounded-lg text-gray-700" aria-labelledby="dropdownSorting">
                         <li>
                             <div class="flex items-start">
                                 <input checked id="default-radio-1" type="radio" value="desc" name="filter-radio" class="filter w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
@@ -136,7 +135,7 @@
                                     </div>
                                     
                                 </div>
-                                <div class="flex justify-end"><a href="${item.slug}" class="text-xs md:text-base text-[#714D00] font-bold rounded-[10px] border md:border-[3px] border-[#714D00] py-2 px-2 md:px-5 shadow-[2px_2px_0_0_rgba(113,77,0,1)]">Selengkapnya</a></div>
+                                <div class="flex justify-end"><a href="${item.slug}" class="transition-all duration-300 shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold rounded-full border border-[#EBC470] py-2.5 px-6 text-center flex items-center justify-between bg-white">Selengkapnya</a></div>
                             </div>`;
                             $('.job-list').append(html);
                         });
@@ -184,6 +183,7 @@
         $radio = $(this).val(); // Fix: Update value BEFORE calling initData
         initData(1, $radio); // Explicitly pass the new order
         const id = $(this).attr('id');
+        /*
         const labelText = '<div class="flex items-center gap-2 bg-[#EBC470] bg-opacity-20 px-4 py-2 rounded-full border border-[#714D00] text-[#714D00] font-medium">' +
             '<span>Filter: ' + 
             ($inputCountry.val() ? 'Negara: <b>' + $inputCountry.val() + '</b>, ' : '') + 
@@ -192,6 +192,18 @@
             '<button class="clear-filter hover:bg-red-100 p-1 rounded-full transition-colors duration-200" title="Hapus Filter">' +
             '<svg width="16" height="16" class="w-4 h-4 text-[#714D00]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15"><path fill="currentColor" d="M12.225 2.082a.5.5 0 0 1 .693.694l-.064.078L8.207 7.5l4.647 4.647l.064.078a.5.5 0 0 1-.693.693l-.078-.064L7.5 8.207l-4.646 4.647a.5.5 0 1 1-.707-.707L6.793 7.5L2.147 2.854l-.065-.078a.5.5 0 0 1 .694-.694l.078.065L7.5 6.793l4.647-4.646z"/></svg>' +
             '</button></div>';
+        */
+        
+        // Chip Style
+        let labels = [];
+        if($inputCountry.val()) labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Negara: ${$inputCountry.val()}</span>`);
+        if($inputCompany.val()) labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Perusahaan: ${$inputCompany.val()}</span>`);
+        labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Urutan: ${$(`label[for="${id}"]`).text().trim()}</span>`);
+
+        const labelText = '<div class="flex flex-wrap items-center gap-2 animate-fade-in-up">' + 
+             labels.join('') +
+            '<button class="clear-filter ml-2 transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-red-500 border border-red-200 shadow-[0_2px_5px_rgba(0,0,0,0.05)] hover:shadow-md hover:border-red-300 hover:text-red-600">Reset Filter</button></div>';
+
         $('.filter-result').html(labelText);
         $dropdownSorting.addClass('hidden')
     });
@@ -209,7 +221,7 @@
             elList.empty();
         }
 
-        elList.append('<li id="loadingItem" class="px-3 py-2 text-gray-400 text-sm">Memuat...</li>');
+        elList.append('<li id="loadingItem" class="px-3 py-2 text-gray-400 text-sm flex items-center justify-center"><svg aria-hidden="true" class="w-5 h-5 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8455 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg></li>');
 
         $.ajax({
             url: '/api/'+ url +'/autocomplate',
@@ -243,20 +255,21 @@
                 $.each(data, function(i, item) {
                     var $li = $('<li>')
                         .text(item)
-                        .addClass('px-3 py-2 hover:bg-gray-100 cursor-pointer')
+                        .addClass('mx-2 my-1 px-4 py-2.5 rounded-xl hover:bg-[#FFF9E6] text-gray-700 cursor-pointer transition-colors duration-200 font-medium')
                         .on('click', function() {
                             elInput.val(item);
                             elList.addClass('hidden');
                             initData();
                             const id = $(`input[name="filter-radio"][value="${$radio}"]`).attr('id');
-                            const labelText = '<div class="flex items-center gap-2 bg-[#EBC470] bg-opacity-20 px-4 py-2 rounded-full border border-[#714D00] text-[#714D00] font-medium">' +
-                                '<span>Filter: ' + 
-                                ($inputCountry.val() ? 'Negara: <b>' + $inputCountry.val() + '</b>, ' : '') + 
-                                ($inputCompany.val() ? 'Perusahaan: <b>' + $inputCompany.val() + '</b>, ' : '') + 
-                                'Urutan: <b>' + $(`label[for="${id}"]`).text().trim() + '</b></span>' +
-                                '<button class="clear-filter hover:bg-red-100 p-1 rounded-full transition-colors duration-200" title="Hapus Filter">' +
-                                '<svg width="16" height="16" class="w-4 h-4 text-[#714D00]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15"><path fill="currentColor" d="M12.225 2.082a.5.5 0 0 1 .693.694l-.064.078L8.207 7.5l4.647 4.647l.064.078a.5.5 0 0 1-.693.693l-.078-.064L7.5 8.207l-4.646 4.647a.5.5 0 1 1-.707-.707L6.793 7.5L2.147 2.854l-.065-.078a.5.5 0 0 1 .694-.694l.078.065L7.5 6.793l4.647-4.646z"/></svg>' +
-                                '</button></div>';
+                            let labels = [];
+                            if($inputCountry.val()) labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Negara: ${$inputCountry.val()}</span>`);
+                            if($inputCompany.val()) labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Perusahaan: ${$inputCompany.val()}</span>`);
+                            labels.push(`<span class="transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-[#714D00] border border-[#EBC470] shadow-[0_2px_5px_rgba(0,0,0,0.05)]">Urutan: ${$(`label[for="${id}"]`).text().trim()}</span>`);
+
+                            const labelText = '<div class="flex flex-wrap items-center gap-2 animate-fade-in-up">' + 
+                                labels.join('') +
+                                '<button class="clear-filter ml-2 transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-red-500 border border-red-200 shadow-[0_2px_5px_rgba(0,0,0,0.05)] hover:shadow-md hover:border-red-300 hover:text-red-600">Reset Filter</button></div>';
+                            
                             $('.filter-result').html(labelText)
                             elDropdown.addClass('hidden')
                         });

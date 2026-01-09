@@ -164,7 +164,7 @@ $lastPart = end($parts);
                 </div>
                 <?php if ($data->malequota > 0 || $data->femalequota > 0 || $data->unisexquota > 0): ?>
                     <div id="fadeJobApply" class="<?= session()->getFlashdata('error') ? 'opacity-1' : 'hidden opacity-0' ?> transition-opacity duration-500 ease-in-out">
-                        <form class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('api/submit/applicant') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
+                        <form id="application-form" class="pr-0 md:pr-14 text-sm md:text-lg flex flex-col gap-8" action="<?= base_url('api/submit/applicant') ?>" method="post" enctype="multipart/form-data" data-parsley-validate>
                             <input type="hidden" name="token" value="<?= $token ?>">
                             <input type="hidden" name="slug" value="<?= $data->slug ?>">
                             <?= csrf_field() ?>
@@ -277,15 +277,15 @@ $lastPart = end($parts);
                                                     <img src="/icon/jariklurik-upload.png" class="h-[1.563rem] md:h-[1.563rem] w-auto">
                                                 </label>
                                                 <input type="file" id="file_<?= $key ?>" name="<?= $key ?>" class="form-control hidden doc-input" required
-                                                    data-parsley-maxfilesize="5242880"
-                                                    data-parsley-maxfilesize-message="Maksimal 5 MB"
+                                                    data-parsley-maxfilesize="2097152"
+                                                    data-parsley-maxfilesize-message="Maksimal 2 MB"
                                                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                                     data-parsley-fileextension="pdf,doc,docx,jpg,jpeg,png"
                                                     data-parsley-fileextension-message="Tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png"
                                                     onchange="handleFileSelect(this, '<?= $key ?>')">
                                                 <label for="file_<?= $key ?>" class="form-label">Upload <?= $label ?></label>
                                             </div>
-                                            <i class="text-xs md:text-sm text-[#B94A48]">Maksimal 5 MB dan tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png</i>
+                                                <i class="text-xs md:text-sm text-[#B94A48]">Maksimal 2 MB dan tipe file hanya .pdf, .doc, .docx, .jpg, .jpeg, .png</i>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -378,7 +378,8 @@ $lastPart = end($parts);
         const $btn = $('#toggleBtnApply');
 
         // AJAX Form Submission
-        $('form').on('submit', function(e) {
+        $('#application-form').on('submit', function(e) {
+            console.log("Form submission triggered");
             e.preventDefault(); // Stop default submission
             
             var $form = $(this);
@@ -428,10 +429,21 @@ $lastPart = end($parts);
                     console.error("AJAX Error:", status, error);
                     console.error("Response:", xhr.responseText);
                     
+                    let errorMessage = 'Terjadi kesalahan sistem. Silakan coba lagi.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                        // Handle specific CSRF error if needed (CI4 usually returns 403)
+                         if (xhr.responseJSON.error) {
+                            errorMessage += ' (' + xhr.responseJSON.error + ')';
+                        }
+                    } else if (xhr.status === 403) {
+                         errorMessage = 'Sesi Anda telah berakhir atau token tidak valid. Silakan refresh halaman.';
+                    }
+
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error!',
-                        text: 'Terjadi kesalahan sistem. Silakan coba lagi. (' + xhr.status + ')',
+                        title: 'Gagal!',
+                        text: errorMessage,
                         confirmButtonColor: '#d33'
                     });
                 }

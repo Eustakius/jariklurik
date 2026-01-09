@@ -102,6 +102,63 @@
                 justify-content: center;
                 padding-inline: 0;
             }
+
+            /* Mini Sidebar Active Fix (Fluent Style) */
+            /* 1. RESET: Remove background from LI and A (active-page is the real class used by app.js) */
+            body.sidebar-toggled .sidebar-menu li.active,
+            body.sidebar-toggled .sidebar-menu li.active-page,
+            body.sidebar-toggled .sidebar-menu li.active > a,
+            body.sidebar-toggled .sidebar-menu li.active-page > a {
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                justify-content: center !important; 
+            }
+            
+            /* 2. HIDE: Remove left stroke and dropdown arrow */
+            body.sidebar-toggled .sidebar-menu li a::before,
+            body.sidebar-toggled .sidebar-menu li a::after,
+            body.sidebar-toggled .sidebar-menu li.active-page a::before,
+            body.sidebar-toggled .sidebar-menu li.active-page a::after {
+                display: none !important; 
+            }
+
+            /* 3. STYLE ICON: The only element that should be Gold */
+            body.sidebar-toggled .sidebar-menu li.active > a .menu-icon,
+            body.sidebar-toggled .sidebar-menu li.active-page > a .menu-icon {
+                background-color: var(--primary) !important;
+                color: #fff !important; 
+                box-shadow: 0 4px 6px -1px rgba(235, 196, 112, 0.4) !important; 
+                border-radius: 8px !important; /* Rounded Rectangle */
+                width: 44px !important;
+                height: 44px !important;
+                min-width: 44px !important; /* Force square */
+                min-height: 44px !important; 
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 4px auto !important; 
+            }
+
+            /* Hover state for mini sidebar icons */
+            body.sidebar-toggled .sidebar-menu li a:hover .menu-icon {
+                background-color: rgba(0, 0, 0, 0.05) !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Dark mode specific adjustments */
+            :is(.dark body.sidebar-toggled .sidebar-menu li.active > a .menu-icon),
+            :is(.dark body.sidebar-toggled .sidebar-menu li.active-page > a .menu-icon) {
+                 color: #fff !important;
+                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+            }
+
+            :is(.dark body.sidebar-toggled .sidebar-menu li a:hover .menu-icon) {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
         }
         
         

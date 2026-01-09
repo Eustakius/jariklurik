@@ -179,6 +179,37 @@
                                     // Handle value decoding:
                                     'selected' => !empty($data->required_documents) ? $data->required_documents : [],
                                 ]]) ?>
+                                <script>
+                                    // Script to limit selection to Max 2
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const cbs = document.querySelectorAll('input[name="required_documents[]"]');
+                                        const max = 2;
+                                        
+                                        const handleCheck = () => {
+                                            const checked = document.querySelectorAll('input[name="required_documents[]"]:checked');
+                                            if (checked.length >= max) {
+                                                cbs.forEach(cb => {
+                                                    if (!cb.checked) {
+                                                        cb.disabled = true;
+                                                        // Visual feedback for disabled check-box-card if needed
+                                                        const card = cb.parentElement.querySelector('.checkbox-card-box');
+                                                        if(card) card.classList.add('opacity-50', 'cursor-not-allowed');
+                                                    }
+                                                });
+                                            } else {
+                                                cbs.forEach(cb => {
+                                                    cb.disabled = false;
+                                                    const card = cb.parentElement.querySelector('.checkbox-card-box');
+                                                    if(card) card.classList.remove('opacity-50', 'cursor-not-allowed');
+                                                });
+                                            }
+                                        };
+
+                                        cbs.forEach(cb => cb.addEventListener('change', handleCheck));
+                                        // Run on init in case of edit mode
+                                        handleCheck();
+                                    });
+                                </script>
                             </div>
                             <div class="md:col-span-6 col-span-6">
                                 <?= view('Backend/Partial/form/dropdown', ['attribute' => [

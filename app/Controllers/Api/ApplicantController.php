@@ -216,33 +216,15 @@ class ApplicantController extends BaseController
         foreach ($allowedKeys as $key) {
             $file = $request->getFile($key);
             if ($file && $file->isValid()) {
-                $filePath = upload_file_confidential($key, 'storage/file/applicant/' . $key, $request->getPost('first_name') . '-' . slugify($request->getPost('email')) . '-' . $key, 5242880);
+                // Limit 2MB = 2097152 bytes
+                $filePath = upload_file_confidential($key, 'storage/file/applicant/' . $key, $request->getPost('first_name') . '-' . slugify($request->getPost('email')) . '-' . $key, 2097152);
                 
                 if (!$filePath['success']) {
-                     // Check if this file was required. If so, fail. If optional, maybe skip? 
-                     // Usually upload errors like 'size' should fail the whole request.
                      return $this->response->setJSON([
                         'success' => false,
-                        'message' => "Upload failed for $key: " . $filePath['error']
+                        'message' => "Gagal mengunggah $key: " . $filePath['error']
                     ]);
                 }
-                
-                // normalize path
-                $storedPath = str_replace('storage/file/applicant/', '', $filePath['path']);
-                // Actually upload_file_confidential returns full path. 
-                // The original code did: str_replace('storage/file/applicant/', '', $filePath['path']);
-                // This implies 'storage/file/applicant/cv/...' -> 'cv/...' ?
-                // We should store consistent paths. 
-                // Let's store relative path as expected by frontend/backend.
-                // Replicating original behavior:
-                // $data['file_cv'] = str_replace('storage/file/applicant/', '', $filePath['path']);
-                // This seems to assume 'file_cv' stores relative path from 'storage/file/applicant/'?
-                // But Wait! upload_file_confidential second arg is target dir 'storage/file/applicant/cv'.
-                // So str_replace 'storage/file/applicant/' leaves 'cv/filename'.
-                
-                // Let's stick to full logic, but we need to know what directory we uploaded to.
-                // We uploaded to "storage/file/applicant/$key".
-                // So removing 'storage/file/applicant/' results in "$key/filename".
                 
                 $uploadedDocs[$key] = str_replace('storage/file/applicant/', '', $filePath['path']);
                 
@@ -257,7 +239,7 @@ class ApplicantController extends BaseController
             if (!isset($uploadedDocs[$req])) {
                  return $this->response->setJSON([
                     'success' => false,
-                    'message' => "Dokumen wajib belum diunggah: " . $req
+                    'message' => "Dokumen wajib belum diunggah: " . strtoupper($req)
                 ]);
             }
         }

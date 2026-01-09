@@ -29,7 +29,7 @@
         </div>
         <div class="flex items-center gap-3">
             <a href="<?= site_url('back-end/administrator/role') ?>" 
-               class="btn bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+               class="btn bg-neutral-100 dark:bg-neutral-600 text-neutral-700 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-500 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
                 <iconify-icon icon="solar:arrow-left-linear" class="text-lg"></iconify-icon>
                 Back to List
             </a>
@@ -71,22 +71,24 @@
                         
                         <div class="grid grid-cols-12 gap-4">
                             <div class="md:col-span-6 col-span-12">
-                                <label class="form-label text-sm font-semibold" for="name">
+                                <label class="form-label text-sm font-semibold text-neutral-800 dark:text-neutral-200" for="name">
                                     Name <span class="text-danger-600">*</span>
                                 </label>
                                 <?= view('Backend/Partial/form/text-box', ['attribute' =>  [
                                     'field' => 'name',
-                                    'label' => 'Name',
+                                    'label' => '',
+                                    'placeholder' => 'Name',
                                     'required' => true,
                                 ]]) ?>
                             </div>
                             <div class="md:col-span-6 col-span-12">
-                                <label class="form-label text-sm font-semibold" for="description">
+                                <label class="form-label text-sm font-semibold text-neutral-800 dark:text-neutral-200" for="description">
                                     Description
                                 </label>
                                 <?= view('Backend/Partial/form/text-box', ['attribute' =>  [
                                     'field' => 'description',
-                                    'label' => 'Description',
+                                    'label' => '',
+                                    'placeholder' => 'Description',
                                 ]]) ?>
                             </div>
                         </div>
@@ -124,11 +126,11 @@
                                     <option value="unselected">Unselected Only</option>
                                 </select>
                                 <!-- Bulk Actions -->
-                                <button type="button" id="selectAllModules" class="btn bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400 hover:bg-success-200 dark:hover:bg-success-900/50 rounded-lg px-3 py-2 text-sm flex items-center gap-2">
+                                <button type="button" id="selectAllModules" class="btn bg-success-100 text-success-800 dark:bg-success-900/50 dark:text-success-300 hover:bg-success-200 dark:hover:bg-success-900/70 rounded-lg px-3 py-2 text-sm flex items-center gap-2 transition-colors">
                                     <iconify-icon icon="solar:check-circle-bold" class="text-lg"></iconify-icon>
                                     Select All
                                 </button>
-                                <button type="button" id="deselectAllModules" class="btn bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400 hover:bg-danger-200 dark:hover:bg-danger-900/50 rounded-lg px-3 py-2 text-sm flex items-center gap-2">
+                                <button type="button" id="deselectAllModules" class="btn bg-danger-100 text-danger-800 dark:bg-danger-900/50 dark:text-danger-300 hover:bg-danger-200 dark:hover:bg-danger-900/70 rounded-lg px-3 py-2 text-sm flex items-center gap-2 transition-colors">
                                     <iconify-icon icon="solar:close-circle-bold" class="text-lg"></iconify-icon>
                                     Deselect All
                                 </button>
@@ -162,11 +164,11 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="<?= site_url('back-end/administrator/role') ?>" 
-                       class="btn bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 rounded-lg px-6 py-2.5 text-sm flex items-center gap-2">
+                       class="btn bg-neutral-100 dark:bg-neutral-600 text-neutral-700 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-500 rounded-lg px-6 py-2.5 text-sm flex items-center gap-2">
                         <iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon>
                         Cancel
                     </a>
-                    <button type="button" id="saveButton" class="btn bg-success-600 text-white hover:bg-success-700 rounded-lg px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all">
+                    <button type="button" id="saveButton" class="btn bg-success-700 text-white hover:bg-success-800 rounded-lg px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all">
                         <iconify-icon icon="solar:diskette-bold-duotone" class="text-lg"></iconify-icon>
                         Save Changes
                     </button>

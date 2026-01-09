@@ -13,8 +13,8 @@ $attribute['minlength']    = isset($attribute['minlength']) && $attribute['minle
 
 ?>
 
-<?php if ($attribute['type'] != "hidden"): ?>
-    <label class="form-label text-sm" for="<?= esc($attribute['field']) ?>">
+<?php if ($attribute['type'] != "hidden" && !empty($attribute['label'])): ?>
+    <label class="form-label text-sm font-semibold text-neutral-800 dark:text-neutral-200" for="<?= esc($attribute['field']) ?>">
         <?= esc($attribute['label']) ?>
     </label>
 <?php endif; ?>

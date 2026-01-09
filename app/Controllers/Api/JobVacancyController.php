@@ -68,6 +68,7 @@ class JobVacancyController extends BaseController
 
         // 🔹 Filter umum
         $model->where('job_vacancy.status', 1)
+            ->where('companies.status', 1) 
             ->where('job_vacancy.selection_date >=', $today);
 
         // 🔹 Jika ada filter nama perusahaan

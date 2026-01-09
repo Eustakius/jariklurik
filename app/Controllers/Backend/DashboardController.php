@@ -67,12 +67,131 @@ class DashboardController extends BaseController
         }
 
 
+        // Initialize Default Chart Data
+        $echartsData = [];
+
+        try {
+            // Chart Data: Applicants from Dec 2025 to Present (DAILY Granularity)
+            $applicantModel = new \App\Models\ApplicantModel();
+            
+            $startDate = new \DateTime('2024-01-01');
+            $endDate   = new \DateTime(); 
+            
+            $builder = $applicantModel->builder();
+            $builder->select("
+                DATE(applicant.created_at) as date_log, 
+                SUM(CASE WHEN applicant.status = 1 THEN 1 ELSE 0 END) as approved,
+                SUM(CASE WHEN applicant.status = -1 THEN 1 ELSE 0 END) as rejected,
+                SUM(CASE WHEN applicant.status = 2 OR applicant.status = 0 THEN 1 ELSE 0 END) as pending
+            ");
+            // Note: status 0 = New, 2 = Process. Grouping both as 'pending'/'in review' for the chart.
+
+            $builder->join('job_vacancy', 'job_vacancy.id = applicant.job_vacancy_id', 'left');
+            $builder->where('applicant.created_at >=', $startDate->format('Y-m-d 00:00:00'));
+            
+            if ($this->auth->user()->user_type === 'company' && !empty($company)) {
+                 $builder->where('job_vacancy.company_id', $company->id);
+            }
+            // Ensure deleted vacancies are not counted if consistent with other views, 
+            // but for historical trends maybe we keep them? 
+            // ApplicantController doesn't filter deleted vacancies explicitly in lists unless joined.
+            // keeping safe.
+            
+            $builder->groupBy('date_log'); // Alias from SELECT
+            $builder->orderBy('date_log', 'ASC');
+            
+            $queryResults = $builder->get()->getResultArray();
+            
+            // Map results to date key
+            $dataMap = [];
+            foreach ($queryResults as $row) {
+                $dataMap[$row['date_log']] = $row;
+            }
+
+            // Fill gaps 
+            $period = new \DatePeriod(
+                $startDate,
+                new \DateInterval('P1D'),
+                $endDate->modify('+1 day') 
+            );
+
+            foreach ($period as $dt) {
+                $dateKey = $dt->format('Y-m-d');
+                $timestamp = $dt->getTimestamp() * 1000; // JS ms
+                
+                if (isset($dataMap[$dateKey])) {
+                    $echartsData[] = [
+                        'date' => $timestamp, 
+                        'approved' => (int)$dataMap[$dateKey]['approved'],
+                        'rejected' => (int)$dataMap[$dateKey]['rejected'],
+                        'pending'  => (int)$dataMap[$dateKey]['pending']
+                    ];
+                } else {
+                    $echartsData[] = [
+                        'date' => $timestamp,
+                        'approved' => 0,
+                        'rejected' => 0,
+                        'pending'  => 0
+                    ];
+                }
+            }
+
+            // --- Visitor Statistics (New Request) ---
+            
+            // --- Visitor Statistics (Real Data Analysis) ---
+            
+            // 1. Real Data: Total Site Visits (from Landing Page)
+            $webVisitorModel = new \App\Models\WebVisitorModel();
+            $totalVisitors = $webVisitorModel->countAll();
+
+            // 2. Real Data: Visitor Growth (Monthly)
+            $growthQuery = $webVisitorModel->select("DATE_FORMAT(created_at, '%Y-%m') as ym, DATE_FORMAT(created_at, '%b') as month, COUNT(*) as count")
+                                          ->groupBy('ym')
+                                          ->orderBy('ym', 'ASC')
+                                          ->findAll(12); // Last 12 months
+            
+            $visitorGrowth['categories'] = [];
+            $visitorGrowth['data'] = [];
+            foreach ($growthQuery as $row) {
+                $visitorGrowth['categories'][] = $row['month'];
+                $visitorGrowth['data'][] = (int)$row['count'];
+            }
+            if (empty($visitorGrowth['categories'])) {
+                 // Fallback if empty
+                 $visitorGrowth['categories'] = [date('M')];
+                 $visitorGrowth['data'] = [0];
+            }
+
+            // 3. Real Data: Traffic Sources (Platform)
+            $platformQuery = $webVisitorModel->select("platform, COUNT(*) as count")
+                                            ->groupBy('platform')
+                                            ->orderBy('count', 'DESC')
+                                            ->findAll();
+            
+            $trafficSources['labels'] = [];
+            $trafficSources['series'] = [];
+            foreach ($platformQuery as $row) {
+                 $trafficSources['labels'][] = $row['platform'] ?: 'Unknown';
+                 $trafficSources['series'][] = (int)$row['count'];
+            }
+
+        } catch (\Exception $e) {
+            log_message('error', 'Dashboard Chart Error: ' . $e->getMessage());
+            $totalVisitors = 0;
+            $visitorGrowth = ['categories' => [], 'data' => []];
+            $trafficSources = ['labels' => [], 'series' => []];
+        }
+
         return view('Backend/dashboard', [
             'config' => $this->config,
             'jobVacancyCount' => $jobVacancyCount,
             'jobVacancyExpiredCount' => $jobVacancyExpiredCount,
             'jobVacancyActiveCount' => $jobVacancyActiveCount,
             'jobVacancyNotActiveCount' => $jobVacancyNotActiveCount,
+            'echartsData' => $echartsData,
+            'totalVisitors' => $totalVisitors,
+            'visitorGrowth' => $visitorGrowth,
+            'trafficSources' => $trafficSources
         ]);
     }
 }

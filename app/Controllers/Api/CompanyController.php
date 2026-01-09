@@ -109,6 +109,7 @@ class CompanyController extends BaseController
 
         // Query data berdasarkan nama
         $builder = $model->like('name', $term ?? '')
+            ->where('companies.status', 1) 
             ->orderBy('name', 'ASC');
 
         $total = $builder->countAllResults(false); 

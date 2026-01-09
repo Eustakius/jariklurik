@@ -193,6 +193,11 @@ npm install
 
 **Jika ada warning, abaikan aja. Yang penting command selesai tanpa error!**
 
+#### 📦 Key Frontend Libraries:
+- **TailwindCSS**: Utilitas CSS utama.
+- **ECharts**: Library charting untuk visualisasi data (Dashboard).
+- **Flowbite**: Komponen UI interaktif (Modals, Dropdowns).
+
 ---
 
 ### 🔧 **STEP 6: Setup Environment Variables**
@@ -2304,3 +2309,136 @@ Successfully implemented comprehensive UI/UX improvements for the Admin Role Edi
 **Date:** January 5, 2026
 **Version:** Phase 1 Complete
 **Status:** ✅ Production Ready
+
+---
+
+### 📅 January 9, 2026 - Admin UI Repair & Visitor Tracking 🛠️
+
+> **✨ Ringkasan Update:**
+> Kami melakukan pembersihan UI besar-besaran di Admin Panel dan mengaktifkan tracking sistem yang lebih akurat. Fokus utama hari ini adalah **Konsistensi Visual (Dark Mode)** dan **Data Integritas (Visitor Stats)**.
+
+#### 1. 📊 Real-Time Visitor Tracking System
+
+**A. Logic: Controller Update**
+*File: `app/Controllers/Backend/DashboardController.php`*
+
+**Before (Dummy Data):**
+```php
+$data['totalVisitors'] = 125000;
+$data['visitorGrowth'] = [10, 20, 15, 30, 25, 40, 35, 50, 45, 60, 55, 70];
+$data['trafficSources'] = [40, 30, 20, 10]; // Direct, Organic, Referral, Social
+```
+
+**After (Real Database):**
+```php
+$data['totalVisitors'] = $this->webVisitorModel->countAll();
+$data['visitorGrowth'] = $this->webVisitorModel->getYearlyGrowth();
+$data['trafficSources'] = $this->webVisitorModel->getTrafficSources(); // Based on 'referer'
+```
+
+**B. New Model & Migration**
+*Creates table `web_visitors` with (id, ip_address, user_agent, referer, platform, created_at).*
+
+**Installation**:
+```bash
+php spark migrate
+```
+
+#### 2. 🎨 Admin UI Polish (Code-Level Fixes)
+
+Berikut adalah detail kode sebelum dan sesudah untuk perbaikan UI yang sulit dibaca.
+
+**A. Role Form: Double Labels Fix ("Name Name")**
+*File: `app/Views/Backend/Administrator/role-form.php`*
+
+**Before:**
+```php
+<label class="form-label text-sm font-semibold" for="name">
+    Name <span class="text-danger-600">*</span>
+</label>
+/* Note: Label 'Name' is passed again inside attribute */
+<?= view('Backend/Partial/form/text-box', ['attribute' =>  [
+    'field' => 'name',
+    'label' => 'Name', 
+    'required' => true,
+]]) ?>
+```
+
+**After:**
+```php
+<label class="form-label text-sm font-semibold text-neutral-800 dark:text-neutral-200" for="name">
+    Name <span class="text-danger-600">*</span>
+</label>
+/* Note: Label removed, Placeholder added */
+<?= view('Backend/Partial/form/text-box', ['attribute' =>  [
+    'field' => 'name',
+    'label' => '', 
+    'placeholder' => 'Name',
+    'required' => true,
+]]) ?>
+```
+
+**B. Text Box Component: Dark Mode Logic**
+*File: `app/Views/Backend/Partial/form/text-box.php`*
+
+**Before:**
+```php
+<?php if ($attribute['type'] != "hidden"): ?>
+    <label class="form-label text-sm" for="<?= esc($attribute['field']) ?>">
+        <?= esc($attribute['label']) ?>
+    </label>
+<?php endif; ?>
+```
+
+**After (Added Dark Mode Class + Empty Check):**
+```php
+<?php if ($attribute['type'] != "hidden" && !empty($attribute['label'])): ?>
+    <label class="form-label text-sm font-semibold text-neutral-800 dark:text-neutral-200" for="<?= esc($attribute['field']) ?>">
+        <?= esc($attribute['label']) ?>
+    </label>
+<?php endif; ?>
+```
+
+**C. Invisible Buttons Fix (Dark Mode)**
+*File: `app/Views/Backend/Administrator/role-form.php`*
+
+**Before:**
+```html
+<a href="..." class="btn ... text-neutral-700 dark:text-neutral-300">
+    Cancel
+</a>
+```
+
+**After (High Contrast):**
+```html
+<a href="..." class="btn ... text-neutral-700 dark:text-white dark:bg-neutral-600">
+    Cancel
+</a>
+```
+
+**D. Dashboard Title Fix**
+*File: `app/Views/Backend/dashboard.php`*
+
+**Before:**
+```php
+<?= view('Backend/Partial/page-header', ['title' => getTitleFromUri([3])]) ?>
+<!-- Returns "Expired Vacancies" (URI segment 3) -->
+```
+
+**After:**
+```php
+<?= view('Backend/Partial/page-header', ['title' => 'Dashboard']) ?>
+<!-- Hardcoded correct title -->
+```
+
+#### 3. 📦 Dependency Updates & Security
+
+**Frontend Dependencies**:
+- **ECharts** (`npm install echarts`): Digunakan di beberapa modul statistik.
+- **ApexCharts**: Digunakan di Dashboard utama.
+- **Flowbite**: Digunakan untuk modal interactif.
+
+**Security Architecture**:
+- **Authentication**: `myth/auth` (Composer).
+- **2FA**: Custom Logic (Google Authenticator) di `AuthController` yang menghasilkan Secret Key manual.
+

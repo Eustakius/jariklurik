@@ -227,5 +227,6 @@ $routes->get('statement-letter/(:any)', 'FilePreviewController::statementLetter/
 $routes->get('stamp-passport-imigrasi/(:any)', 'FilePreviewController::stampPassportImigrasi/$1', ['filter' => 'auth']);
 $routes->get('captcha', 'CaptchaController::index');
 $routes->get('thank-you-registered', 'PageController::thankYou');
+
 $routes->get('/(:any)', 'PageController::index/$1');
 // $routes->get('image/(:any)', 'ImageController::show/$1');

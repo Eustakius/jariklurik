@@ -394,7 +394,7 @@ if (!empty($importPerm)): ?>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     Select Action
                 </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="$('#decision-modal<?= $props['key'] ?>').addClass('hidden')">
+                <button type="button" class="btn-close-decision-modal text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-key="<?= $props['key'] ?>">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
@@ -408,6 +408,9 @@ if (!empty($importPerm)): ?>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">What do you want to do with <span id="decision-count<?= $props['key'] ?>"></span> selected items?</h3>
                 <div class="flex justify-center gap-4">
+                    <button id="btn-decision-approve<?= $props['key'] ?>" type="button" class="text-white bg-success-600 hover:bg-success-700 focus:ring-4 focus:outline-none focus:ring-success-300 dark:focus:ring-success-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                        <iconify-icon icon="mingcute:check-line" class="mr-2"></iconify-icon> Approve
+                    </button>
                     <button id="btn-decision-reject<?= $props['key'] ?>" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                         <iconify-icon icon="mingcute:close-line" class="mr-2"></iconify-icon> Reject
                     </button> 
@@ -422,6 +425,7 @@ if (!empty($importPerm)): ?>
         var table = {};
         // Persistent Selection Set
         var selectedIds<?= $props['key'] ?> = new Set();
+        var decisionModal = null; // Lifted to outer scope
 
         let buttons = <?= json_encode($buttons, JSON_UNESCAPED_SLASHES) ?>;
         buttons.forEach(b => {
@@ -656,49 +660,49 @@ if (!empty($importPerm)): ?>
                                     <?php if (str_ends_with($permission['permission'], '.detail')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}" 
                                         class="group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(6,182,212,0.15); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3);"
+                                        style="background-color: rgba(6,182,212,0.15); color: #0e7490; border: 1px solid rgba(6,182,212,0.3);"
                                         title="View Details">
                                             <iconify-icon icon="solar:eye-bold-duotone" width="22"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.update')): ?>
                                         <a href="<?= esc($route) ?>/${data.id}/edit" 
                                         class="group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);"
+                                        style="background-color: rgba(245,158,11,0.15); color: #b45309; border: 1px solid rgba(245,158,11,0.3);"
                                         title="Edit">
                                             <iconify-icon icon="solar:pen-new-square-bold-duotone" width="22"></iconify-icon>
                                         </a>
                                     <?php elseif (str_ends_with($permission['permission'], '.delete')): ?>
                                         <button data-method="DELETE" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to delete ?" data-url="<?= esc($route) ?>/${data.id}" 
                                         class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);"
+                                        style="background-color: rgba(244,63,94,0.15); color: #be123c; border: 1px solid rgba(244,63,94,0.3);"
                                         title="Delete">
                                             <iconify-icon icon="solar:trash-bin-trash-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.process')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to process ?" data-url="<?= esc($route) ?>/${data.id}/process" 
                                         class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);"
+                                        style="background-color: rgba(16,185,129,0.15); color: #047857; border: 1px solid rgba(16,185,129,0.3);"
                                         title="Process">
                                             <iconify-icon icon="solar:check-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.approve')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to approve ?" data-url="<?= esc($route) ?>/${data.id}/approve" 
                                         class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);"
+                                        style="background-color: rgba(16,185,129,0.15); color: #047857; border: 1px solid rgba(16,185,129,0.3);"
                                         title="Approve">
                                             <iconify-icon icon="solar:check-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.reject')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to reject ?" data-url="<?= esc($route) ?>/${data.id}/reject" 
                                         class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);"
+                                        style="background-color: rgba(244,63,94,0.15); color: #be123c; border: 1px solid rgba(244,63,94,0.3);"
                                         title="Reject">
                                             <iconify-icon icon="solar:close-circle-bold-duotone" width="22"></iconify-icon>
                                         </button>
                                     <?php elseif (str_ends_with($permission['permission'], '.revert')): ?>
                                         <button data-method="PUT" data-key="<?= $props['key'] ?>" data-action="Are you sure you want to revert ?" data-url="<?= esc($route) ?>/${data.id}/revert" 
                                         class="btn-open-modal<?= $props['key'] ?> group relative w-10 h-10 inline-flex items-center justify-center rounded-xl transition-all duration-300 hover:-translate-y-1 focus:outline-none shadow-sm"
-                                        style="background-color: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);"
+                                        style="background-color: rgba(245,158,11,0.15); color: #b45309; border: 1px solid rgba(245,158,11,0.3);"
                                         title="Revert">
                                             <iconify-icon icon="solar:restart-bold-duotone" width="22"></iconify-icon>
                                         </button>
@@ -910,7 +914,7 @@ if (!empty($importPerm)): ?>
                      $('#decision-count<?= $props['key'] ?>').text(idsList.length);
                      const $decisionModalEl = document.getElementById('decision-modal<?= $props['key'] ?>');
                      if ($decisionModalEl) {
-                         const decisionModal = new Modal($decisionModalEl);
+                         decisionModal = new Modal($decisionModalEl); // Removed const
                          decisionModal.show();
                          
                          $('#btn-decision-approve<?= $props['key'] ?>').off('click').on('click', function() {
@@ -1030,6 +1034,10 @@ if (!empty($importPerm)): ?>
 
             $('.close-modal').on('click', function() {
                 if(modal) modal.hide();
+            });
+            // New Handler for Decision Modal Close
+            $(document).on('click', '.btn-close-decision-modal', function() {
+                if(decisionModal) decisionModal.hide();
             });
              $(document).on('click', '.btn-open-modal<?= $props['key'] ?>', function() {
                 $('#formConfirm<?= $props['key'] ?>').off('submit'); 

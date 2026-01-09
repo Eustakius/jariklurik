@@ -101,6 +101,17 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
+        $request = \Config\Services::request();
+
+        // Strict check: Only use API Handler if URL starts with 'api/' OR it is an AJAX request.
+        // We avoid negotiate() here because browsers often accept */* or application/json in standard requests.
+        $isApi = strpos($request->getPath(), 'api/') === 0;
+        $isAjax = $request->isAJAX();
+
+        if ($isApi || $isAjax) {
+             return new \App\Libraries\APIExceptionHandler();
+        }
+
         return new ExceptionHandler($this);
     }
 }

@@ -478,6 +478,19 @@ class ApplicantController extends BaseController
             return "Applicant with ID $id not found";
         }
 
+        // Security Check: Ensure Applicant belongs to a vacancy owned by this company
+        if ($this->auth->user()->user_type == 'company') {
+            $companyModel = new \App\Models\CompanyModel();
+            $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+            
+            // Applicant -> JobVacancy -> Company
+            $vacancy = $this->modelJobVacancy->find($item->job_vacancy_id);
+            
+            if (!$company || !$vacancy || $vacancy->company_id != $company->id) {
+                 return "You do not have permission to process this applicant.";
+            }
+        }
+
         if (!$this->model->update($id, $data)) {
             return $this->model->errors();
         }
@@ -634,6 +647,16 @@ class ApplicantController extends BaseController
         $item = $this->model->find($id);
         if (!$item) return "Item not found";
 
+        // Security Check
+        if ($this->auth->user()->user_type == 'company') {
+            $companyModel = new \App\Models\CompanyModel();
+            $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+            $vacancy = $this->modelJobVacancy->find($item->job_vacancy_id);
+            if (!$company || !$vacancy || $vacancy->company_id != $company->id) {
+                 return "You do not have permission to reject this applicant.";
+            }
+        }
+
         $dataJobVacancy = $this->modelJobVacancy->where('id', $item->job_vacancy_id)->first();
 
         if (!empty($dataJobVacancy)) {
@@ -738,6 +761,16 @@ class ApplicantController extends BaseController
             
             $item = $this->model->find($id);
             if (!$item) return "Applicant ID $id not found";
+
+            // Security Check
+            if ($this->auth->user()->user_type == 'company') {
+                $companyModel = new \App\Models\CompanyModel();
+                $company = $companyModel->where('user_id', $this->auth->user()->id)->first();
+                $vacancy = $this->modelJobVacancy->find($item->job_vacancy_id);
+                if (!$company || !$vacancy || $vacancy->company_id != $company->id) {
+                    return "You do not have permission to revert this applicant.";
+                }
+            }
 
             if (!$this->model->update($id, $data)) {
                 return $this->model->errors();
