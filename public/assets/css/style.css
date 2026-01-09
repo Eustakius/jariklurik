@@ -258,6 +258,7 @@ button,
 [type='reset'],
 [type='submit'] {
   -webkit-appearance: button;
+  appearance: button;
   /* 1 */
   background-color: transparent;
   /* 2 */
@@ -300,6 +301,7 @@ Correct the cursor style of increment and decrement buttons in Safari.
 */
 [type='search'] {
   -webkit-appearance: textfield;
+  appearance: textfield;
   /* 1 */
   outline-offset: -2px;
   /* 2 */
@@ -3841,6 +3843,7 @@ svg.radial-progress text.percentage {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
 }
 
 .block {
@@ -6440,13 +6443,7 @@ svg.radial-progress text.percentage {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
-.\[a-zA-Z0-9\:_\\-\.\] {
-  a-z-a--z0-9: \-.;
-}
 
-.\[a-zA-Z\:_\] {
-  a-z-a--z: ;
-}
 
 span,
 a {

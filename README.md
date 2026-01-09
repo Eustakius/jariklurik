@@ -35,6 +35,7 @@ Sebelum memulai, pastikan semua ini sudah terinstall di komputer Anda:
 1. Buka **Command Prompt** atau **PowerShell**
 2. Ketik: `php -v`
 3. Pastikan version PHP-nya **8.1 atau lebih tinggi**
+
    ```
    PHP 8.2.12 (cli) - OK ✅
    ```
@@ -324,8 +325,6 @@ Setelah login, pastikan fitur utama berfungsi:
 
 ---
 
-
-
 ## 🧙‍♂️ Script Bantuan (Tools)
 
 Kita udah buatin beberapa script ajaib biar hidup kalian lebih mudah:
@@ -336,8 +335,6 @@ Kita udah buatin beberapa script ajaib biar hidup kalian lebih mudah:
   - *Cara pake*: Klik 2x, lebih efisien daripada script lama.
 
 ---
-
-
 
 ## 📘 PANDUAN PELENGKAP & TROUBLESHOOTING DETAIL
 
@@ -482,11 +479,11 @@ Masalah **CORS**. Domain di browser beda sama domain di config aplikasi.
    * Kalo di browser `http://localhost:8081`, di .env juga harus `http://localhost:8081/`.
    * Jangan lupa akhiri dengan garis miring `/`.
 
-
 ### 8. ❌ Error: "Cannot find module 'mythauth'"
 
 **Penyebab**: Composer install belum selesai atau corrupt.
 **Solusi**:
+
 ```bash
 rm -r vendor
 composer install
@@ -496,6 +493,7 @@ composer install
 
 **Penyebab**: Node.js belum terinstall atau tidak di PATH.
 **Solusi**:
+
 1. Download & install Node.js dari nodejs.org.
 2. Restart terminal.
 3. Coba `npm install` lagi.
@@ -504,15 +502,14 @@ composer install
 
 **Penyebab**: Browser cache atau database belum ready.
 **Solusi**:
+
 1. Hard refresh browser: `CTRL+SHIFT+R`.
 2. Pastikan MySQL masih running.
 3. Cek console (F12) ada error apa.
 
 ---
 
-
 ## 📝 CHANGELOG - Recent Updates
-
 
 ### 📅 January 6, 2026 - Stability & Performance Overhaul 🚀
 
@@ -536,9 +533,9 @@ window.universalFilterSyncLock = false; // Global Flag
 function syncPrimary(val, suffix) {
     if (window.universalFilterSyncLock) return; // Prevent Recursive Loop
     window.universalFilterSyncLock = true;
-    
+  
     // ... sync logic ...
-    
+  
     setTimeout(() => {
         window.universalFilterSyncLock = false; // Release Lock
     }, 50);
@@ -548,7 +545,8 @@ function syncPrimary(val, suffix) {
 ##### 2. 🛑 **Fix: Double Refresh on Load (Silent Init Strategy)**
 
 **Problem**: Initializing Select2 filters (`.val(x).trigger('change')`) triggered the banner's listeners, causing an unnecessary second table reload.
-**Files Modified**: 
+**Files Modified**:
+
 - `app/Views/Backend/Partial/table/table.php`
 - `app/Views/Backend/Partial/banner/filter-banner.php`
 
@@ -556,19 +554,21 @@ function syncPrimary(val, suffix) {
 We introduced a "Silent Init" flag (`isInit`) to distinguish between programmatic setups and manual user clicks.
 
 **A. Sender (`table.php`):**
+
 ```php
 // Pass [true] as extra parameter to indicate "This is Initialization"
 $('#<?= $filter['id'] ?>').val(value).trigger('change', [true]); 
 ```
 
 **B. Receiver (`filter-banner.php`):**
+
 ```javascript
 $(document).on('change', '#' + keyBase + suffix, function(e, isInit) {
     // If this change came from Initialization, IGNORE IT
     if (isInit === true) {
         return; 
     }
-    
+  
     // Normal logic continues...
     renderAllCards();
     triggerFilterClick();
@@ -625,7 +625,9 @@ function setCanvasSize() {
 > Fitur baru untuk melakukan aksi massal (Approve/Reject/Delete) dengan aman dan perbaikan sistem permission.
 
 #### 1. 🔧 **Mass Action Functionality**
+
 Sekarang admin bisa melakukan aksi massal untuk:
+
 - ✅ **Job Seeker**
 - ✅ **Purna PMI**
 - ✅ **Training Type**
@@ -759,8 +761,6 @@ headers: {
 - ✅ Permission check masih jalan normal
 - ✅ JSON data aman terkirim
 - ✅ Support both form-encoded & JSON formats
-
-
 
 ---
 
@@ -1281,7 +1281,7 @@ Sesi ini fokus pada peningkatan User Experience (UX) untuk fitur filter dan appl
 - Modified `show()` method untuk return formatted data
 
 ```php
-$response = [
+````$response = [
     'id' => $data->id,
     'position' => $data->position,
     'company_name' => $data->company?->name ?? null,  // Flat property
@@ -1748,9 +1748,11 @@ $('#mySelect').select2({
 - Dropdown empty → Check data in database
 
 ---
+
 # 📝 Changelog - Admin Role Edit Page Rework (January 5, 2026)
 
 ## 🎯 Overview
+
 Complete UI/UX rework of the Administrator Role Edit page with modern design, improved visual hierarchy, and enhanced user experience for permission management.
 
 ---
@@ -1758,12 +1760,14 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 ## ✨ New Features Implemented
 
 ### 1. **Breadcrumb Navigation** 🧭
+
 - Added full navigation path: Dashboard → Administrator → Role → [Action]
 - Clickable links for easy navigation
 - Current page highlighted with bold text
 - Icons for visual clarity using `solar:home-2-bold-duotone`
 
 **Benefits:**
+
 - Users always know where they are
 - Quick navigation to parent pages
 - Better UX for deep navigation
@@ -1771,12 +1775,14 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 ---
 
 ### 2. **Enhanced Page Header** 📌
+
 - Larger, bold title (text-2xl font size)
 - Descriptive subtitle: "Manage role permissions and access control"
 - "Back to List" button with left arrow icon
 - Improved spacing and visual hierarchy
 
 **Visual Improvements:**
+
 - Clear title/subtitle separation
 - Action buttons aligned to right
 - Consistent spacing throughout
@@ -1786,6 +1792,7 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 ### 3. **Improved Form Section** 📝
 
 **Role Information Card:**
+
 - Gradient header background (primary-50 → primary-100)
 - Document icon (`solar:document-text-bold-duotone`) for visual identification
 - Required field indicators with red asterisk (*)
@@ -1793,6 +1800,7 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 - Better input field spacing
 
 **Key Changes:**
+
 - Explicit labels above each input field
 - Visual separation with gradient backgrounds
 - Shadow effects for card depth
@@ -1805,6 +1813,7 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 #### A. **Search & Filter Functionality**
 
 **Real-time Search Bar:**
+
 - Instant filtering by module name or permission label
 - Magnifier icon indicator
 - Placeholder text: "Search permissions..."
@@ -1812,6 +1821,7 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 - Works seamlessly with filter dropdown
 
 **Filter Dropdown:**
+
 - Three options:
   - All Permissions
   - Selected Only
@@ -1820,6 +1830,7 @@ Complete UI/UX rework of the Administrator Role Edit page with modern design, im
 - Instant visual feedback
 
 **Implementation:**
+
 ```javascript
 // Real-time search
 $('#permissionSearch').on('input', function() {
@@ -1835,6 +1846,7 @@ $('#permissionSearch').on('input', function() {
 #### B. **Selection Count Indicators**
 
 **Global Counter (Header Badge):**
+
 - Shows "X / Y selected" format
 - Dynamic color coding:
   - 🔴 Gray (neutral-500) = 0% selected
@@ -1843,6 +1855,7 @@ $('#permissionSearch').on('input', function() {
 - Updates in real-time as permissions are toggled
 
 **Per-Module Counters:**
+
 - Each card displays "X / Y selected"
 - Percentage indicator (e.g., "67%")
 - Color-coded to match global counter
@@ -1851,6 +1864,7 @@ $('#permissionSearch').on('input', function() {
 #### C. **Visual Progress Bars**
 
 Each module card includes an animated progress bar:
+
 - **Width** = Selection percentage (0-100%)
 - **Color Coding:**
   - Gray = 0% selected
@@ -1860,6 +1874,7 @@ Each module card includes an animated progress bar:
 - Rounded corners for modern look
 
 **Card Border Colors:**
+
 - Match progress bar colors
 - Subtle background tint for selected cards
 - Clear visual feedback at a glance
@@ -1870,22 +1885,23 @@ Each module card includes an animated progress bar:
 
 Added contextual icons for each permission module:
 
-| Module | Icon | Description |
-|--------|------|-------------|
-| Dashboard | `solar:home-2-bold-duotone` | Home/Dashboard |
-| Company | `solar:buildings-2-bold-duotone` | Buildings |
-| Job Vacancy | `solar:case-round-bold-duotone` | Briefcase |
-| Training | `solar:diploma-bold-duotone` | Education |
-| Training Type | `solar:book-bold-duotone` | Book |
-| Job Seekers | `solar:users-group-rounded-bold-duotone` | User Group |
-| Purna PMI | `solar:user-check-rounded-bold-duotone` | Verified User |
-| Applicant | `solar:user-id-bold-duotone` | User ID |
-| Role | `solar:shield-user-bold-duotone` | Shield |
-| User | `solar:user-bold-duotone` | User |
-| Setting | `solar:settings-bold-duotone` | Settings |
-| My Profile | `solar:user-circle-bold-duotone` | User Circle |
+| Module        | Icon                                       | Description    |
+| ------------- | ------------------------------------------ | -------------- |
+| Dashboard     | `solar:home-2-bold-duotone`              | Home/Dashboard |
+| Company       | `solar:buildings-2-bold-duotone`         | Buildings      |
+| Job Vacancy   | `solar:case-round-bold-duotone`          | Briefcase      |
+| Training      | `solar:diploma-bold-duotone`             | Education      |
+| Training Type | `solar:book-bold-duotone`                | Book           |
+| Job Seekers   | `solar:users-group-rounded-bold-duotone` | User Group     |
+| Purna PMI     | `solar:user-check-rounded-bold-duotone`  | Verified User  |
+| Applicant     | `solar:user-id-bold-duotone`             | User ID        |
+| Role          | `solar:shield-user-bold-duotone`         | Shield         |
+| User          | `solar:user-bold-duotone`                | User           |
+| Setting       | `solar:settings-bold-duotone`            | Settings       |
+| My Profile    | `solar:user-circle-bold-duotone`         | User Circle    |
 
 **Visual Design:**
+
 - 10x10 rounded square badges
 - Gradient background (primary-500 → primary-600)
 - White icons centered
@@ -1899,6 +1915,7 @@ Added contextual icons for each permission module:
 Completely redesigned permission badges with modern fluent design principles:
 
 #### **Unchecked State:**
+
 - White background (dark: gray-800)
 - Neutral border (2px, neutral-300)
 - Circle outline icon
@@ -1908,6 +1925,7 @@ Completely redesigned permission badges with modern fluent design principles:
   - Subtle shadow appears
 
 #### **Checked State:**
+
 - **Blue gradient background** (primary-500 → primary-600)
 - **White text** for high contrast
 - **Checkmark icon** with bounce-in animation (0.3s)
@@ -1916,6 +1934,7 @@ Completely redesigned permission badges with modern fluent design principles:
 - **Ripple effect** on click
 
 **Visual Indicators:**
+
 1. ✓ **Animated Checkmark** - Circle outline transforms to filled circle with checkmark
 2. 🎖️ **Success Badge** - Green indicator appears in top-right corner
 3. 🌊 **Ripple Effect** - Smooth animation on click
@@ -1923,6 +1942,7 @@ Completely redesigned permission badges with modern fluent design principles:
 5. ✨ **Subtle Shadow** - Refined depth without excessive glow
 
 **Design Philosophy:**
+
 - Clean and professional (no "alay" effects)
 - Subtle animations for smooth UX
 - Clear visual feedback
@@ -1936,12 +1956,14 @@ Completely redesigned permission badges with modern fluent design principles:
 Added convenient bulk action buttons for efficient permission management:
 
 **Select All Modules:**
+
 - Green background (success-100)
 - Checkmark icon (`solar:check-circle-bold`)
 - Selects all module toggles at once
 - Instant visual feedback
 
 **Deselect All:**
+
 - Red background (danger-100)
 - Close icon (`solar:close-circle-bold`)
 - **Confirmation dialog** before deselecting
@@ -1949,6 +1971,7 @@ Added convenient bulk action buttons for efficient permission management:
 - Warning message: "Are you sure you want to deselect all permissions?"
 
 **Per-Module Toggle Switches:**
+
 - Larger size (11x6 vs previous 9x5)
 - Green gradient when all permissions selected
 - Focus ring on keyboard interaction
@@ -1962,6 +1985,7 @@ Added convenient bulk action buttons for efficient permission management:
 Redesigned save section as a sticky footer for better UX:
 
 **Layout:**
+
 - Fixed to bottom of viewport
 - White background with top border
 - Elevated shadow for depth
@@ -1969,12 +1993,14 @@ Redesigned save section as a sticky footer for better UX:
 - Z-index 50 to stay on top
 
 **Left Side - Warning Message:**
+
 - Info icon (`solar:info-circle-bold-duotone`) in warning-500
 - Bold primary message: "Changes will affect all users assigned to this role"
 - Smaller subtitle: "Make sure you review all permissions before saving"
 - Clear visual hierarchy
 
 **Right Side - Action Buttons:**
+
 - **Cancel Button:**
   - Neutral colors (neutral-100 background)
   - Close icon
@@ -1986,6 +2012,7 @@ Redesigned save section as a sticky footer for better UX:
   - Loading state during save
 
 **Functionality:**
+
 - **Validation:** Requires at least 1 permission selected
 - **Confirmation Dialog:** "Are you sure you want to save these changes?"
 - **Loading State:** Button disabled with spinner during save
@@ -1998,14 +2025,15 @@ Redesigned save section as a sticky footer for better UX:
 ### Files Modified
 
 1. **`app/Views/Backend/Administrator/role-form.php`**
+
    - Added breadcrumb navigation structure
    - Enhanced page header with title and subtitle
    - Improved form section with gradient headers
    - Added search input and filter dropdown
    - Implemented sticky save footer
    - JavaScript for search, filter, and bulk actions
-
 2. **`app/Views/Backend/Partial/form/checkbox-list-group.php`**
+
    - Added module icon mapping array
    - Implemented progress bars with dynamic colors
    - Added selection count indicators (count + percentage)
@@ -2016,6 +2044,7 @@ Redesigned save section as a sticky footer for better UX:
 ### JavaScript Features
 
 **Dynamic Search & Filter:**
+
 ```javascript
 // Real-time search filtering
 $('#permissionSearch').on('input', function() {
@@ -2033,6 +2062,7 @@ $('#permissionFilter').on('change', function() {
 ```
 
 **Bulk Actions:**
+
 ```javascript
 // Select all modules
 $('#selectAllModules').on('click', function() {
@@ -2048,6 +2078,7 @@ $('#deselectAllModules').on('click', function() {
 ```
 
 **Badge State Management:**
+
 ```javascript
 // Toggle visual state on checkbox change
 $('.permission-checkbox').on('change', function() {
@@ -2067,21 +2098,22 @@ $('.permission-checkbox:checked').each(function() {
 ```
 
 **Dynamic Counter Updates:**
+
 ```javascript
 function updateParentState(fieldId) {
     const total = $children.length;
     const checkedCount = $children.filter(':checked').length;
     const percentage = Math.round((checkedCount / total) * 100);
-    
+  
     // Update count display
     $countSpan.text(checkedCount + ' / ' + total + ' selected');
-    
+  
     // Update percentage with color coding
     $percentageSpan.text('(' + percentage + '%)');
-    
+  
     // Update progress bar width and color
     $progressBar.css('width', percentage + '%');
-    
+  
     // Update card border colors
     // Update toggle switch colors
 }
@@ -2090,6 +2122,7 @@ function updateParentState(fieldId) {
 ### CSS Animations
 
 **Bounce-in Animation (Checkmark):**
+
 ```css
 @keyframes bounce-in {
     0% { transform: scale(0); }
@@ -2099,6 +2132,7 @@ function updateParentState(fieldId) {
 ```
 
 **Ripple Effect (Click Feedback):**
+
 ```css
 @keyframes ripple {
     0% { 
@@ -2113,6 +2147,7 @@ function updateParentState(fieldId) {
 ```
 
 **Checked State Styles:**
+
 ```css
 .permission-badge.is-checked {
     background: linear-gradient(135deg, rgb(59 130 246), rgb(37 99 235));
@@ -2129,11 +2164,13 @@ function updateParentState(fieldId) {
 ### Color Coding System
 
 **Selection State Colors:**
+
 - **0% selected** → Gray (neutral-500)
 - **1-99% selected** → Yellow (warning-500/600)
 - **100% selected** → Green (success-500/600)
 
 **Applied To:**
+
 - Count badges (header and per-module)
 - Progress bars
 - Card borders
@@ -2141,6 +2178,7 @@ function updateParentState(fieldId) {
 - Toggle switches (when all selected)
 
 **Benefits:**
+
 - Instant visual feedback
 - Clear status at a glance
 - Consistent across all indicators
@@ -2176,6 +2214,7 @@ function updateParentState(fieldId) {
 ## ✅ Benefits & Improvements
 
 ### User Experience
+
 - ✅ **Faster Permission Management** - Search and filter save time
 - ✅ **Clear Visual Feedback** - Always know selection status
 - ✅ **Bulk Actions** - Efficient for managing many permissions
@@ -2183,6 +2222,7 @@ function updateParentState(fieldId) {
 - ✅ **Reduced Errors** - Confirmation dialogs prevent mistakes
 
 ### Visual Design
+
 - ✅ **Modern & Professional** - Fluent design principles
 - ✅ **Consistent Branding** - Matches overall design system
 - ✅ **Excellent Dark Mode** - All features work in dark mode
@@ -2190,6 +2230,7 @@ function updateParentState(fieldId) {
 - ✅ **Clear Hierarchy** - Easy to scan and understand
 
 ### Technical
+
 - ✅ **Performance Optimized** - Efficient selectors and animations
 - ✅ **Maintainable Code** - Well-organized JavaScript
 - ✅ **Reusable Components** - Can be used in other forms
@@ -2210,11 +2251,13 @@ function updateParentState(fieldId) {
 ## 📝 User Feedback Incorporated
 
 ### Initial Implementation:
+
 - ❌ Excessive glow effects (20px blur, 50% opacity)
 - ❌ Shimmer animation too distracting
 - ❌ Radial glow overlay unnecessary
 
 ### Refined Implementation:
+
 - ✅ Reduced shadow to 8px blur, 25% opacity
 - ✅ Removed shimmer animation
 - ✅ Removed radial glow overlay
@@ -2229,16 +2272,16 @@ function updateParentState(fieldId) {
 
 Successfully implemented comprehensive UI/UX improvements for the Admin Role Edit page:
 
-**Navigation:** ✅ Breadcrumb, Back button  
-**Form:** ✅ Enhanced styling, icons, required indicators  
-**Search:** ✅ Real-time filtering  
-**Filter:** ✅ All/Selected/Unselected dropdown  
-**Counts:** ✅ Global and per-module indicators  
-**Progress:** ✅ Visual bars with color coding  
-**Icons:** ✅ Contextual module icons  
-**Badges:** ✅ Fluent design with subtle effects  
-**Bulk Actions:** ✅ Select All, Deselect All  
-**Save:** ✅ Sticky footer with confirmation  
+**Navigation:** ✅ Breadcrumb, Back button
+**Form:** ✅ Enhanced styling, icons, required indicators
+**Search:** ✅ Real-time filtering
+**Filter:** ✅ All/Selected/Unselected dropdown
+**Counts:** ✅ Global and per-module indicators
+**Progress:** ✅ Visual bars with color coding
+**Icons:** ✅ Contextual module icons
+**Badges:** ✅ Fluent design with subtle effects
+**Bulk Actions:** ✅ Select All, Deselect All
+**Save:** ✅ Sticky footer with confirmation
 
 **Overall Result:** Modern, professional, user-friendly interface with excellent UX! 🎊
 
@@ -2258,6 +2301,6 @@ Successfully implemented comprehensive UI/UX improvements for the Admin Role Edi
 
 ---
 
-**Date:** January 5, 2026  
-**Version:** Phase 1 Complete  
+**Date:** January 5, 2026
+**Version:** Phase 1 Complete
 **Status:** ✅ Production Ready
