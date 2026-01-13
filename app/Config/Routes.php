@@ -6,7 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-
+// Short URL redirect route (must be before other routes)
+$routes->get('s/(:any)', 'ShortUrlController::redirect/$1');
 
 $routes->group('back-end', static function ($routes) {
     $routes->get('login', 'AuthController::login', ['as' => 'login']);
@@ -83,6 +84,7 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     // Job Vacancy Routes
     $routes->get('job-vacancy/template-import', 'Backend\Application\JobVacancyController::templateImport', ['filter' => 'permission']);
     $routes->post('job-vacancy/import', 'Backend\Application\JobVacancyController::import', ['filter' => 'permission']);
+    $routes->post('job-vacancy/send-whatsapp', 'Backend\Application\JobVacancyController::sendWhatsapp', ['filter' => 'auth']);
     
     $routes->get('job-vacancy', 'Backend\Application\JobVacancyController::index', ['filter' => 'permission']);
     $routes->get('job-vacancy/new', 'Backend\Application\JobVacancyController::new', ['filter' => 'permission']);

@@ -434,6 +434,8 @@ $auth = service('authentication');
         // Init Global Spark
         document.addEventListener('DOMContentLoaded', () => new ClickSpark());
     </script>
+    
+    <?= $this->include('Backend/Partial/toast-notification') ?>
 </body>
 
 </html>

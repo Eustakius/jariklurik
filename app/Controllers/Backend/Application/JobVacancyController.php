@@ -632,4 +632,70 @@ class JobVacancyController extends BaseController
             return redirect()->to(pathBack($this->request))->with('error-backend', 'Read file failed: ' . $e->getMessage());
         }
     }
+    public function sendWhatsapp()
+    {
+        $ids = $this->request->getPost('ids');
+        $recipient = $this->request->getPost('recipient_phone');
+
+        // Fallback to JSON if standard POST is empty (e.g. from mass-action JS)
+        if (empty($ids) || empty($recipient)) {
+            $json = $this->request->getJSON(true);
+            if ($json) {
+                if (empty($ids)) $ids = $json['ids'] ?? [];
+                if (empty($recipient)) $recipient = $json['recipient_phone'] ?? null;
+            }
+        }
+
+        if (empty($ids) || !is_array($ids)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'No job vacancies selected.'
+            ]);
+        }
+        if (empty($recipient)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Recipient phone number is required.'
+            ]);
+        }
+
+        $jobVacancies = $this->model->whereIn('id', $ids)->findAll();
+        if (empty($jobVacancies)) {
+             return $this->response->setJSON([
+                'status' => 'Error',
+                'message' => 'Job vacancies not found.'
+            ]);
+        }
+
+        $message = "Halo Sobat Jariklurik!\n\nBerikut info lowongan terbaru untukmu:\n\n";
+        
+        foreach ($jobVacancies as $index => $job) {
+            // Use entity method to get slug safely
+            $frontendData = $job->formatDataFrontendModel();
+            $fullUrl = base_url($frontendData['slug']);
+
+            $message .= "*" . ($index + 1) . ". " . $job->position . "*\n";
+            $message .= "Perusahaan: " . ($job->company?->name ?? '-') . "\n";
+            $message .= "Negara: " . ($job->country?->name ?? '-') . "\n";
+            $message .= "Durasi: " . $job->duration . " " . $job->duration_type . "\n";
+            $message .= "Link: " . $fullUrl . "\n\n";
+        }
+        $message .= "Terima kasih!";
+
+        // WhatsApp Click-to-Chat URL
+        // Clean phone number: remove non-numeric
+        $cleanPhone = preg_replace('/[^0-9]/', '', $recipient);
+        
+        // IMPORTANT: Don't urlencode the entire message - it will break URLs!
+        // Instead, manually encode only spaces and newlines
+        $encodedMessage = str_replace(["\n", " "], ["%0A", "%20"], $message);
+        
+        $whatsappLink = "https://wa.me/{$cleanPhone}?text={$encodedMessage}";
+
+        return $this->response->setJSON([
+            'status' => 'Success',
+            'message' => 'Opening WhatsApp...',
+            'link' => $whatsappLink
+        ]);
+    }
 }

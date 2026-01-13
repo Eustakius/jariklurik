@@ -5,26 +5,7 @@
         transform: scale(1) !important;
     }
 </style>
-<?php if (session()->has('key') && session('key') == $props['key'] || !session()->has('key')): ?>
-    <?php if (session()->has('message-backend')): ?>
-        <div class="mb-4 alert alert-success bg-success-100 dark:bg-success-600/25 text-success-600 dark:text-white border-success-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert">
-            <div class="flex items-center gap-2 text-success-600 dark:text-white">
-                <iconify-icon icon="akar-icons:double-check" class="icon text-xl"></iconify-icon>
-                <?= esc(session('message-backend')) ?>
-            </div>
-            <button class="remove-button text-success-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button>
-        </div>
-    <?php endif; ?>
-    <?php if (session()->has('error-backend')): ?>
-        <div class="mb-4 alert alert-danger bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 border-danger-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert">
-            <div class="flex items-center gap-2">
-                <iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl"></iconify-icon>
-                <?= esc(session('error-backend')) ?>
-            </div>
-            <button class="remove-button text-danger-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button>
-        </div>
-    <?php endif; ?>
-<?php endif; ?>
+
 <?php
 // Inject Checkbox Column if Selectable
 if (isset($props['selectable']) && $props['selectable']) {
@@ -62,11 +43,19 @@ if (isset($props['selectable']) && $props['selectable']) {
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 warning-text<?= $props['key'] ?>"></h3>
+
                 <div class="flex flex-row justify-center items-center">
                     <form id="formConfirm<?= $props['key'] ?>" action="" method="post">
                         <?= csrf_field() ?>
                         <input id="method<?= $props['key'] ?>" type="hidden" name="_method" value="DELETE">
                         <input id="key<?= $props['key'] ?>" type="hidden" name="key" value="">
+                        
+                        <div id="extra-input-container<?= $props['key'] ?>" class="hidden mb-4 text-left">
+                            <label for="recipient_phone<?= $props['key'] ?>" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Recipient WhatsApp Number</label>
+                            <input type="text" id="recipient_phone<?= $props['key'] ?>" name="recipient_phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="628123456789">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format: Country Code + Number (No '+'). Example: <b>62</b>8123456789</p>
+                        </div>
+
                         <button type="submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                             Yes, I'm sure
                         </button>
@@ -183,7 +172,7 @@ if (isset($mas_actions) && !empty($mas_actions)) {
     foreach ($mas_actions as $key => $action) {
          $buttons[] = [
             'text' => '<div class="px-3.5 py-2 flex items-center justify-center gap-2 text-white"><iconify-icon icon="' . ($action['icon'] ?? 'mingcute:check-line') . '" class="text-sm"></iconify-icon> ' . ($action['label'] ?? 'Action') . '</div>',
-            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-' . ($action['type'] ?? 'success') . '-100 [&_div]:text-' . ($action['type'] ?? 'success') . '-600 hover:bg-' . ($action['type'] ?? 'success') . '-700 hover:[&_div]:text-white rounded-lg text-sm p-0',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-' . ($action['type'] ?? 'success') . '-600 [&_div]:text-white hover:bg-' . ($action['type'] ?? 'success') . '-700 hover:[&_div]:text-white rounded-lg text-sm p-0',
             'attr' =>  [
                 'data-url' => $action['url'],
                 'data-action-name' => $key
@@ -442,11 +431,12 @@ if (!empty($importPerm)): ?>
                 success: 'mdi:check-circle-outline',
                 danger: 'mdi:alert-circle-outline'
             };
-            var html = '<div class="mb-4 alert alert-danger bg-danger-100 dark:bg-danger-400 text-danger-600 dark:text-danger-400 border-danger-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert"><div class="flex items-center gap-2"><iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl"></iconify-icon>' + message + '</div><button class="remove-button text-danger-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button></div>'
-
+            var html = '<div class="mb-4 alert alert-danger bg-danger-100 dark:bg-danger-400 text-danger-600 dark:text-danger-400 border-danger-600 border-start-width-4-px border-l-[3px] dark:border-neutral-600 px-6 py-[13px] mb-0 text-sm rounded flex items-center justify-between" role="alert"><div class="flex items-center gap-2"><iconify-icon icon="' + icon[type] + '" class="icon text-xl"></iconify-icon><span class="alert-message"></span></div><button class="remove-button text-danger-600 text-2xl line-height-1"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></button></div>';
 
             const container = $('.notification');
-            const alert = $(html).hide().appendTo(container).fadeIn(200);
+            const alert = $(html);
+            alert.find('.alert-message').text(message); // Safely set text
+            alert.hide().appendTo(container).fadeIn(200);
 
             // ✅ tombol close manual
             alert.find('.remove-button').on('click', function(e) {
@@ -843,8 +833,38 @@ if (!empty($importPerm)): ?>
                  if (modal) return modal;
                  if ($modalElement) {
                      try {
-                          modal = new Modal($modalElement);
-                     } catch(e) { }
+                          // Try to get existing instance from Flowbite
+                          if (typeof Flowbite !== 'undefined' && Flowbite.instances && Flowbite.instances.Modal) {
+                              modal = Flowbite.instances.Modal[$modalElement.id];
+                          }
+                          
+                          if (!modal) {
+                              const options = {
+                                  placement: 'center',
+                                  backdrop: 'dynamic',
+                                  closable: true,
+                                  onHide: () => {
+                                      modal = null;
+                                  },
+                                  onShow: () => {
+                                  },
+                              };
+                              // Check if Flowbite global is valid, otherwise basic fallback or force new
+                              modal = new Modal($modalElement, options);
+                          }
+                     } catch(e) { 
+                         // Fallback for non-Flowbite environments or errors
+                         console.warn('Flowbite init warning:', e);
+                     }
+                     // Manual toggle fallback if Modal object creation failed but element exists
+                     if (!modal) {
+                         // We will return a mock object to prevents crashes
+                         return {
+                             show: () => $modalElement.classList.remove('hidden'),
+                             hide: () => $modalElement.classList.add('hidden'),
+                             toggle: () => $modalElement.classList.toggle('hidden')
+                         };
+                     }
                  }
                  return modal;
             }
@@ -876,15 +896,15 @@ if (!empty($importPerm)): ?>
                          success: function(response) {
                             if(modal) modal.hide();
                             if (response.status == 'Success' || response.status == 200) {
-                                showAlert(response.message || 'Action successful', 'success');
+                                Alert.success(response.message || 'Action successful');
                                 table.<?= $props['key'] ?>.ajax.reload(null, false);
                             } else {
-                                showAlert(response.message || 'Error occurred', 'danger');
+                                Alert.error(response.message || 'Error occurred');
                             }
                         },
                         error: function(xhr, status, error) {
                             if(modal) modal.hide();
-                             showAlert('Server error occurred', 'danger');
+                             Alert.error('Server error occurred');
                         }
                      });
                 });
@@ -896,8 +916,11 @@ if (!empty($importPerm)): ?>
                 var actionName = $(this).data('action-name');
                 
                 var idsList = Array.from(selectedIds<?= $props['key'] ?>);
+                console.log('Mass action clicked. Selected IDs:', idsList);
+                console.log('ToastManager available:', typeof ToastManager !== 'undefined');
+                
                 if (idsList.length === 0) {
-                    showAlert('Please select at least one item.', 'danger');
+                    Alert.warning('Silakan pilih minimal satu lowongan pekerjaan terlebih dahulu.');
                     return;
                 }
 
@@ -940,6 +963,13 @@ if (!empty($importPerm)): ?>
                         console.error('Decision modal element not found for key: <?= $props['key'] ?>');
                      }
                 } else {
+                    if (actionName === 'send-whatsapp') {
+                        $('#extra-input-container<?= $props['key'] ?>').removeClass('hidden');
+                        $('#recipient_phone<?= $props['key'] ?>').prop('required', true);
+                    } else {
+                        $('#extra-input-container<?= $props['key'] ?>').addClass('hidden');
+                        $('#recipient_phone<?= $props['key'] ?>').prop('required', false);
+                    }
                     performMassAction(idsList, actionUrl, actionName);
                 }
             });
@@ -955,14 +985,24 @@ if (!empty($importPerm)): ?>
                 
                 $('#formConfirm<?= $props['key'] ?>').off('submit').on('submit', function(e) {
                      e.preventDefault();
+                     
+                     let formData = {
+                        ids: ids,
+                        key: '<?= $props['key'] ?>'
+                     };
+                     
+                     let serialized = $(this).serializeArray();
+                     serialized.forEach(item => {
+                         if (item.name !== '_method' && item.name !== 'key') {
+                             formData[item.name] = item.value;
+                         }
+                     });
+
                      $.ajax({
                         url: url,
-                        method: 'PUT',
+                        method: 'POST', // Force POST for mass actions usually to carry payload
                         contentType: 'application/json',
-                        data: JSON.stringify({
-                            ids: ids,
-                            key: '<?= $props['key'] ?>'
-                        }),
+                        data: JSON.stringify(formData),
                         headers: {
                             'Authorization': 'Bearer <?= esc($props['token']) ?>',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -980,10 +1020,15 @@ if (!empty($importPerm)): ?>
                              
                              if(modal) modal.hide();
                             if (response.status == 'Success' || response.status == 'success' || response.status == 200) {
-                                showAlert(response.message || 'Mass action successful', 'success');
+                                Alert.success(response.message || 'Mass action successful');
                                 table.<?= $props['key'] ?>.ajax.reload();
                                 selectedIds<?= $props['key'] ?>.clear(); 
                                 $('#selectAll<?= $props['key'] ?>').prop('checked', false);
+
+                                // Check for Redirect Link (Click-to-Chat)
+                                if (response.link) {
+                                    window.open(response.link, '_blank');
+                                }
                             } else {
                                 // Enhanced error message with full details
                                 let errorMsg = response.message || 'Error occurred';
@@ -993,7 +1038,7 @@ if (!empty($importPerm)): ?>
                                     errorMsg += 'Full Response: ' + JSON.stringify(response);
                                 }
                                 console.error('Mass action failed with response:', response);
-                                showAlert(errorMsg, 'danger');
+                                Alert.error(errorMsg);
                             }
                         },
                         error: function(xhr, status, error) {
@@ -1024,7 +1069,7 @@ if (!empty($importPerm)): ?>
                                  }
                              }
                              
-                             showAlert(errorMsg, 'danger');
+                             Alert.error(errorMsg);
                          }
                      });
                 });

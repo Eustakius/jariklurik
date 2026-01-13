@@ -96,6 +96,10 @@ class Backend extends BaseConfig
                     'label' => 'Restore',
                     'name' => 'restore'
                 ],
+                [
+                    'label' => 'Send WhatsApp',
+                    'name' => 'send_whatsapp'
+                ],
             ]
         ],
         [
@@ -565,6 +569,25 @@ class Backend extends BaseConfig
             'key' => "file_statement_letter",
             'name' => "File Statement Letter",
             'type' => "file"
+        ],
+
+        // WhatsApp Gateway
+        [
+            'key' => "whatsapp_token",
+            'name' => "WhatsApp Token",
+            'type' => "password",
+            'values' => "EAAxdPVo72WkBQQNGZBx6YoRIjh5gCp017yX9RdFuOwCfgzEiuMlAZC0VZA2DGxjRWFMuxod344wvmMAd9wb4Npb0cfScZAdtgUBPh0fULILQsIR1qZCvdTq20tPWMwTIBpc667i0AQ1BFnqr1keTinaJ0P1JTvGXW1YxupvEdHdGj6YqrjssBb470j3TJJAZDZD"
+        ],
+        [
+            'key' => "whatsapp_phone_number_id",
+            'name' => "WhatsApp Phone Number ID",
+            'type' => "text",
+            'values' => "6281353199745"
+        ],
+        [
+            'key' => "whatsapp_business_account_id",
+            'name' => "WhatsApp Business Account ID",
+            'type' => "text"
         ]
     ];
 

@@ -60,7 +60,18 @@
                 <div id="card-title-tab-content">
                     <?php if(isset($tabs)): foreach ($tabs as $tab): ?>
                         <div class="<?= (session('key') == $tab['key'] || (!session('key') && $tab['key'] === 'active')) ? 'animate-fade-in-up' : 'hidden' ?>" id="<?= $tab['key'] ?>" role="tabpanel" aria-labelledby="<?= $tab['key'] ?>-tab">                                
-                            <?= view('Backend/Partial/table/table', ['title' => getTitleFromUri([2, 3]), 'props' => $tab['datatable']]) ?>
+                            <?= view('Backend/Partial/table/table', [
+                                'title' => getTitleFromUri([2, 3]), 
+                                'props' => $tab['datatable'],
+                                'mas_actions' => [
+                                    'send-whatsapp' => [
+                                        'label' => 'Send WhatsApp',
+                                        'url' => base_url('back-end/job-vacancy/send-whatsapp'), 
+                                        'icon' => 'mingcute:whatsapp-line',
+                                        'type' => 'success'
+                                    ]
+                                ]
+                            ]) ?>
                         </div>
                     <?php endforeach; endif; ?>
                 </div>
