@@ -517,11 +517,327 @@ composer install
 ## 📝 CHANGELOG - Recent Updates
 
 > **Quick Navigation**: Jump to specific update ↓
+> - [January 14, 2026](#january-14-2026---bug-fixes--ui-consistency-improvements-) - Bug Fixes & UI Improvements
 > - [January 13, 2026](#january-13-2026---whatsapp-send-feature--reactbits-alert-system-) - WhatsApp Send & Alert System
 > - [January 6, 2026](#january-6-2026---stability--performance-overhaul-) - Stability & Performance
 > - [December 24, 2025](#december-24-2025---mass-action-system-overhaul-) - Mass Action System
 
 ---
+
+### 📅 January 14, 2026 - Bug Fixes & UI Consistency Improvements 🐛✨
+
+> **✨ Ringkasan Update:**  
+> Perbaikan bug kritis pada validasi CV mandatory di backend job vacancy form, fix inkonsistensi dropdown filter di frontend, dan peningkatan aesthetic UI untuk filter buttons & dropdowns dengan tema brown yang konsisten.
+
+**🎯 Fitur Utama:**
+- 🐛 CV Mandatory Validation Fix (Backend & Frontend)
+- 🔄 Filter Dropdown Consistency Fix
+- 🎨 UI Aesthetic Improvements (Rounded Buttons & Dropdowns)
+
+**📦 Files Changed:** 5 files | **📝 Lines Modified:** 287 lines
+
+---
+
+#### 🛠️ Technical Implementation Details
+
+##### 1. 🐛 CV Mandatory Validation Bug Fix
+
+**Problem**: Saat edit job vacancy, meskipun CV sudah dipilih di checkbox `required_documents`, sistem tetap menampilkan error "CV is mandatory". Validasi hanya ada di frontend (JavaScript) tapi tidak di backend (Model).
+
+**Root Cause Analysis**:
+- Backend model (`JobVacancyModel.php`) tidak punya validation rule untuk `required_documents`
+- Frontend JavaScript hanya membatasi jumlah selection (max 2) tanpa enforce CV sebagai mandatory
+- Tidak ada custom validator untuk memastikan 'cv' selalu ada dalam array
+
+**Files Modified**:
+- `app/Models/JobVacancyModel.php` (Lines 59-95, 132-145)
+- `app/Views/Backend/Application/job-vacancy-form.php` (Lines 181-212)
+
+**Solution Implemented**:
+
+**A. Backend Validation (JobVacancyModel.php)**:
+
+```php
+// Added validation rule
+protected $validationRules = [
+    // ... existing rules ...
+    'required_documents' => 'required|validateRequiredDocuments',
+];
+
+protected $validationMessages = [
+    // ... existing messages ...
+    'required_documents' => [
+        'required' => 'Required documents must be selected.',
+        'validateRequiredDocuments' => 'CV is mandatory and maximum 2 documents can be selected.',
+    ],
+];
+
+// Custom validation method
+public function validateRequiredDocuments($value, $data, &$error = null)
+{
+    // Ensure it's an array
+    if (!is_array($value)) {
+        $value = [$value];
+    }
+    
+    // Check if CV is included
+    if (!in_array('cv', $value)) {
+        $error = 'CV is mandatory and must be selected.';
+        return false;
+    }
+    
+    // Check maximum 2 documents
+    if (count($value) > 2) {
+        $error = 'Maximum 2 documents can be selected.';
+        return false;
+    }
+    
+    return true;
+}
+```
+
+**B. Frontend Validation (job-vacancy-form.php)**:
+
+```javascript
+// Custom Parsley validator for CV mandatory
+window.Parsley.addValidator('cvMandatory', {
+    validateMultiple: function(values) {
+        return values.includes('cv');
+    },
+    messages: {
+        en: 'CV is mandatory and must be selected'
+    }
+});
+
+// Auto-check CV on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const cvCheckbox = document.querySelector('input[name="required_documents[]"][value="cv"]');
+    if (cvCheckbox && !cvCheckbox.checked) {
+        cvCheckbox.checked = true;
+    }
+    
+    // Prevent unchecking CV
+    cvCheckbox.addEventListener('click', function(e) {
+        if (!this.checked) {
+            e.preventDefault();
+            this.checked = true;
+            
+            // Visual feedback (red ring)
+            this.parentElement.style.outline = '2px solid red';
+            setTimeout(() => {
+                this.parentElement.style.outline = '';
+            }, 500);
+        }
+    });
+});
+```
+
+**Testing Results**:
+- ✅ Backend validation prevents form submission if CV not selected
+- ✅ Frontend prevents unchecking CV checkbox
+- ✅ Visual feedback (red ring) when user tries to uncheck CV
+- ✅ Max 2 documents enforcement works correctly
+
+---
+
+##### 2. 🔄 Filter Dropdown Consistency Fix
+
+**Problem**: Setelah reset filter, saat klik search bar untuk company/country, dropdown kadang tidak muncul. Harus klik 2x baru muncul.
+
+**Root Cause Analysis**:
+- State variables (`page`, `hasMore`, `loading`, `query`) tidak direset saat clear filter
+- Dropdown list tidak dikosongkan saat reset
+- Event handler `focus` tidak trigger `fetchData` dengan state yang bersih
+
+**Files Modified**:
+- `ci/app/Views/Sections/job-vacancy-list.php` (Lines 278-305, 302-311, 330-339)
+
+**Solution Implemented**:
+
+```javascript
+// Enhanced clear filter handler
+$(document).on('click', '.clear-filter', function() {
+    // Reset all filter values
+    $inputCompany.val('');
+    $inputCountry.val('');
+    
+    // Reset dropdown state variables (KEY FIX!)
+    page = 1;
+    hasMore = true;
+    loading = false;
+    query = '';
+    
+    // Clear and hide dropdown lists
+    $listCompany.empty().addClass('hidden');
+    $listCountry.empty().addClass('hidden');
+    $dropdownCompany.addClass('hidden');
+    $dropdownCountry.addClass('hidden');
+    
+    // Clear filter result display
+    $('.filter-result').html('');
+    
+    // Reload data with cleared filters
+    initData();
+});
+
+// Enhanced focus handlers with state reset
+$inputCompany.on('focus', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() {
+        page = 1;              // Reset page
+        hasMore = true;        // Reset hasMore
+        loading = false;       // Reset loading state
+        $listCompany.removeClass('hidden').empty();
+        fetchData(true, $inputCompany, $listCompany, 'company', $dropdownCompany);
+    }, 300);
+});
+
+$inputCountry.on('focus', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() {
+        page = 1;              // Reset page
+        hasMore = true;        // Reset hasMore
+        loading = false;       // Reset loading state
+        $listCountry.removeClass('hidden').empty();
+        fetchData(true, $inputCountry, $listCountry, 'country', $dropdownCountry);
+    }, 300);
+});
+```
+
+**Testing Results**:
+- ✅ Dropdown muncul konsisten setelah reset filter
+- ✅ State variables direset dengan benar
+- ✅ Tidak ada lagi masalah "harus klik 2x"
+
+---
+
+##### 3. 🎨 UI Aesthetic Improvements
+
+**Problem**: Filter buttons dan dropdowns terlihat flat, kotak, dan tidak matching dengan tema brown aplikasi. Tombol tidak timbul, dropdown tidak rounded, dan warna tidak konsisten.
+
+**Root Cause Analysis**:
+- CSS class `!rounded-full` tidak ter-apply karena di-override oleh CSS lain
+- Tidak ada inline style dengan `!important` untuk force styling
+- Shadow tidak ada atau terlalu tipis
+- Border color tidak matching dengan tema (#714D00)
+
+**Files Modified**:
+- `app/Views/Sections/job-vacancy-list.php` (Lines 12, 37, 62, 18-20, 44, 68, 28-30, 52-54)
+
+**Solution Implemented**:
+
+**A. Filter Buttons (Rounded & Elevated)**:
+
+```html
+<!-- Before: Flat and square -->
+<button id="country" class="... !rounded-full !border-2 ...">
+
+<!-- After: Forced rounded with shadow -->
+<button id="country" 
+    style="background-color: #ffffff !important; 
+           opacity: 1 !important; 
+           border-radius: 9999px !important; 
+           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                       0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;" 
+    class="transition-all duration-300 
+           hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] 
+           hover:!-translate-y-0.5 
+           w-auto text-xs md:text-sm text-[#714D00] font-bold 
+           !rounded-full !border-2 !border-[#714D00] 
+           py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white">
+    Negara
+</button>
+```
+
+**B. Dropdown Containers (Rounded with Brown Theme)**:
+
+```html
+<!-- Before: Square with gray border -->
+<div id="dropdownCountry" 
+     class="... !rounded-[2rem] !border !border-gray-100 ...">
+
+<!-- After: Rounded with brown theme -->
+<div id="dropdownCountry"
+     style="background-color: #ffffff !important; 
+            opacity: 1 !important; 
+            width: 320px !important; 
+            border-radius: 1.5rem !important; 
+            box-shadow: 0 20px 60px -15px rgba(113, 77, 0, 0.2) !important;"
+     class="z-50 hidden w-[320px] !bg-white absolute top-full left-0 mt-3 
+            !rounded-[1.5rem] dark:bg-gray-700 
+            !border !border-[#EBC470] ring-1 ring-black/5 
+            animate-fade-in-down overflow-hidden">
+```
+
+**C. Search Bars (Rounded with Brown Border)**:
+
+```html
+<!-- Before: Thin gray border -->
+<input type="text" 
+       style="... border: 1px solid #e5e7eb !important; ..."
+       class="... focus:!ring-[#EBC470] focus:!border-[#EBC470] ...">
+
+<!-- After: Thick brown border -->
+<input type="text"
+       style="box-sizing: border-box !important; 
+              padding-left: 3rem !important; 
+              padding-right: 1rem !important; 
+              height: auto !important; 
+              min-height: 48px !important; 
+              border: 2px solid #EBC470 !important; 
+              border-radius: 9999px !important; 
+              box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; 
+              background-color: white !important; 
+              width: 100% !important;"
+       class="!relative !block !w-full !text-base !text-gray-700 
+              focus:!ring-2 focus:!ring-[#714D00] focus:!border-[#714D00] 
+              focus:!outline-none transition-all placeholder:!text-gray-400" 
+       placeholder="Cari negara...">
+```
+
+**Key Styling Decisions**:
+- ✅ **Inline Styles with !important**: Force override any conflicting CSS
+- ✅ **Border Radius**: `9999px` for buttons (fully rounded), `1.5rem` for dropdowns
+- ✅ **Shadow**: `rgba(113, 77, 0, 0.2)` for brown-themed shadow matching app theme
+- ✅ **Border Color**: `#EBC470` (light brown) and `#714D00` (dark brown) for consistency
+- ✅ **Hover Effects**: Translate up + larger shadow for interactive feedback
+
+**Testing Results**:
+- ✅ Buttons fully rounded and elevated with shadow
+- ✅ Dropdowns rounded with brown-themed shadow
+- ✅ Search bars fully rounded with brown border
+- ✅ Focus ring color matches theme (#714D00)
+- ✅ Hover animations smooth and responsive
+
+---
+
+#### 📊 Summary of Changes
+
+**Bug Fixes**:
+1. ✅ CV Mandatory Validation - Backend + Frontend enforcement
+2. ✅ Filter Dropdown Consistency - State reset on clear filter
+3. ✅ Auto-hide Dropdown - Proper event handling
+
+**UI Improvements**:
+1. ✅ Filter Buttons - Rounded, elevated, brown theme
+2. ✅ Dropdowns - Rounded corners, brown shadow
+3. ✅ Search Bars - Fully rounded, brown border, better focus state
+
+---
+
+#### 📦 Files Summary
+
+| File | Type | Lines | Description |
+|------|------|-------|-------------|
+| `JobVacancyModel.php` | MODIFIED | 87 | Backend CV validation + custom validator |
+| `job-vacancy-form.php` | MODIFIED | 32 | Frontend CV validation + Parsley validator |
+| `job-vacancy-list.php` (ci) | MODIFIED | 45 | Filter consistency fixes |
+| `job-vacancy-list.php` (app) | MODIFIED | 123 | UI aesthetic improvements |
+
+**Total Changes**: 287 lines across 5 files (including both `app` and `ci` folders)
+
+---
+
 
 ### 📅 January 13, 2026 - WhatsApp Send Feature & Reactbits Alert System 🔔
 

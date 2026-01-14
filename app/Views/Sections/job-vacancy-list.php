@@ -1,3 +1,6 @@
+<!-- Backdrop for dropdowns -->
+<div id="filterBackdrop" class="hidden fixed inset-0 backdrop-blur-[2px] transition-all duration-300 z-20"></div>
+
 <div class="bg-[#EBC470] px-7 md:px-[16.813rem] tab-content pt-12">
     <div class="flex flex-wrap items-center justify-between mb-6 gap-2">
         <div class="flex flex-row gap-4 items-center">
@@ -6,15 +9,15 @@
         </div>
         <div class="flex flex-row items-center justify-center gap-2">
             <div class="relative z-30">
-                <button id="country" data-dropdown-toggle="dropdownCountry" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                <button id="country" data-dropdown-toggle="dropdownCountry" style="background-color: #ffffff !important; opacity: 1 !important; border-radius: 9999px !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;" class="transition-all duration-300 hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border-2 !border-[#714D00] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
                     Negara 
                     <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
                 <div id="dropdownCountry"
-                    style="background-color: #ffffff !important; opacity: 1 !important; width: 320px !important;"
-                    class="z-50 hidden w-[320px] !bg-white absolute top-full left-0 mt-3 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 !border !border-gray-100 ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
+                    style="background-color: #ffffff !important; opacity: 1 !important; width: 320px !important; border-radius: 1.5rem !important; box-shadow: 0 20px 60px -15px rgba(113, 77, 0, 0.2) !important;"
+                    class="z-50 hidden w-[320px] !bg-white absolute top-full left-0 mt-3 !rounded-[1.5rem] dark:bg-gray-700 !border !border-[#EBC470] ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
                     <div class="p-4 bg-gray-50">
                         <div class="relative w-full block">
                             <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; display: flex; align-items: center; justify-content: center;">
@@ -23,8 +26,8 @@
                                 </svg>
                             </div>
                             <input type="text" autocomplete="off" name="country" id="countryFilter"
-                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1rem !important; height: auto !important; min-height: 48px !important; border: 1px solid #e5e7eb !important; border-radius: 9999px !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
-                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#EBC470] focus:!border-[#EBC470] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari negara...">
+                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1rem !important; height: auto !important; min-height: 48px !important; border: 2px solid #EBC470 !important; border-radius: 9999px !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
+                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#714D00] focus:!border-[#714D00] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari negara...">
                         </div>
                     </div>
                     <ul id="countryResult" class="px-2 pb-2 text-sm text-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
@@ -32,13 +35,13 @@
                 </div>
             </div>
             <div class="relative z-30">
-                <button id="company" data-dropdown-toggle="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                <button id="company" data-dropdown-toggle="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important; border-radius: 9999px !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;" class="transition-all duration-300 hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border-2 !border-[#714D00] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
                     Perusahaan 
                     <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
-                <div id="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important; width: 420px !important;" class="z-50 hidden w-[420px] max-w-[90vw] !bg-white absolute top-full left-0 mt-3 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 !border !border-gray-100 ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
+                <div id="dropdownCompany" style="background-color: #ffffff !important; opacity: 1 !important; width: 420px !important; border-radius: 1.5rem !important; box-shadow: 0 20px 60px -15px rgba(113, 77, 0, 0.2) !important;" class="z-50 hidden w-[420px] max-w-[90vw] !bg-white absolute top-full left-0 mt-3 !rounded-[1.5rem] dark:bg-gray-700 !border !border-[#EBC470] ring-1 ring-black/5 animate-fade-in-down overflow-hidden">
                     <div class="p-4 bg-gray-50">
                         <div class="relative w-full block">
                             <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; display: flex; align-items: center; justify-content: center;">
@@ -47,8 +50,8 @@
                                 </svg>
                             </div>
                             <input type="text" autocomplete="off" name="company" id="companyFilter"
-                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1.5rem !important; height: auto !important; min-height: 48px !important; border: 1px solid #e5e7eb !important; border-radius: 9999px !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
-                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#EBC470] focus:!border-[#EBC470] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari perusahaan...">
+                                style="box-sizing: border-box !important; padding-left: 3rem !important; padding-right: 1.5rem !important; height: auto !important; min-height: 48px !important; border: 2px solid #EBC470 !important; border-radius: 9999px !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; background-color: white !important; width: 100% !important; margin: 0 !important; font-size: 1rem !important; line-height: 1.5rem !important;"
+                                class="!relative !block !w-full !text-base !text-gray-700 focus:!ring-2 focus:!ring-[#714D00] focus:!border-[#714D00] focus:!outline-none transition-all placeholder:!text-gray-400" placeholder="Cari perusahaan...">
                         </div>
                     </div>
                     <ul id="companyResult" class="px-2 pb-2 text-sm text-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
@@ -56,13 +59,13 @@
                 </div>
             </div>
             <div class="relative z-30">
-                <button id="sorting" data-dropdown-toggle="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important;" class="transition-all duration-300 !shadow-[0_3px_10px_rgb(0,0,0,0.1)] hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border !border-[#EBC470] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
+                <button id="sorting" data-dropdown-toggle="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important; border-radius: 9999px !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;" class="transition-all duration-300 hover:!shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:!-translate-y-0.5 w-auto text-xs md:text-sm text-[#714D00] font-bold !rounded-full !border-2 !border-[#714D00] py-2.5 px-5 md:px-6 text-center flex items-center justify-between !bg-white" type="button">
                     Urutkan 
                     <svg class="w-2.5 h-2.5 ms-3 transition-transform duration-300 opacity-60" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                     </svg>
                 </button>
-                <div id="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important;" class="z-20 hidden w-[240px] !bg-white divide-y divide-gray-100 !rounded-[2rem] !shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:bg-gray-700 dark:divide-gray-600 mt-3 animate-fade-in-down !border !border-gray-100 ring-1 ring-black/5 overflow-hidden">
+                <div id="dropdownSorting" style="background-color: #ffffff !important; opacity: 1 !important; border-radius: 1.5rem !important; box-shadow: 0 20px 60px -15px rgba(113, 77, 0, 0.2) !important;" class="z-20 hidden w-[240px] !bg-white divide-y divide-gray-100 !rounded-[1.5rem] dark:bg-gray-700 dark:divide-gray-600 mt-3 animate-fade-in-down !border !border-[#EBC470] ring-1 ring-black/5 overflow-hidden">
                     <ul class="p-4 space-y-3 text-sm bg-transparent rounded-lg text-gray-700" aria-labelledby="dropdownSorting">
                         <li>
                             <div class="flex items-start">
@@ -259,6 +262,11 @@
                         .on('click', function() {
                             elInput.val(item);
                             elList.addClass('hidden');
+                            elDropdown.addClass('hidden');
+                            
+                            // Hide backdrop when item is selected
+                            $('#filterBackdrop').addClass('hidden');
+                            
                             initData();
                             const id = $(`input[name="filter-radio"][value="${$radio}"]`).attr('id');
                             let labels = [];
@@ -271,7 +279,6 @@
                                 '<button class="clear-filter ml-2 transition-all duration-300 inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-white text-red-500 border border-red-200 shadow-[0_2px_5px_rgba(0,0,0,0.05)] hover:shadow-md hover:border-red-300 hover:text-red-600">Reset Filter</button></div>';
                             
                             $('.filter-result').html(labelText)
-                            elDropdown.addClass('hidden')
                         });
                     elList.append($li);
                 });
@@ -291,17 +298,41 @@
     }
 
     $(document).on('click', '.clear-filter', function() {
-        initData();
+        // Reset all filter values
         $inputCompany.val('');
         $inputCountry.val('');
-        $('.filter-result').html('')
+        
+        // Reset dropdown state variables
+        page = 1;
+        hasMore = true;
+        loading = false;
+        query = '';
+        
+        // Clear and hide dropdown lists
+        $listCompany.empty().addClass('hidden');
+        $listCountry.empty().addClass('hidden');
+        $dropdownCompany.addClass('hidden');
+        $dropdownCountry.addClass('hidden');
+        
+        // Hide backdrop
+        $('#filterBackdrop').addClass('hidden');
+        
+        // Clear filter result display
+        $('.filter-result').html('');
+        
+        // Reload data with cleared filters
+        initData();
     });
 
     $inputCompany.on('focus', function() {
+        // Show backdrop
+        $('#filterBackdrop').removeClass('hidden');
+        
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function() {
             page = 1;
             hasMore = true;
+            loading = false;
             $listCompany.removeClass('hidden').empty();
             fetchData(true, $inputCompany, $listCompany, 'company', $dropdownCompany);
         }, 300); // debounce 300ms
@@ -328,10 +359,14 @@
         }
     });
     $inputCountry.on('focus', function() {
+        // Show backdrop
+        $('#filterBackdrop').removeClass('hidden');
+        
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(function() {
             page = 1;
             hasMore = true;
+            loading = false;
             $listCountry.removeClass('hidden').empty();
             fetchData(true, $inputCountry, $listCountry, 'country', $dropdownCountry);
         }, 300); // debounce 300ms
@@ -358,12 +393,41 @@
         }
     });
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#companyResult, #companyFilter').length) {
-            // $listCompany.addClass('hidden');
+    // Handle backdrop click to close dropdowns
+    $('#filterBackdrop').on('click', function() {
+        $dropdownCompany.addClass('hidden');
+        $dropdownCountry.addClass('hidden');
+        $dropdownSorting.addClass('hidden');
+        $(this).addClass('hidden');
+    });
+    
+    // Show backdrop when sorting dropdown opens
+    $('#sorting').on('click', function() {
+        if ($dropdownSorting.hasClass('hidden')) {
+            $('#filterBackdrop').removeClass('hidden');
+        } else {
+            $('#filterBackdrop').addClass('hidden');
         }
-        else if (!$(e.target).closest('#countryResult, #countryFilter').length) {
-            // $listCountry.addClass('hidden');
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#companyResult, #companyFilter, #dropdownCompany, #company').length) {
+            $dropdownCompany.addClass('hidden');
+            if ($dropdownCountry.hasClass('hidden') && $dropdownSorting.hasClass('hidden')) {
+                $('#filterBackdrop').addClass('hidden');
+            }
+        }
+        if (!$(e.target).closest('#countryResult, #countryFilter, #dropdownCountry, #country').length) {
+            $dropdownCountry.addClass('hidden');
+            if ($dropdownCompany.hasClass('hidden') && $dropdownSorting.hasClass('hidden')) {
+                $('#filterBackdrop').addClass('hidden');
+            }
+        }
+        if (!$(e.target).closest('#dropdownSorting, #sorting').length) {
+            $dropdownSorting.addClass('hidden');
+            if ($dropdownCompany.hasClass('hidden') && $dropdownCountry.hasClass('hidden')) {
+                $('#filterBackdrop').addClass('hidden');
+            }
         }
     });
 </script>

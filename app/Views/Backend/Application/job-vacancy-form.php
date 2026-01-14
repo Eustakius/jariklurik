@@ -167,7 +167,7 @@
                             <div class="md:col-span-12 col-span-12">
                                 <?= view('Backend/Partial/form/checkbox-list', ['attribute' => [
                                     'field' => 'required_documents[]', // Array for multiple selection
-                                    'label' => 'Required Documents (Min 2)',
+                                    'label' => 'Required Documents (Max 2, CV Mandatory)',
                                     'display' => 'box', 
                                     'required' => true,
                                     'source' => [
@@ -180,13 +180,48 @@
                                     'selected' => !empty($data->required_documents) ? $data->required_documents : [],
                                 ]]) ?>
                                 <script>
-                                    // Script to limit selection to Max 2
+                                    // Custom Parsley validator for CV mandatory
+                                    window.Parsley.addValidator('cvMandatory', {
+                                        validateMultiple: function(values) {
+                                            return values.includes('cv');
+                                        },
+                                        messages: {
+                                            en: 'CV is mandatory and must be selected'
+                                        }
+                                    });
+
+                                    // Script to limit selection to Max 2 and enforce CV
                                     document.addEventListener('DOMContentLoaded', function() {
                                         const cbs = document.querySelectorAll('input[name="required_documents[]"]');
+                                        const cvCheckbox = document.querySelector('input[name="required_documents[]"][value="cv"]');
                                         const max = 2;
+                                        
+                                        // Add Parsley validation attribute
+                                        if (cbs.length > 0) {
+                                            cbs[0].setAttribute('data-parsley-cv-mandatory', 'true');
+                                        }
+
+                                        // Ensure CV is always checked on page load
+                                        if (cvCheckbox) {
+                                            cvCheckbox.checked = true;
+                                        }
                                         
                                         const handleCheck = () => {
                                             const checked = document.querySelectorAll('input[name="required_documents[]"]:checked');
+                                            
+                                            // Prevent unchecking CV
+                                            if (cvCheckbox && !cvCheckbox.checked) {
+                                                cvCheckbox.checked = true;
+                                                // Show visual feedback
+                                                const cvCard = cvCheckbox.closest('.form-check')?.querySelector('.checkbox-card-box');
+                                                if (cvCard) {
+                                                    cvCard.classList.add('ring-2', 'ring-red-500');
+                                                    setTimeout(() => {
+                                                        cvCard.classList.remove('ring-2', 'ring-red-500');
+                                                    }, 500);
+                                                }
+                                            }
+
                                             if (checked.length >= max) {
                                                 cbs.forEach(cb => {
                                                     if (!cb.checked) {
@@ -205,7 +240,20 @@
                                             }
                                         };
 
-                                        cbs.forEach(cb => cb.addEventListener('change', handleCheck));
+                                        cbs.forEach(cb => {
+                                            cb.addEventListener('change', handleCheck);
+                                            // Prevent CV from being unchecked
+                                            if (cb.value === 'cv') {
+                                                cb.addEventListener('click', function(e) {
+                                                    if (!this.checked) {
+                                                        e.preventDefault();
+                                                        this.checked = true;
+                                                        return false;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        
                                         // Run on init in case of edit mode
                                         handleCheck();
                                     });

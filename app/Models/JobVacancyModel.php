@@ -70,6 +70,7 @@ class JobVacancyModel extends Model
         'description'      => 'required|min_length[3]',
         'requirement'      => 'required|min_length[3]',
         'selection_date' => 'required|valid_date[Y-m-d]',
+        'required_documents' => 'required|validateRequiredDocuments',
     ];
     protected $validationMessages = [
         'country_id' => [
@@ -88,6 +89,10 @@ class JobVacancyModel extends Model
         'selection_date' => [
             'required'   => 'Selection date is required.',
             'valid_date' => 'Selection date format YYYY-MM-DD.',
+        ],
+        'required_documents' => [
+            'required' => 'Required documents must be selected.',
+            'validateRequiredDocuments' => 'CV is mandatory and maximum 2 documents can be selected.',
         ],
     ];
 
@@ -132,6 +137,28 @@ class JobVacancyModel extends Model
     protected function validateCompany(string $str, string $fields, array $data): bool
     {
         return model('CompanyModel')->where('id', $str)->countAllResults() > 0;
+    }
+
+    protected function validateRequiredDocuments($str, string $fields, array $data): bool
+    {
+        // Handle both array and JSON string formats
+        $documents = is_array($str) ? $str : (is_string($str) ? json_decode($str, true) : []);
+        
+        if (!is_array($documents) || empty($documents)) {
+            return false;
+        }
+
+        // Check if CV is included
+        if (!in_array('cv', $documents)) {
+            return false;
+        }
+
+        // Check maximum 2 documents
+        if (count($documents) > 2) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getDataTableQuery(?string $search = null, ?array $order = null, ?array $columns = null, ?int $start = null, ?int $length = null, $filter = null)

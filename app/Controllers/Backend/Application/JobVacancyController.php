@@ -216,9 +216,21 @@ class JobVacancyController extends BaseController
         $data = $this->request->getPost();
         
         $reqDocs = $this->request->getPost('required_documents');
-        if (empty($reqDocs) || count($reqDocs) > 2) {
-             return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'Please select at most 2 required documents (CV is mandatory).']);
+        
+        // Validation: Must select documents, max 2, and CV is mandatory
+        if (empty($reqDocs)) {
+            return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'Please select required documents (CV is mandatory).']);
         }
+        
+        if (count($reqDocs) > 2) {
+            return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'Please select at most 2 required documents.']);
+        }
+        
+        // Check if CV is selected (MANDATORY)
+        if (!in_array('cv', $reqDocs)) {
+            return redirect()->to(pathBack($this->request))->withInput()->with('errors-backend', ['required_documents' => 'CV / Resume is mandatory. Please select CV along with one other document.']);
+        }
+        
         $data['required_documents'] = json_encode($reqDocs);
 
         $data['id'] = $id;
