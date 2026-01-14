@@ -75,7 +75,7 @@ if (empty($attribute['dataField']['items'])) {
                     <input type="checkbox"
                         class="checkbox-card-input sr-only peer"
                         id="<?= $id ?>"
-                        name="<?= $attribute['field'] ?>[<?= $item['value'] ?? $i ?>]"
+                        name="<?= $attribute['field'] ?>[]"
                         value="<?= $item['value'] ?? $i ?>"
                         data-field-id="<?= $attribute['fieldId'] ?>"
                         <?= $checked ?>
@@ -107,7 +107,7 @@ if (empty($attribute['dataField']['items'])) {
                     <input type="checkbox"
                         class="sr-only peer"
                         id="<?= $id ?>"
-                        name="<?= $attribute['field'] ?>[<?= $item['value'] ?? $i ?>]"
+                        name="<?= $attribute['field'] ?>[]"
                         value="<?= $item['value'] ?? $i ?>"
                         data-field-id="<?= $attribute['fieldId'] ?>"
                         <?= $checked ?>

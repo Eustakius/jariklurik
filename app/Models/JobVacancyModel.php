@@ -70,7 +70,7 @@ class JobVacancyModel extends Model
         'description'      => 'required|min_length[3]',
         'requirement'      => 'required|min_length[3]',
         'selection_date' => 'required|valid_date[Y-m-d]',
-        'required_documents' => 'required|validateRequiredDocuments',
+        // 'required_documents' => 'required|validateRequiredDocuments', // Removed to fix 500 error, handled in Controller
     ];
     protected $validationMessages = [
         'country_id' => [
@@ -89,10 +89,6 @@ class JobVacancyModel extends Model
         'selection_date' => [
             'required'   => 'Selection date is required.',
             'valid_date' => 'Selection date format YYYY-MM-DD.',
-        ],
-        'required_documents' => [
-            'required' => 'Required documents must be selected.',
-            'validateRequiredDocuments' => 'CV is mandatory and maximum 2 documents can be selected.',
         ],
     ];
 
@@ -141,23 +137,38 @@ class JobVacancyModel extends Model
 
     protected function validateRequiredDocuments($str, string $fields, array $data): bool
     {
+        // Log for debugging
+        log_message('debug', 'validateRequiredDocuments called with: ' . print_r($str, true));
+        
+        // Handle null or empty value
+        if ($str === null || $str === '') {
+            log_message('debug', 'required_documents is null or empty');
+            return false;
+        }
+        
         // Handle both array and JSON string formats
         $documents = is_array($str) ? $str : (is_string($str) ? json_decode($str, true) : []);
         
+        log_message('debug', 'Parsed documents: ' . print_r($documents, true));
+        
         if (!is_array($documents) || empty($documents)) {
+            log_message('debug', 'Documents is not array or empty');
             return false;
         }
 
         // Check if CV is included
         if (!in_array('cv', $documents)) {
+            log_message('debug', 'CV not found in documents array');
             return false;
         }
 
         // Check maximum 2 documents
         if (count($documents) > 2) {
+            log_message('debug', 'Too many documents selected: ' . count($documents));
             return false;
         }
-
+        
+        log_message('debug', 'Validation passed!');
         return true;
     }
 

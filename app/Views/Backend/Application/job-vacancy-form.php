@@ -13,23 +13,6 @@
                         <h6 class="card-title mb-0 text-lg">Form</h6>
                     </div>
                     <div class="card-body">
-                        <?php if (session()->has('errors-backend')): ?>
-                            <div class="alert alert-danger bg-danger-100 dark:bg-danger-600/25 text-danger-600 dark:text-danger-400 border-danger-100 px-6 py-[11px] mb-0 font-semibold text-lg rounded-lg" role="alert">
-                                <div class="flex items-start justify-between text-lg">
-                                    <div class="flex items-start gap-2">
-                                        <iconify-icon icon="mdi:alert-circle-outline" class="icon text-xl mt-1.5 shrink-0"></iconify-icon>
-                                        <div>
-                                            <ul class="font-medium dark:text-danger-400 text-danger-600 text-sm mt-2">
-                                                <?php foreach (session('errors-backend') as $field => $error): ?>
-                                                    <li><?= esc($error) ?></li>
-                                                <?php endforeach ?>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="remove-button text-danger-600 text-2xl line-height-1 cursor-pointer"> <iconify-icon icon="iconamoon:sign-times-light" class="icon"></iconify-icon></div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
                         <div class="grid grid-cols-12 gap-4">
                             <div class="md:col-span-6 col-span-12">
                                 <?= view('Backend/Partial/form/text-box', ['attribute' => [
@@ -166,7 +149,7 @@
                             </div>
                             <div class="md:col-span-12 col-span-12">
                                 <?= view('Backend/Partial/form/checkbox-list', ['attribute' => [
-                                    'field' => 'required_documents[]', // Array for multiple selection
+                                    'field' => 'required_documents', // checkbox-list.php will append []
                                     'label' => 'Required Documents (Max 2, CV Mandatory)',
                                     'display' => 'box', 
                                     'required' => true,
@@ -180,26 +163,17 @@
                                     'selected' => !empty($data->required_documents) ? $data->required_documents : [],
                                 ]]) ?>
                                 <script>
-                                    // Custom Parsley validator for CV mandatory
-                                    window.Parsley.addValidator('cvMandatory', {
-                                        validateMultiple: function(values) {
-                                            return values.includes('cv');
-                                        },
-                                        messages: {
-                                            en: 'CV is mandatory and must be selected'
-                                        }
-                                    });
-
-                                    // Script to limit selection to Max 2 and enforce CV
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        const cbs = document.querySelectorAll('input[name="required_documents[]"]');
-                                        const cvCheckbox = document.querySelector('input[name="required_documents[]"][value="cv"]');
-                                        const max = 2;
+                                    // Wait for document to be ready
+                                    $(document).ready(function() {
+                                        // ROBUST SELECTOR: Match input name starting with "required_documents"
+                                        // This handles both "required_documents[]" and "required_documents[][cv]"
+                                        const cbs = document.querySelectorAll('input[name^="required_documents"]');
                                         
-                                        // Add Parsley validation attribute
-                                        if (cbs.length > 0) {
-                                            cbs[0].setAttribute('data-parsley-cv-mandatory', 'true');
-                                        }
+                                        // Find CV checkbox by value 'cv'
+                                        const cvCheckbox = Array.from(cbs).find(cb => cb.value === 'cv');
+                                        const max = 2;
+
+
 
                                         // Ensure CV is always checked on page load
                                         if (cvCheckbox) {
@@ -207,7 +181,7 @@
                                         }
                                         
                                         const handleCheck = () => {
-                                            const checked = document.querySelectorAll('input[name="required_documents[]"]:checked');
+                                            const checked = Array.from(cbs).filter(cb => cb.checked);
                                             
                                             // Prevent unchecking CV
                                             if (cvCheckbox && !cvCheckbox.checked) {
@@ -242,7 +216,7 @@
 
                                         cbs.forEach(cb => {
                                             cb.addEventListener('change', handleCheck);
-                                            // Prevent CV from being unchecked
+                                            // Prevent CV from being unchecked - check by value
                                             if (cb.value === 'cv') {
                                                 cb.addEventListener('click', function(e) {
                                                     if (!this.checked) {
@@ -256,6 +230,18 @@
                                         
                                         // Run on init in case of edit mode
                                         handleCheck();
+                                        
+                                        // CRITICAL: Enable all checkboxes before form submit
+                                        $('form[data-parsley-validate]').on('submit', function(e) {
+
+                                            
+                                            // Re-enable all checkboxes temporarily for submission
+                                            cbs.forEach(cb => {
+                                                cb.disabled = false;
+                                            });
+                                            
+
+                                        });
                                     });
                                 </script>
                             </div>

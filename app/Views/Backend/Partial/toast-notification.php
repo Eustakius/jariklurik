@@ -86,33 +86,38 @@ window.Alert = (function() {
     };
 
     function playNotificationSound() {
-        // Create audio context for notification sound
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create oscillator for "tuliluttt" sound
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Configure sound
-        oscillator.type = 'sine';
-        
-        const now = audioContext.currentTime;
-        
-        // "Tu-li-lu-ttt" melody
-        oscillator.frequency.setValueAtTime(800, now);           // Tu
-        oscillator.frequency.setValueAtTime(1000, now + 0.1);    // li
-        oscillator.frequency.setValueAtTime(1200, now + 0.2);    // lu
-        oscillator.frequency.setValueAtTime(1000, now + 0.3);    // ttt
-        
-        // Volume envelope
-        gainNode.gain.setValueAtTime(0.3, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        
-        oscillator.start(now);
-        oscillator.stop(now + 0.5);
+        try {
+            // Create audio context for notification sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create oscillator for "tuliluttt" sound
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Configure sound
+            oscillator.type = 'sine';
+            
+            const now = audioContext.currentTime;
+            
+            // "Tu-li-lu-ttt" melody
+            oscillator.frequency.setValueAtTime(800, now);           // Tu
+            oscillator.frequency.setValueAtTime(1000, now + 0.1);    // li
+            oscillator.frequency.setValueAtTime(1200, now + 0.2);    // lu
+            oscillator.frequency.setValueAtTime(1000, now + 0.3);    // ttt
+            
+            // Volume envelope
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.5);
+        } catch (e) {
+            // Silently fail if AudioContext not available or blocked
+            console.debug('Notification sound not available:', e.message);
+        }
     }
 
     function show(message, type = 'info', duration = 5000) {
@@ -203,6 +208,19 @@ window.Alert = (function() {
         
         <?php if (session()->has('info-backend')): ?>
             Alert.info(<?= json_encode(session('info-backend')) ?>);
+        <?php endif; ?>
+        
+        <?php if (session()->has('errors-backend')): ?>
+            <?php 
+            $errors = session('errors-backend');
+            if (is_array($errors) && count($errors) > 0):
+                // Show first error as toast, or combine if multiple
+                $errorMessage = count($errors) === 1 
+                    ? reset($errors) 
+                    : count($errors) . ' validation errors occurred. Please check the form.';
+            ?>
+                Alert.error(<?= json_encode($errorMessage) ?>, 7000);
+            <?php endif; ?>
         <?php endif; ?>
     });
 
