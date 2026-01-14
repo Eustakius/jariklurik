@@ -20,6 +20,17 @@ class RoleController extends BaseController
         $this->auth   = service('authentication');
         $this->model     = new GroupModel();
     }
+
+    /**
+     * Check if the role is Administrator (system-critical role)
+     * @param int $id Role ID
+     * @return bool
+     */
+    private function isAdministratorRole($id)
+    {
+        $role = $this->model->find($id);
+        return $role && strtolower($role->name) === 'administrator';
+    }
     public function index(): string
     {
         $jwt = new \App\Libraries\JWTService();
@@ -61,12 +72,16 @@ class RoleController extends BaseController
         if (!$role) {
             return redirect()->to(pathBack($this->request))->with('error-backend', "Role with ID $id not found");
         }
+
+        // Check if this is Administrator role (read-only)
+        $isAdministrator = $this->isAdministratorRole($id);
         
         return view('Backend/Administrator/role-form', [
             'config' => $this->config,
             'param' => [
                 'id' => $id,
                 'action' => 'detail',
+                'isAdministrator' => $isAdministrator, // Pass flag to view
             ],
             'data' => $role,
             'datarole' => $this->model->getPermissionsForGroupSet($id),
@@ -104,6 +119,12 @@ class RoleController extends BaseController
      */
     public function update($id = null)
     {
+        // PROTECTION: Prevent updating Administrator role
+        if ($this->isAdministratorRole($id)) {
+            return redirect()->to('/back-end/administrator/role')
+                ->with('error-backend', 'Cannot modify Administrator role. This is a system-critical role.');
+        }
+
         $data = $this->request->getPost();
         $data['id'] = $id;
 
@@ -129,6 +150,12 @@ class RoleController extends BaseController
      */
     public function delete($id = null)
     {
+        // PROTECTION: Prevent deleting Administrator role
+        if ($this->isAdministratorRole($id)) {
+            return redirect()->to('/back-end/administrator/role')
+                ->with('error-backend', 'Cannot delete Administrator role. This is a system-critical role.');
+        }
+
         if (!$this->model->delete($id)) {
             return redirect()->to(pathBack($this->request))->with('errors-backend', $this->model->errors());
         }
@@ -164,6 +191,12 @@ class RoleController extends BaseController
      */
     public function edit($id = null)
     {
+        // PROTECTION: Prevent editing Administrator role
+        if ($this->isAdministratorRole($id)) {
+            return redirect()->to('/back-end/administrator/role')
+                ->with('error-backend', 'Cannot edit Administrator role. This is a system-critical role. You can only view it.');
+        }
+
         $role = $this->model->find($id);
 
         if (!$role) {

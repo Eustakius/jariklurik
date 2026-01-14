@@ -1,6 +1,11 @@
 <?= $this->extend($config->viewLayout) ?>
 <?= $this->section('main') ?>
 
+<?php 
+// Check if this is Administrator role (system-critical, always read-only)
+$isAdministrator = isset($param['isAdministrator']) && $param['isAdministrator'];
+?>
+
 <div class="dashboard-main-body">
     <!-- Breadcrumb Navigation -->
     <div class="mb-4">
@@ -68,6 +73,18 @@
                                 </div>
                             </div>
                         <?php endif; ?>
+
+                        <?php if ($isAdministrator): ?>
+                            <div class="alert bg-warning-100 dark:bg-warning-600/25 text-warning-800 dark:text-warning-300 border border-warning-200 dark:border-warning-700 px-6 py-4 mb-4 rounded-lg" role="alert">
+                                <div class="flex items-start gap-3">
+                                    <iconify-icon icon="solar:shield-warning-bold-duotone" class="text-2xl mt-0.5 shrink-0"></iconify-icon>
+                                    <div>
+                                        <h6 class="font-bold text-lg mb-1">System-Critical Role - Read Only</h6>
+                                        <p class="text-sm">The <strong>Administrator</strong> role is a system-critical role and cannot be modified. All fields are read-only to prevent accidental changes that could break the permission system.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                         
                         <div class="grid grid-cols-12 gap-4">
                             <div class="md:col-span-6 col-span-12">
@@ -79,6 +96,7 @@
                                     'label' => '',
                                     'placeholder' => 'Name',
                                     'required' => true,
+                                    'disabled' => $isAdministrator,
                                 ]]) ?>
                             </div>
                             <div class="md:col-span-6 col-span-12">
@@ -89,6 +107,7 @@
                                     'field' => 'description',
                                     'label' => '',
                                     'placeholder' => 'Description',
+                                    'disabled' => $isAdministrator,
                                 ]]) ?>
                             </div>
                         </div>
@@ -111,6 +130,7 @@
                                 </h5>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap">
+                                <?php if (strtolower($param['action']) != "detail" && !$isAdministrator): ?>
                                 <!-- Search Box -->
                                 <div class="relative">
                                     <iconify-icon icon="solar:magnifer-linear" class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-lg"></iconify-icon>
@@ -134,6 +154,12 @@
                                     <iconify-icon icon="solar:close-circle-bold" class="text-lg"></iconify-icon>
                                     Deselect All
                                 </button>
+                                <?php else: ?>
+                                <div class="text-sm text-warning-700 dark:text-warning-300 font-semibold">
+                                    <iconify-icon icon="solar:eye-bold" class="text-lg align-middle"></iconify-icon>
+                                    Viewing only - modifications not allowed
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -143,6 +169,7 @@
                                     'source' => $datarole,
                                     'label' => 'Nama',
                                     'required' => true,
+                                    'disabled' => $isAdministrator,
                                 ]]) ?>
                     </div>
                 </div>
@@ -151,7 +178,7 @@
     </form>
 
     <!-- Sticky Save Footer -->
-    <?php if(strtolower($param['action']) != "detail"): ?>
+    <?php if(strtolower($param['action']) != "detail" && !$isAdministrator): ?>
     <div id="stickyFooter" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 shadow-lg z-50 transition-transform duration-300">
         <div class="dashboard-main-body">
             <div class="flex items-center justify-between py-4">
