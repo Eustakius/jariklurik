@@ -360,6 +360,16 @@ class Backend extends BaseConfig
             ]
         ],
         [
+            'id' => 94,
+            'parent_id' => 99,
+            'name' => 'Security',
+            'icon' => 'solar:shield-check-bold-duotone',
+            'is_group' => false,
+            'url' => 'security',
+            'type' => 'sidebar',
+            'permissions' => []
+        ],
+        [
             'id' => 100,
             'parent_id' => null,
             'name' => 'My Profile',

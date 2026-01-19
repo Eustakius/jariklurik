@@ -43,3 +43,14 @@ Cukup gunakan file **`run.bat`** yang telah kami buat:
 3.  Aplikasi akan otomatis terbuka di browser pada alamat `http://localhost:8081`.
 
 *Catatan: Pastikan XAMPP (MySQL) tetap menyala untuk database.*
+
+### 5. Visitor Tracking & API Stabilization (19 Januari 2026)
+Masalah ini membuat data statistik pengunjung di dashboard tidak muncul (tetap nol) dan dashboard mengalami error koneksi.
+-   **Penyebab 1 (Casing Logic)**: Filter tracking menggunakan kode yang membedakan huruf besar/kecil saat mengecek metode "GET". Karena server mengirimkan "GET" (huruf besar) dan kode mengecek "get" (huruf kecil), tracking selalu dilewati.
+-   **Penyebab 2 (Model Restriction)**: Model `WebVisitorModel` memblokir penyimpanan data `page_url` dan `last_activity` karena alasan keamanan (tidak ada di daftar *allowed fields*). Padahal ini adalah data utama yang dibutuhkan dashboard.
+-   **Penyebab 3 (API Response Corruption)**: Script `preload.php` mencetak teks "Loaded: ..." langsung ke browser. Teks ini merusak format data JSON yang dikirim ke dashboard, menyebabkan error "NetworkError" karena browser tidak bisa membaca data yang bercampur teks.
+-   **Solusi Terpadu**:
+    1.  Menormalkan pengecekan metode request menggunakan `strtolower()`.
+    2.  Membuka izin penyimpanan field `page_url` dan `last_activity` di model.
+    3.  Mematikan (memberikan komentar) pada perintah `echo` di `preload.php` agar response API bersih dan valid.
+    4.  Mengahktifkan kembali filter `visitor-tracker` di file `Config/Filters.php`.

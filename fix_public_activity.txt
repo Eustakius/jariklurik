@@ -1,0 +1,32 @@
+    public function publicActivity()
+    {
+        $db = \Config\Database::connect();
+        
+        $activeVisitors = $db->table('web_visitors')
+            ->where('last_activity >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
+            ->countAllResults();
+
+        $todayViews = $db->table('web_visitors')
+            ->where('last_activity >=', date('Y-m-d 00:00:00'))
+            ->countAllResults();
+
+        $popularPages = $db->table('web_visitors')
+            ->select('page_url, COUNT(*) as views')
+            ->where('last_activity >=', date('Y-m-d H:i:s', strtotime('-24 hours')))
+            ->groupBy('page_url')
+            ->orderBy('views', 'DESC')
+            ->limit(5)
+            ->get()->getResultArray();
+
+        $recentActivity = $db->table('web_visitors')
+            ->orderBy('last_activity', 'DESC')
+            ->limit(10)
+            ->get()->getResultArray();
+
+        return $this->respond([
+            'active_visitors' => $activeVisitors,
+            'today_views' => $todayViews,
+            'popular_pages' => $popularPages,
+            'recent_activity' => $recentActivity
+        ]);
+    }

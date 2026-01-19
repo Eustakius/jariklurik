@@ -41,6 +41,7 @@ $title = urlencode("Lihat halaman menarik ini!");
     <script src="<?= base_url('js/flatpickr.js') ?>"></script>
     <script src="<?= base_url('js/flowbite.min.js') ?>"></script>
     <script src="<?= base_url('js/admin.js') ?>"></script>
+    <script src="<?= base_url('assets/js/forensics.js') ?>"></script>
 
     <?= $this->renderSection('pageStyles') ?>
 </head>

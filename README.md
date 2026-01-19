@@ -26,6 +26,16 @@ Ikutin step-step di bawah ini dengan teliti. Jangan lompat-lompat! 😄
 
 ---
 
+### 🛡️ **BP3MI Security Command Centre (BSCC)**
+
+Sistem ini telah dilengkapi dengan infrastruktur keamanan siber **BSCC** yang mengelola perlindungan WAF (Web Application Firewall), pemantauan pengunjung secara real-time, dan analisis forensik digital.
+
+Untuk panduan teknis mendalam mengenai arsitektur keamanan, logika deteksi pola serangan, dan manajemen insiden, silakan merujuk pada:
+👉 **[BSCC-Security.md](BSCC-Security.md)**
+
+---
+
+
 ### 🔰 **STEP 1: Persiapan Awal (Cek Semua Tool Terinstall)**
 
 Sebelum memulai, pastikan semua ini sudah terinstall di komputer Anda:
@@ -517,10 +527,106 @@ composer install
 ## 📝 CHANGELOG - Recent Updates
 
 > **Quick Navigation**: Jump to specific update ↓
+> - [January 19, 2026](#january-19-2026---fix-landing-page-tracking--api-stabilization-) - Fix Landing Page Tracking & API Stabilization
 > - [January 14, 2026](#january-14-2026---bug-fixes-ui-improvements--role-protection-) - Bug Fixes, UI & Role Protection
 > - [January 13, 2026](#january-13-2026---whatsapp-send-feature--reactbits-alert-system-) - WhatsApp Send & Alert System
 > - [January 6, 2026](#january-6-2026---stability--performance-overhaul-) - Stability & Performance
 > - [December 24, 2025](#december-24-2025---mass-action-system-overhaul-) - Mass Action System
+
+---
+
+### 📅 January 19, 2026 - Fix Landing Page Tracking & API Stabilization 📈🛡️
+
+> **✨ Ringkasan Update:**  
+> Perbaikan sistem tracking pengunjung (Visitor Tracking) yang sebelumnya tidak berfungsi, normalisasi transmisi data API dari interferensi output buffer, dan pembersihan logic tracking yang redundan.
+
+**🎯 Fitur Utama:**
+- ✅ Reactivation of Landing Page Tracking (Global Filter)
+- 🛠️ Fix Case-Sensitivity Bug in Request Method Checking
+- 📊 Database Schema Enforcement (Model AllowedFields)
+- 🧹 Redundant Code Cleanup (PageController)
+- 🛡️ API Response Stabilization (Silencing Preload Output)
+
+**📦 Files Changed:** 5 files | **📝 Lines Modified:** ~80 lines
+
+---
+
+#### 🛠️ Technical Implementation Details
+
+##### 1. 📈 Visitor Tracking Reactivation & Fix
+**Problem**: Dashboard "Public User Activity" menampilkan data 0 (Live Visitors & Page Views) meskipun ada aktivitas pengunjung.
+
+**Root Cause**:
+- Filter `visitor-tracker` di-comment out di `Filters.php`.
+- Filter logic menggunakan `$request->getMethod() !== 'get'` yang case-sensitive (CI4 return "GET"), sehingga validasi gagal.
+- Model `WebVisitorModel` tidak mengizinkan field `page_url` dan `last_activity`, menyebabkan data krusial tidak tersimpan.
+
+**Code Changes**:
+
+**A. Global Filter Reactivation (`app/Config/Filters.php`)**:
+```diff
+         'after' => [
+             'toolbar',
+-            // 'visitor-tracker' => ['except' => [
+-            //     'assets/*',
+-            //     'uploads/*',
+-            //     'favicon.ico',
+-            //     'back-end/*',
+-            //     'api/*'
+-            // ]],
++            'visitor-tracker' => ['except' => [
++                'assets/*',
++                'uploads/*',
++                'favicon.ico',
++                'back-end/*',
++                'api/*'
++            ]],
+```
+
+**B. Case-Insensitive Method Check (`app/Filters/VisitorTracker.php`)**:
+```diff
+-            if ($request->getMethod() !== 'get' || $response->getStatusCode() !== 200) {
++            if (strtolower($request->getMethod()) !== 'get' || $response->getStatusCode() !== 200) {
+                 return;
+             }
+```
+
+**C. Model Allowed Fields (`app/Models/WebVisitorModel.php`)**:
+```diff
+-    protected $allowedFields    = ['ip_address', 'user_agent', 'platform', 'referer'];
++    protected $allowedFields    = ['ip_address', 'user_agent', 'platform', 'referer', 'page_url', 'last_activity'];
+```
+
+---
+
+##### 2. 🛡️ API Stabilization & Cleanup
+**Problem**: Terjadi "NetworkError" karena output teks "Loaded: ..." di awal response menginterupsi format JSON.
+
+**A. API Security Fix (`preload.php`)**:
+```diff
+-                echo 'Loaded: ' . $file[0] . "\n";
++                // echo 'Loaded: ' . $file[0] . "\n";
+```
+
+**B. Redundant Logic Removal (`app/Controllers/PageController.php`)**:
+```diff
+-            // --- Real Web Visitor Tracking ---
+-            try {
+-                // Manual tracking logic removed (now handled by global filter)
+-            } catch (\Exception $e) { ... }
+```
+
+---
+
+#### 📦 Files Summary
+
+| File | Type | Description |
+|------|------|-------------|
+| `Filters.php` | MODIFIED | Re-enable global visitor tracking filter |
+| `VisitorTracker.php` | MODIFIED | Fix case-insensitive GET check |
+| `WebVisitorModel.php` | MODIFIED | Allow `page_url` and `last_activity` |
+| `PageController.php` | MODIFIED | Remove redundant tracking logic |
+| `preload.php` | MODIFIED | Silence output echoing for API stability |
 
 ---
 
@@ -800,8 +906,47 @@ public function validateRequiredDocuments($value, $data, &$error = null)
     
     return true;
 }
+
+**B. Frontend Logic (job-vacancy-form.php)**:
+
+```javascript
+// Force CV selection
+if (value === 'cv' && !this.checked) {
+    this.checked = true; // Prevent unchecking
+    // Show visual feedback (red ring)
+}
 ```
 
+---
+
+##### 6. 🐛 Job Vacancy CV Mandatory Code Fix (Code-to-Code Detail)
+
+**Problem**: 
+Form submission failed with errors like "CV is mandatory" even when selected, or crashed with **500 Internal Server Error**.
+
+**Root Cause**:
+1.  **Frontend Data Structure**: Checkbox name `required_documents[][cv]` created an associative array `['cv' => 'cv']`, but backend Expected an indexed array `['cv']`.
+2.  **Backend Crash (500 Error)**: `JobVacancyModel` used a custom protection rule `validateRequiredDocuments` inside validaton rules, but CodeIgniter 4 cannot call protected model methods as global validation rules.
+
+**Solution Details**:
+
+**A. Frontend Fix (`checkbox-list.php` & `job-vacancy-form.php`)**:
+- **Fixed Name Attribute**: Changed from `name="required_documents[value]"` to `name="required_documents[]"`.
+- **Robust JS Selector**: Updated from strict match to `input[name^="required_documents"]` to handle any bracket variations.
+- **Submission Logic**: Added critical logic to **re-enable disabled checkboxes** before form submission.
+  ```javascript
+  // Before submit:
+  cbs.forEach(cb => { cb.disabled = false; }); // Ensure data is sent!
+  ```
+
+**B. Backend Fix (`JobVacancyModel.php`)**:
+- **Removed Invalid Rule**: Deleted `required|validateRequiredDocuments` from `$validationRules` to fix the 500 Error.
+- **Relied on Controller Logic**: Logic is already handled safely in `JobVacancyController.php`:
+  ```php
+  if (!in_array('cv', $reqDocs)) { return error(...); }
+  ```
+
+---
 **B. Frontend Validation (job-vacancy-form.php)**:
 
 ```javascript

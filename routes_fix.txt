@@ -1,0 +1,7 @@
+        $routes->get('check-blacklist', 'Api\SecurityController::checkBlacklist');
+        $routes->get('system-health', 'Api\SecurityController::systemHealth');
+        $routes->get('public-activity', 'Api\SecurityController::publicActivity');
+        $routes->get('blocked-ips', 'Api\SecurityController::blockedIps');
+        $routes->delete('blocked-ips/(:num)', 'Api\SecurityController::unblockIp/$1');
+    });
+});

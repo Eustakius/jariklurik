@@ -41,6 +41,8 @@ class Filters extends BaseFilters
         'permission'    => \App\Filters\PermissionFilter::class,
         'post'          => \App\Filters\PostAuth::class,
         '2fa'           => \App\Filters\TwoFactorFilter::class,
+        'security-monitor' => \App\Filters\SecurityMonitor::class,
+        'visitor-tracker' => \App\Filters\VisitorTracker::class,
     ];
 
     /**
@@ -85,9 +87,31 @@ class Filters extends BaseFilters
                 'back-end/*/mass-*', // Mass action endpoints
                 'submit/*', // Allow submission endpoints
                 'api/submit/*', // Allow API submission endpoints
+                'api/security/*', // Allow Security API endpoints
+            ]],
+            'security-monitor' => ['except' => [
+                'assets/*',
+                'uploads/*',
+                'favicon.ico',
+                'back-end/*',
+                'api/security/*' // Exclude security API from WAF inspection
             ]],
         ],
         'after' => [
+            'security-monitor' => ['except' => [
+                'assets/*',
+                'uploads/*',
+                'favicon.ico',
+                'back-end/*',
+                'api/security/*' // Don't log the dashboard's own polling
+            ]],
+            'visitor-tracker' => ['except' => [
+                'assets/*',
+                'uploads/*',
+                'favicon.ico',
+                'back-end/*',
+                'api/*' // Don't track API calls
+            ]],
             // 'toolbar',
             // 'honeypot',
             // 'secureheaders',

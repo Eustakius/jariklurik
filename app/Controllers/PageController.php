@@ -17,7 +17,7 @@ class PageController extends BaseController
         $this->config = config('Frontend');
     }
 
-    public function index($slug): string
+    public function index($slug = null): string
     {
         $page = $this->request->getPath();
         $page = $page === "" ? "lowongan-kerja" : $page;
@@ -76,39 +76,6 @@ class PageController extends BaseController
             );
         }
 
-        // --- Real Web Visitor Tracking ---
-        try {
-            $visitorModel = new \App\Models\WebVisitorModel();
-            $agent = $this->request->getUserAgent();
-            $agentString = (string) $agent;
-            $ip = $this->request->getIPAddress();
-            
-            // Check for duplicate visit today (IP + User Agent + Date)
-            $isDuplicate = $visitorModel->where('ip_address', $ip)
-                                        ->where('user_agent', $agentString)
-                                        ->where('DATE(created_at)', date('Y-m-d'))
-                                        ->countAllResults();
-
-            if ($isDuplicate == 0) {
-                // Basic Platform Detection
-                $platform = 'Unknown';
-                if ($agent->isMobile()) {
-                    $platform = $agent->getMobile();
-                } elseif ($agent->isBrowser()) {
-                    $platform = $agent->getPlatform(); 
-                }
-
-                $visitorModel->insert([
-                    'ip_address' => $ip,
-                    'user_agent' => $agentString,
-                    'platform'   => $platform, 
-                    'referer'    => $agent->getReferrer()
-                ]);
-            }
-        } catch (\Exception $e) {
-            // Silently fail to avoid breaking the page
-            log_message('error', 'Visitor Tracking Failed: ' . $e->getMessage());
-        }
         // ---------------------------------
         
         $sections = array_filter($this->config->sections, function ($key) use ($page) {
