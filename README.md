@@ -527,11 +527,99 @@ composer install
 ## 📝 CHANGELOG - Recent Updates
 
 > **Quick Navigation**: Jump to specific update ↓
+> - [January 23, 2026](#january-23-2026---real-time-visitor-analysis--dashboard-metrics-) - Real-Time Visitor Analysis & Dashboard Metrics
 > - [January 19, 2026](#january-19-2026---fix-landing-page-tracking--api-stabilization-) - Fix Landing Page Tracking & API Stabilization
 > - [January 14, 2026](#january-14-2026---bug-fixes-ui-improvements--role-protection-) - Bug Fixes, UI & Role Protection
 > - [January 13, 2026](#january-13-2026---whatsapp-send-feature--reactbits-alert-system-) - WhatsApp Send & Alert System
 > - [January 6, 2026](#january-6-2026---stability--performance-overhaul-) - Stability & Performance
 > - [December 24, 2025](#december-24-2025---mass-action-system-overhaul-) - Mass Action System
+
+---
+
+### 📅 January 23, 2026 - Real-Time Visitor Analysis & Dashboard Metrics 📊⚡
+
+> **✨ Ringkasan Update:**  
+> Peningkatan signifikan pada engine tracking pengunjung untuk mendukung pemantauan real-time dan analisis pengunjung unik yang akurat. Implementasi deteksi perangkat (Mobile/Desktop/Tablet) serta sinkronisasi definisi metrik antara Security Dashboard dan Main Dashboard.
+
+**🎯 Fitur Utama:**
+- ✅ **Real-Time Feed**: Widget "Public User Activity" menampilkan setiap hit detik ini juga.
+- 📱 **Device Detection**: Logika baru untuk mendeteksi Mobile, Desktop, dan Tablet.
+- 🎯 **Metric Accuracy**: Pemisahan tegas antara "Live Visitors" (Unik 15-menit) vs "Page Views" (Total Hits).
+- 🔄 **Auto-Refresh**: Grafik dashboard otomatis update setiap 30 detik tanpa reload.
+- 🛠️ **Robust Error Handling**: Perbaikan bug tracker yang menyebabkan error 404 pada landing page.
+
+**📦 Files Changed:** 6 files | **📝 Lines Modified:** ~120 lines
+
+---
+
+#### 🛠️ Technical Implementation Details
+
+##### 1. 📊 Metric Differentiation Strategy
+**Problem**: Dashboard mencampuradukkan istilah "Visitor" dan "Page View", menyebabkan data terlihat tidak konsisten antara Security Dashboard dan Main Dashboard.
+
+**Solution**:
+- **Main Dashboard**: Fokus pada *Lifetime Unique Visitors* (Orang) dan *Growth*.
+- **Security Dashboard**: Fokus pada *Live Activity* (Hits) dan *Short-term Uniques*.
+
+**A. Dashboard API Controller (`app/Controllers/Api/DashboardApiController.php`)**:
+```diff
+-            // 1. Total Unique Visitors (Old Generic Count)
+-            $totalVisitors = $webVisitorModel->db->table('web_visitors')
+-                ->select('COUNT(DISTINCT CONCAT(...)) as unique_count')
++            // 1. Total Unique Visitors (Device Fingerprint Based)
++            $totalVisitors = $webVisitorModel->db->table('web_visitors')
++                ->select('COUNT(DISTINCT device_fingerprint) as unique_count')
+                 ->get()->getRow()->unique_count ?? 0;
++
++            // 1b. Total Page Views (Raw Hits)
++            $totalPageViews = $webVisitorModel->db->table('web_visitors')->countAllResults();
+```
+
+##### 2. 📱 Device Type Detection
+**Problem**: Sebelumnya hanya menyimpan "Platform" (OS), tidak bisa membedakan Mobile vs Desktop dengan mudah untuk analisis UX.
+
+**Implementation (`app/Filters/VisitorTracker.php`)**:
+```php
+// Detect device type using CodeIgniter UserAgent
+if (strpos($agentString, 'tablet') !== false) {
+    $deviceType = 'Tablet';
+} elseif ($userAgent->isMobile()) {
+    $deviceType = 'Mobile';
+} elseif ($userAgent->isRobot()) {
+    $deviceType = 'Unknown'; // Bot tracking
+} else {
+    $deviceType = 'Desktop';
+}
+
+// Log directly to 'web_visitors' with new 'device_type' column
+$data = [
+    'device_type' => $deviceType,
+    'device_fingerprint' => $deviceFingerprint,
+    // ...
+];
+```
+
+##### 3. 🛡️ Robust Security Dashboard
+**Frontend Update**: `PublicActivityMonitor.tsx` sekarang menampilkan icon perangkat yang sesuai.
+```tsx
+const getDeviceIcon = (type?: string) => {
+    switch(type) {
+        case 'Mobile': return '📱';
+        case 'Desktop': return '💻'; 
+        default: return '🌐';
+    }
+};
+```
+
+##### 4. 🔄 Auto-Refresh Mechanism
+**Implementation**: Polling interval 30 detik pada `dashboard.php` untuk memperbarui grafik tanpa membebani server.
+```js
+setInterval(async () => {
+    const response = await fetch('/api/dashboard/visitor-stats');
+    const data = await response.json();
+    // Update ApexCharts series dynamically...
+}, 30000);
+```
 
 ---
 

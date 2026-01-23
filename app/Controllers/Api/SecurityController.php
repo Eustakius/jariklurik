@@ -118,7 +118,8 @@ class SecurityController extends ResourceController
             $db = \Config\Database::connect();
             
             $activeVisitors = $db->table('web_visitors')
-                ->where('last_activity >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
+                ->where('last_activity >=', date('Y-m-d H:i:s', strtotime('-15 minutes')))
+                ->groupBy('device_fingerprint')
                 ->countAllResults();
 
             $todayViews = $db->table('web_visitors')
@@ -134,6 +135,7 @@ class SecurityController extends ResourceController
                 ->get()->getResultArray();
 
             $recentActivity = $db->table('web_visitors')
+                ->select('ip_address, page_url, device_type, platform, user_agent, last_activity')
                 ->orderBy('last_activity', 'DESC')
                 ->limit(10)
                 ->get()->getResultArray();

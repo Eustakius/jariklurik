@@ -15,7 +15,7 @@
     <!-- Stats Overview -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <?= view('Backend/Partial/stat-card', [
-            'title' => 'Total Vacancies',
+            'label' => 'Total Vacancies',
             'value' => $jobVacancyCount,
             'icon' => 'solar:case-round-bold-duotone',
             'colorClass' => 'from-primary-500 to-primary-600',
@@ -23,7 +23,7 @@
         ]) ?>
 
         <?= view('Backend/Partial/stat-card', [
-            'title' => 'Active Vacancies',
+            'label' => 'Active Vacancies',
             'value' => $jobVacancyActiveCount,
             'icon' => 'solar:play-circle-bold-duotone',
             'colorClass' => 'from-success-500 to-success-600',
@@ -31,7 +31,7 @@
         ]) ?>
 
         <?= view('Backend/Partial/stat-card', [
-            'title' => 'Expired Vacancies',
+            'label' => 'Expired Vacancies',
             'value' => $jobVacancyExpiredCount,
             'icon' => 'solar:close-circle-bold-duotone',
             'colorClass' => 'from-danger-500 to-danger-600',
@@ -54,14 +54,14 @@
             </a>
 
             <a href="/back-end/applicant" class="card p-4 rounded-2xl shadow-lg bg-white dark:bg-neutral-800 hover:shadow-xl transition-all group flex flex-col items-center justify-center gap-3 text-center h-[120px]">
-                <div class="w-10 h-10 rounded-full bg-info-50 dark:bg-info-900/30 text-info-600 dark:text-info-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-full bg-success-50 dark:bg-success-900/30 text-success-600 dark:text-success-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="text-2xl"></iconify-icon>
                 </div>
                 <span class="font-semibold text-neutral-700 dark:text-neutral-300 text-sm">Review Applicants</span>
             </a>
 
             <a href="/back-end/company" class="card p-4 rounded-2xl shadow-lg bg-white dark:bg-neutral-800 hover:shadow-xl transition-all group flex flex-col items-center justify-center gap-3 text-center h-[120px]">
-                <div class="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-full bg-warning-50 dark:bg-warning-900/30 text-warning-600 dark:text-warning-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <iconify-icon icon="solar:buildings-2-bold-duotone" class="text-2xl"></iconify-icon>
                 </div>
                 <span class="font-semibold text-neutral-700 dark:text-neutral-300 text-sm">Company Profile</span>
@@ -103,7 +103,7 @@
         <!-- Vacancy Status (1/2 Width) -->
         <div class="col-span-1 card p-6 rounded-3xl shadow-xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700/50 flex flex-col">
             <h5 class="text-lg font-bold text-neutral-800 dark:text-white mb-2 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-info-50 dark:bg-info-900/20 text-info-500 flex items-center justify-center">
+                <div class="w-8 h-8 rounded-lg bg-success-50 dark:bg-success-900/20 text-success-500 flex items-center justify-center">
                     <iconify-icon icon="solar:pie-chart-2-bold-duotone" class="text-lg"></iconify-icon>
                 </div>
                 Vacancy Status
@@ -122,7 +122,7 @@
             <div class="flex items-center justify-between gap-4 mb-4">
                 <div>
                     <h4 class="text-xl font-bold text-neutral-800 dark:text-white flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-info-50 dark:bg-info-900/20 text-info-500 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 flex items-center justify-center">
                             <iconify-icon icon="solar:chart-square-bold-duotone" class="text-2xl"></iconify-icon>
                         </div>
                         Visitor Growth
@@ -147,7 +147,7 @@
                             <span>+12.5% vs last month</span>
                         </div>
                     </div>
-                    <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 flex items-center justify-center">
                         <iconify-icon icon="solar:eye-bold-duotone" class="text-2xl"></iconify-icon>
                     </div>
                 </div>
@@ -156,11 +156,12 @@
             <!-- Traffic Sources Chart -->
             <div class="card p-6 rounded-3xl shadow-xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700/50 flex-1 flex flex-col">
                 <h5 class="text-lg font-bold text-neutral-800 dark:text-white mb-2 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-500 flex items-center justify-center">
+                    <div class="w-8 h-8 rounded-lg bg-warning-50 dark:bg-warning-900/20 text-warning-500 flex items-center justify-center">
                         <iconify-icon icon="solar:pie-chart-bold-duotone" class="text-lg"></iconify-icon>
                     </div>
-                    Traffic Sources
+                    Device Types
                 </h5>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-6 pl-11">Visitor devices breakdown</p>
                 <div id="trafficSourceChart" class="w-full flex-1 flex items-center justify-center min-h-[220px]"></div>
             </div>
         </div>
@@ -174,8 +175,8 @@
         const colors = {
             primary: '#EBC470',
             success: '#10B981',
-            danger: '#EF4444', 
-            pending: '#6366f1',
+            danger: '#EF4444',
+            warning: '#F59E0B',
             grid: '#e5e7eb',
             gridDark: '#374151',
             textLight: '#6b7280',
@@ -218,7 +219,7 @@
                 animations: { enabled: true, speed: 800 },
                 zoom: { enabled: true, type: 'x', autoScaleYaxis: true }
             },
-            colors: [colors.success, colors.pending, colors.danger],
+            colors: [colors.success, colors.warning, colors.danger],
             dataLabels: { enabled: false },
             stroke: { curve: 'smooth', width: 2 },
             fill: {
@@ -315,7 +316,7 @@
                 toolbar: { show: false },
                 animations: { enabled: true }
             },
-            colors: [colors.pending], // Use a distinct color like Indigo/Purple
+            colors: [colors.primary],
             stroke: { curve: 'smooth', width: 3 },
             dataLabels: { enabled: false },
             xaxis: {
@@ -346,7 +347,7 @@
                 fontFamily: 'inherit',
                 background: 'transparent'
             },
-            colors: [colors.primary, colors.success, colors.pending, colors.textLight],
+            colors: [colors.primary, colors.success, colors.warning, colors.textLight],
             plotOptions: {
                 pie: {
                     donut: {
@@ -367,6 +368,50 @@
             tooltip: { theme: isDark ? 'dark' : 'light' }
         };
         new ApexCharts(document.querySelector("#trafficSourceChart"), trafficOptions).render();
+        
+        // --- Auto-Refresh: Poll API every 30 seconds for new visitor data ---
+        let visitorChart = new ApexCharts(document.querySelector("#visitorGrowthChart"), visitorOptions);
+        let trafficChart = new ApexCharts(document.querySelector("#trafficSourceChart"), trafficOptions);
+        
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/dashboard/visitor-stats');
+                if (!response.ok) return;
+                
+                const result = await response.json();
+                if (!result.success) return;
+                
+                const data = result.data;
+                
+                // Update Total Visitors count
+                const totalVisitorsEl = document.querySelector('.text-3xl.font-bold');
+                if (totalVisitorsEl && data.totalVisitors) {
+                    totalVisitorsEl.textContent = data.totalVisitors.toLocaleString();
+                }
+                
+                // Update Visitor Growth chart
+                if (data.visitorGrowth && visitorChart) {
+                    visitorChart.updateOptions({
+                        xaxis: { categories: data.visitorGrowth.categories }
+                    });
+                    visitorChart.updateSeries([{
+                        name: 'Visitors',
+                        data: data.visitorGrowth.data
+                    }]);
+                }
+                
+                // Update Traffic Sources chart
+                if (data.trafficSources && trafficChart) {
+                    trafficChart.updateOptions({
+                        labels: data.trafficSources.labels
+                    });
+                    trafficChart.updateSeries(data.trafficSources.series);
+                }
+                
+            } catch (error) {
+                console.error('Auto-refresh error:', error);
+            }
+        }, 30000); // Poll every 30 seconds
     });
 </script>
 <?= $this->endSection() ?>

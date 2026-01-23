@@ -113,6 +113,7 @@ class Filters extends BaseFilters
                 'api/*' // Don't track API calls
             ]],
             // 'toolbar',
+            // 'toolbar',
             // 'honeypot',
             // 'secureheaders',
         ],

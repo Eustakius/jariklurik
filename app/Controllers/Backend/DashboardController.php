@@ -136,19 +136,25 @@ class DashboardController extends BaseController
                 }
             }
 
-            // --- Visitor Statistics (New Request) ---
+            // --- Visitor Statistics (Unique Visitors) ---
             
-            // --- Visitor Statistics (Real Data Analysis) ---
-            
-            // 1. Real Data: Total Site Visits (from Landing Page)
+            // 1. Total Unique Visitors (count distinct IP + device + date combinations)
             $webVisitorModel = new \App\Models\WebVisitorModel();
-            $totalVisitors = $webVisitorModel->countAll();
+            $totalVisitors = $webVisitorModel->db->table('web_visitors')
+                ->select('COUNT(DISTINCT CONCAT(COALESCE(ip_address, ""), "-", COALESCE(device_fingerprint, ""), "-", COALESCE(visit_date, ""))) as unique_count')
+                ->get()
+                ->getRow()
+                ->unique_count ?? 0;
 
-            // 2. Real Data: Visitor Growth (Monthly)
-            $growthQuery = $webVisitorModel->select("DATE_FORMAT(created_at, '%Y-%m') as ym, DATE_FORMAT(created_at, '%b') as month, COUNT(*) as count")
-                                          ->groupBy('ym')
-                                          ->orderBy('ym', 'ASC')
-                                          ->findAll(12); // Last 12 months
+            // 2. Unique Visitor Growth (Monthly)
+            $growthQuery = $webVisitorModel->db->table('web_visitors')
+                ->select("DATE_FORMAT(visit_date, '%Y-%m') as ym, DATE_FORMAT(visit_date, '%b') as month, COUNT(DISTINCT CONCAT(ip_address, '-', device_fingerprint, '-', visit_date)) as count")
+                ->where('visit_date IS NOT NULL')
+                ->groupBy('ym')
+                ->orderBy('ym', 'ASC')
+                ->limit(12)
+                ->get()
+                ->getResultArray();
             
             $visitorGrowth['categories'] = [];
             $visitorGrowth['data'] = [];
@@ -162,16 +168,19 @@ class DashboardController extends BaseController
                  $visitorGrowth['data'] = [0];
             }
 
-            // 3. Real Data: Traffic Sources (Platform)
-            $platformQuery = $webVisitorModel->select("platform, COUNT(*) as count")
-                                            ->groupBy('platform')
-                                            ->orderBy('count', 'DESC')
-                                            ->findAll();
+            // 3. Unique Visitors by Device Type (Traffic Sources)
+            $deviceQuery = $webVisitorModel->db->table('web_visitors')
+                ->select("device_type, COUNT(DISTINCT CONCAT(ip_address, '-', device_fingerprint, '-', visit_date)) as count")
+                ->where('device_type IS NOT NULL')
+                ->groupBy('device_type')
+                ->orderBy('count', 'DESC')
+                ->get()
+                ->getResultArray();
             
             $trafficSources['labels'] = [];
             $trafficSources['series'] = [];
-            foreach ($platformQuery as $row) {
-                 $trafficSources['labels'][] = $row['platform'] ?: 'Unknown';
+            foreach ($deviceQuery as $row) {
+                 $trafficSources['labels'][] = $row['device_type'] ?: 'Unknown';
                  $trafficSources['series'][] = (int)$row['count'];
             }
 

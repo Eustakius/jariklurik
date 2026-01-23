@@ -12,7 +12,7 @@ class WebVisitorModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['ip_address', 'user_agent', 'platform', 'referer', 'page_url', 'last_activity'];
+    protected $allowedFields    = ['ip_address', 'user_agent', 'device_fingerprint', 'device_type', 'platform', 'referer', 'page_url', 'visit_date', 'last_activity'];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';

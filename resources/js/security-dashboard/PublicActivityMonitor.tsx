@@ -4,8 +4,25 @@ interface PublicStats {
     active_visitors: number;
     today_views: number;
     popular_pages: Array<{ page_url: string, views: string }>;
-    recent_activity: Array<{ ip_address: string, page_url: string, user_agent: string, last_activity: string }>;
+    recent_activity: Array<{
+        ip_address: string,
+        page_url: string,
+        user_agent: string,
+        last_activity: string,
+        device_type?: string,
+        platform?: string
+    }>;
 }
+
+const getDeviceIcon = (type?: string) => {
+    switch (type) {
+        case 'Mobile': return '📱';
+        case 'Tablet': return '📱'; // Tablet specific if needed
+        case 'Desktop': return '💻';
+        case 'Unknown': return '🤖';
+        default: return '🌐';
+    }
+};
 
 export const PublicActivityMonitor: React.FC = () => {
     const [stats, setStats] = useState<PublicStats | null>(null);
@@ -36,7 +53,7 @@ export const PublicActivityMonitor: React.FC = () => {
         <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg mb-8">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <span className="text-cyan-400">🌐</span> Public User Activity
-                <span className="text-xs bg-cyan-900 text-cyan-200 px-2 py-1 rounded ml-2">Jarik Lurik Landing Page</span>
+                <span className="text-xs bg-cyan-900 text-cyan-200 px-2 py-1 rounded ml-2">Live Monitor</span>
             </h2>
 
             {/* Metrics Grid */}
@@ -46,7 +63,7 @@ export const PublicActivityMonitor: React.FC = () => {
                         <p className="text-cyan-300 text-sm uppercase font-bold tracking-wider">Live Visitors</p>
                         <p className="text-xs text-cyan-500">Last 15 Minutes</p>
                     </div>
-                    <div className="text-4xl font-mono text-white font-bold">{stats.active_visitors}</div>
+                    <div className="text-4xl font-mono text-white font-bold animate-pulse">{stats.active_visitors}</div>
                 </div>
 
                 <div className="bg-gray-750 p-4 rounded-lg border border-gray-600 flex items-center justify-between">
@@ -83,15 +100,21 @@ export const PublicActivityMonitor: React.FC = () => {
                 {/* Recent Feed */}
                 <div>
                     <h3 className="text-sm font-bold text-gray-400 uppercase mb-3 border-b border-gray-700 pb-2">Real-time Feed</h3>
-                    <div className="space-y-2 h-[200px] overflow-y-auto custom-scrollbar pr-2">
+                    <div className="space-y-2 h-[250px] overflow-y-auto custom-scrollbar pr-2">
                         {stats.recent_activity?.map((log, idx) => (
-                            <div key={idx} className="text-xs border-l-2 border-cyan-800 pl-3 py-1 hover:border-cyan-500 transition">
+                            <div key={idx} className="text-xs border-l-2 border-cyan-800 pl-3 py-2 hover:border-cyan-500 transition bg-black/20 mb-1 rounded-r">
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-gray-300 font-mono">{log.ip_address}</span>
-                                    <span className="text-gray-500">{new Date(log.last_activity).toLocaleTimeString()}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg" title={log.device_type || 'Unknown Device'}>{getDeviceIcon(log.device_type)}</span>
+                                        <span className="text-gray-300 font-mono font-bold">{log.ip_address}</span>
+                                        {log.platform && <span className="bg-gray-700 text-gray-300 px-1 rounded text-[10px]">{log.platform}</span>}
+                                    </div>
+                                    <span className="text-cyan-500 font-mono">{new Date(log.last_activity).toLocaleTimeString()}</span>
                                 </div>
-                                <div className="text-cyan-500 font-medium truncate mb-1">{log.page_url}</div>
-                                <div className="text-gray-600 truncate" title={log.user_agent}>{log.user_agent}</div>
+                                <div className="text-cyan-400 font-medium truncate mb-1 pl-7">{log.page_url || 'Home'}</div>
+                                <div className="text-gray-600 truncate pl-7 text-[10px]" title={log.user_agent}>
+                                    {log.user_agent.substring(0, 50)}...
+                                </div>
                             </div>
                         ))}
                         {(!stats.recent_activity || stats.recent_activity.length === 0) && <div className="text-gray-500 italic text-sm">No recent activity.</div>}

@@ -422,6 +422,9 @@ $routes->group('api', function ($routes) {
         $routes->get('autocomplate', 'Api\CountryController::autocomplate');
     });
     
+    // Dashboard Visitor Stats API (for auto-refresh)
+    $routes->get('dashboard/visitor-stats', 'Api\\DashboardApiController::getVisitorStats');
+    
     // Security Dashboard API
     $routes->group('security', static function ($routes) {
         $routes->get('stats', 'Api\SecurityController::stats');

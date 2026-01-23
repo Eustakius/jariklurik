@@ -29,21 +29,49 @@ class VisitorTracker implements FilterInterface
 
             $db = \Config\Database::connect();
             
+            // Generate device fingerprint
+            $userAgent = $request->getUserAgent();
+            $fingerprintData = [
+                'user_agent' => $userAgent->getAgentString(),
+                'platform' => $userAgent->getPlatform(),
+                'browser' => $userAgent->getBrowser(),
+                'accept_language' => $request->getHeaderLine('Accept-Language'),
+            ];
+            $deviceFingerprint = md5(json_encode($fingerprintData));
+            
+            // Detect device type
+            $agentString = strtolower($userAgent->getAgentString());
+            if (strpos($agentString, 'tablet') !== false || strpos($agentString, 'ipad') !== false) {
+                $deviceType = 'Tablet';
+            } elseif ($userAgent->isMobile()) {
+                $deviceType = 'Mobile';
+            } elseif ($userAgent->isRobot()) {
+                $deviceType = 'Unknown'; // Track bots but mark as Unknown
+            } else {
+                $deviceType = 'Desktop';
+            }
+            
+            $ipAddress = $request->getIPAddress();
+            $visitDate = date('Y-m-d');
+            
+            // Always insert hit directly (Real-Time Feed Log Mode)
             $data = [
-                'ip_address' => $request->getIPAddress(),
-                'user_agent' => $request->getUserAgent()->getAgentString(),
+                'ip_address' => $ipAddress,
+                'user_agent' => $userAgent->getAgentString(),
+                'device_fingerprint' => $deviceFingerprint,
+                'device_type' => $deviceType,
                 'page_url' => $uri ?: '/',
-                'platform' => $request->getUserAgent()->getPlatform(),
+                'platform' => $userAgent->getPlatform(),
                 'referer' => $request->getHeaderLine('Referer') ?: null,
+                'visit_date' => $visitDate,
                 'last_activity' => date('Y-m-d H:i:s'),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
-
-            // Insert or update visitor record
+            
             $db->table('web_visitors')->insert($data);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silently fail - don't break the page if tracking fails
             log_message('error', 'Visitor tracking error: ' . $e->getMessage());
         }

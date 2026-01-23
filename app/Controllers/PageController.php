@@ -20,7 +20,7 @@ class PageController extends BaseController
     public function index($slug = null): string
     {
         $page = $this->request->getPath();
-        $page = $page === "" ? "lowongan-kerja" : $page;
+        $page = (empty($page) || $page === "/") ? "lowongan-kerja" : $page;
         $data = null;
         $meta = (object)[   
             'title' => 'Jariklurik ' . ($page === "" ? "" : " - ". ucfirst(str_replace("-"," ",$page))),
