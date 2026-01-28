@@ -565,8 +565,15 @@ class PurnaPmiController extends BaseController
         }
     }
 
+    // massProcess is handled by the decision modal in the frontend
+    // It shows Approve/Reject options based on the current tab
     public function massProcess()
     {
-        return $this->massRevert();
+        // This method intentionally returns an error
+        // The frontend decision modal should call massApprove or massReject directly
+        return $this->response->setJSON([
+            'status' => 'Error',
+            'message' => 'Mass Process should use decision modal to call massApprove or massReject'
+        ])->setStatusCode(400);
     }
 }

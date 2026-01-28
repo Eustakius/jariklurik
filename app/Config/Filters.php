@@ -43,6 +43,7 @@ class Filters extends BaseFilters
         '2fa'           => \App\Filters\TwoFactorFilter::class,
         'security-monitor' => \App\Filters\SecurityMonitor::class,
         'visitor-tracker' => \App\Filters\VisitorTracker::class,
+        'maintenance'     => \App\Filters\MaintenanceFilter::class,
     ];
 
     /**
@@ -81,6 +82,7 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            'maintenance', // Maintenance Check
             'cors', // Enable CORS
             'csrf' => ['except' => [
                 'back-end/api/*', // API endpoints

@@ -527,12 +527,129 @@ composer install
 ## 📝 CHANGELOG - Recent Updates
 
 > **Quick Navigation**: Jump to specific update ↓
+> - [January 28, 2026](#january-28-2026---maintenance-mode--uiux-enhancements-) - Maintenance Mode & UI/UX Enhancements
 > - [January 23, 2026](#january-23-2026---real-time-visitor-analysis--dashboard-metrics-) - Real-Time Visitor Analysis & Dashboard Metrics
 > - [January 19, 2026](#january-19-2026---fix-landing-page-tracking--api-stabilization-) - Fix Landing Page Tracking & API Stabilization
 > - [January 14, 2026](#january-14-2026---bug-fixes-ui-improvements--role-protection-) - Bug Fixes, UI & Role Protection
 > - [January 13, 2026](#january-13-2026---whatsapp-send-feature--reactbits-alert-system-) - WhatsApp Send & Alert System
 > - [January 6, 2026](#january-6-2026---stability--performance-overhaul-) - Stability & Performance
 > - [December 24, 2025](#december-24-2025---mass-action-system-overhaul-) - Mass Action System
+
+---
+
+### 📅 January 28, 2026 - Maintenance Mode & UI/UX Enhancements 🛠️✨
+
+> **✨ Ringkasan Update:**  
+> Implementasi fitur Maintenance Mode global, perbaikan UI/UX pada form Training Type, dan optimasi fungsionalitas System Settings dengan tampilan toggle switch 3D.
+
+**🎯 Finetuning & Fixes:**
+- ✅ **Global Maintenance Mode**: Filter baru untuk memblokir akses publik saat maintenance aktif (Admin Panel tetap dapat diakses).
+- 🛠️ **System Settings Upgrade**: Perbaikan logic `update` untuk menangani semua field konfigurasi, support file upload, dan toggle switch 3D CSS.
+- 🎨 **Enhanced UI Layout**: Redesign form `Training Type` dengan grouping yang lebih rapi.
+- 🐛 **Mass Action Fixes**: Perbaikan bug pada fitur mass-reject dan mass-revert pelamar.
+
+**📦 Files Changed:** 8 files | **📝 Lines Modified:** ~200 lines
+
+---
+
+#### 🛠️ Technical Implementation Details
+
+##### 1. 🚧 Global Maintenance Mode (New Middleware)
+**Problem**: Tidak ada mekanisme untuk memblokir akses publik secara global saat maintenance.
+**Implementation (`app/Filters/MaintenanceFilter.php`)**:
+```php
+public function before(RequestInterface $request, $arguments = null)
+{
+    // 1. Exclude Admin & API Routes
+    $path = trim($request->getUri()->getPath(), '/');
+    $excludedPaths = ['back-end', 'api', 'login', 'assets', 'uploads'];
+    
+    foreach ($excludedPaths as $excluded) {
+        if (str_starts_with($path, $excluded) || $path === $excluded) return;
+    }
+
+    // 2. Check Database Setting
+    $db = \Config\Database::connect();
+    $status = $db->table('settings')->where('key', 'maintenance_mode')->get()->getRow();
+
+    // 3. Block Access if Active
+    if ($status && $status->values == '1') {
+        $response = service('response');
+        $response->setStatusCode(503);
+        $response->setBody(view('maintenance')); // Custom View
+        return $response;
+    }
+}
+```
+
+##### 2. ⚙️ System Settings Controller Logic
+**Problem**: Method `update` lama hardcoded hanya untuk 1 field, mengabaikan field lain.
+**Code Comparison (`SettingsController.php`)**:
+
+❌ **Before (Broken)**:
+```php
+public function update($id = null) {
+    // Only handles one specific file
+    $logoPath = upload_file('file_statement_letter', 'file', 'file_statement_letter');
+    if ($logoPath) {
+        $this->model->where('key', 'file_statement_letter')
+                    ->set(['values' => $logoPath])->update();
+    }
+    // Ignores all other POST data!
+}
+```
+
+✅ **After (Dynamic & Robust)**:
+```php
+public function update($id = null) {
+    $keys = ['site_name', 'maintenance_mode', 'smtp_host', ...]; // List all keys
+
+    foreach ($keys as $key) {
+        // Handle Checkboxes (unchecked = 0)
+        if (in_array($key, ['maintenance_mode', 'auto_backup_enabled'])) {
+            $value = $this->request->getPost($key) ? '1' : '0';
+        } else {
+            $value = $this->request->getPost($key);
+        }
+        $this->model->where('key', $key)->set(['values' => $value])->update();
+    }
+
+    // Handle Files Dynamically
+    $files = ['company_logo', 'file_statement_letter'];
+    foreach ($files as $dbKey) {
+        $path = upload_file($dbKey, 'file', $dbKey);
+        if ($path) $this->model->where('key', $dbKey)->set(['values' => $path])->update();
+    }
+}
+```
+
+##### 3. 🎨 3D Toggle Switch (CSS Injection)
+**Problem**: Checkbox bawaan browser terlihat standar dan "boring".
+**Solution**: Inject CSS langsung di view untuk mengubah checkbox menjadi 3D Toggle tanpa load library Three.js (hemat 600KB).
+
+**Implementation (`setting.php`)**:
+```css
+/* The "Physical" Button */
+.toggle-3d-button {
+    background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff;
+    transition: 0.4s;
+}
+
+/* The Toggle State (Pressed) */
+input:checked + .toggle-3d-button {
+    background: linear-gradient(145deg, #4f46e5, #6366f1);
+    border-color: #4f46e5;
+}
+```
+
+##### 4. 🧩 Route Fix for Mass Actions
+**Problem**: Tombol "Mass Revert" gagal karena route POST tidak terdaftar.
+**Fixed Route (`Routes.php`)**:
+```php
+// Added missing POST route for mass-revert action
+$routes->post('job-seekers/mass-revert', 'JobSeekerController::massRevert');
+```
 
 ---
 

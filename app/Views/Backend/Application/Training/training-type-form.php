@@ -30,47 +30,74 @@
                                 </div>
                             </div>
                         <?php endif; ?>
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="md:col-span-6 col-span-12">
-                                <?= view('Backend/Partial/form/text-box', ['attribute' => [
-                                    'field' => 'name',
-                                    'label' => 'Name',
-                                    'required' => true,
-                                ]]) ?>
+                        <div class="space-y-6">
+                            <!-- Section: General Information -->
+                            <div>
+                                <h6 class="text-sm font-semibold text-neutral-500 uppercase mb-4 tracking-wider">General Information</h6>
+                                <div class="grid grid-cols-12 gap-6">
+                                    <div class="col-span-12">
+                                        <?= view('Backend/Partial/form/text-box', ['attribute' => [
+                                            'field' => 'name',
+                                            'label' => 'Training Name',
+                                            'required' => true,
+                                            'placeholder' => 'Enter training name'
+                                        ]]) ?>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="md:col-span-3 col-span-12">
-                                <?= view('Backend/Partial/form/checkbox', ['attribute' => [
-                                    'value' => $data->is_jobseekers,
-                                    'type' => 'is_jobseekers',
-                                    'field' => 'is_jobseekers',
-                                    'label' => 'is Job Seekers',
-                                    'required' => false,
-                                ]]) ?>
+
+                            <hr class="border-neutral-200 dark:border-neutral-700 my-2">
+
+                            <!-- Section: Capacity -->
+                            <div>
+                                <h6 class="text-sm font-semibold text-neutral-500 uppercase mb-4 tracking-wider">Capacity</h6>
+                                <div class="grid grid-cols-12 gap-6">
+                                    <div class="md:col-span-6 col-span-12">
+                                        <?= view('Backend/Partial/form/text-box', ['attribute' => [
+                                            'type' => 'number',
+                                            'field' => 'quota',
+                                            'label' => 'Total Quota',
+                                            'required' => true,
+                                            'placeholder' => '0'
+                                        ]]) ?>
+                                    </div>
+                                    <div class="md:col-span-6 col-span-12">
+                                        <?= view('Backend/Partial/form/text-box', ['attribute' => [
+                                            'type' => 'number',
+                                            'field' => 'quota_used',
+                                            'label' => 'Quota Used', // Keep readonly as per original logic if it was meant to be
+                                            'readonly' => true,
+                                            'value' => $data->quota_used ?? 0
+                                        ]]) ?>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="md:col-span-3 col-span-12">
-                                <?= view('Backend/Partial/form/checkbox', ['attribute' => [
-                                    'value' => $data->is_purna_pmi,
-                                    'type' => 'is_purna_pmi',
-                                    'field' => 'is_purna_pmi',
-                                    'label' => 'is Pur PMI',
-                                    'required' => false,
-                                ]]) ?>
-                            </div>
-                            <div class="md:col-span-6 col-span-12">
-                                <?= view('Backend/Partial/form/text-box', ['attribute' => [
-                                    'type' => 'number',
-                                    'field' => 'quota',
-                                    'label' => 'Quota',
-                                    'required' => true,
-                                ]]) ?>
-                            </div>
-                            <div class="md:col-span-6 col-span-12">
-                                <?= view('Backend/Partial/form/text-box', ['attribute' => [
-                                    'type' => 'number',
-                                    'field' => 'quota_used',
-                                    'label' => 'Quota Used',
-                                    'readonly' => true,
-                                ]]) ?>
+
+                             <hr class="border-neutral-200 dark:border-neutral-700 my-2">
+
+                            <!-- Section: Target Audience -->
+                            <div>
+                                <h6 class="text-sm font-semibold text-neutral-500 uppercase mb-4 tracking-wider">Target Audience</h6>
+                                <div class="flex flex-wrap gap-8">
+                                    <div class="w-auto">
+                                        <?= view('Backend/Partial/form/checkbox', ['attribute' => [
+                                            'value' => $data->is_jobseekers,
+                                            'type' => 'is_jobseekers',
+                                            'field' => 'is_jobseekers',
+                                            'label' => 'Job Seekers',
+                                            'required' => false,
+                                        ]]) ?>
+                                    </div>
+                                    <div class="w-auto">
+                                        <?= view('Backend/Partial/form/checkbox', ['attribute' => [
+                                            'value' => $data->is_purna_pmi,
+                                            'type' => 'is_purna_pmi',
+                                            'field' => 'is_purna_pmi',
+                                            'label' => 'Purna PMI',
+                                            'required' => false,
+                                        ]]) ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

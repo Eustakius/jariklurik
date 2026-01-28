@@ -71,7 +71,16 @@ class PermissionFilter extends BaseFilter implements FilterInterface
             }
             return $prefix . '.view';
         } else if ($method === 'post') { 
-            if ($resource == 'import') {
+            // Handle mass actions via POST
+            if (in_array($resource, ['mass-process', 'mass-approve'])) {
+                return implode('.', array_slice($segments, 0, -1)) . '.approve';
+            } else if ($resource === 'mass-reject') {
+                return implode('.', array_slice($segments, 0, -1)) . '.reject';
+            } else if ($resource === 'mass-revert') {
+                return implode('.', array_slice($segments, 0, -1)) . '.revert';
+            } else if ($resource === 'mass-delete') {
+                return implode('.', array_slice($segments, 0, -1)) . '.delete';
+            } else if ($resource == 'import') {
                 return implode('.', array_slice($segments, 0, -1)) . '.import';
             }
             return $prefix . '.create';

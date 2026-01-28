@@ -99,10 +99,15 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     $routes->put('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
     $routes->patch('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
     $routes->delete('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::delete/$1', ['filter' => 'permission']);
+    // Mass Action Routes - Support both PUT and POST methods
     $routes->put('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
+    $routes->post('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
     $routes->put('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
+    $routes->post('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
     $routes->put('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
+    $routes->post('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
     $routes->put('applicant/mass-revert', 'Backend\Application\ApplicantController::massRevert', ['filter' => 'permission']);
+    $routes->post('applicant/mass-revert', 'Backend\Application\ApplicantController::massRevert', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/process', 'Backend\Application\ApplicantController::process/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/approve', 'Backend\Application\ApplicantController::approve/$1', ['filter' => 'permission']);
     $routes->put('applicant/(:segment)/reject', 'Backend\Application\ApplicantController::reject/$1', ['filter' => 'permission']);
@@ -118,11 +123,15 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
     $routes->patch('applicant/(:segment)', 'Backend\Application\ApplicantController::update/$1', ['filter' => 'permission']);
     $routes->delete('applicant/(:segment)', 'Backend\Application\ApplicantController::delete/$1', ['filter' => 'permission']);
     $routes->group('training', static function ($routes) {
-        // Job Seeker Mass Actions
+        // Job Seeker Mass Actions - Support both PUT and POST methods
         $routes->put('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-process', 'Backend\Application\Training\JobSeekerController::massProcess', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-process', 'Backend\Application\Training\JobSeekerController::massProcess', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-reject', 'Backend\Application\Training\JobSeekerController::massReject', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-reject', 'Backend\Application\Training\JobSeekerController::massReject', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-revert', 'Backend\Application\Training\JobSeekerController::massRevert', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-revert', 'Backend\Application\Training\JobSeekerController::massRevert', ['filter' => 'permission']);
         
         $routes->put('job-seekers/(:segment)/approve', 'Backend\Application\Training\JobSeekerController::approve/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/reject', 'Backend\Application\Training\JobSeekerController::reject/$1', ['filter' => 'permission']);
@@ -137,11 +146,15 @@ $routes->group('back-end', ['filter' => ['auth', '2fa']], static function ($rout
         $routes->patch('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::update/$1', ['filter' => 'permission']);
         $routes->delete('job-seekers/(:segment)', 'Backend\Application\Training\JobSeekerController::delete/$1', ['filter' => 'permission']);
         
-        // Purna PMI Mass Actions
+        // Purna PMI Mass Actions - Support both PUT and POST methods
         $routes->put('purna-pmi/mass-approve', 'Backend\Application\Training\PurnaPmiController::massApprove', ['filter' => 'permission']);
+        $routes->post('purna-pmi/mass-approve', 'Backend\Application\Training\PurnaPmiController::massApprove', ['filter' => 'permission']);
         $routes->put('purna-pmi/mass-process', 'Backend\Application\Training\PurnaPmiController::massProcess', ['filter' => 'permission']);
+        $routes->post('purna-pmi/mass-process', 'Backend\Application\Training\PurnaPmiController::massProcess', ['filter' => 'permission']);
         $routes->put('purna-pmi/mass-reject', 'Backend\Application\Training\PurnaPmiController::massReject', ['filter' => 'permission']);
+        $routes->post('purna-pmi/mass-reject', 'Backend\Application\Training\PurnaPmiController::massReject', ['filter' => 'permission']);
         $routes->put('purna-pmi/mass-revert', 'Backend\Application\Training\PurnaPmiController::massRevert', ['filter' => 'permission']);
+        $routes->post('purna-pmi/mass-revert', 'Backend\Application\Training\PurnaPmiController::massRevert', ['filter' => 'permission']);
 
         $routes->put('purna-pmi/(:segment)/approve', 'Backend\Application\Training\PurnaPmiController::approve/$1', ['filter' => 'permission']);
         $routes->put('purna-pmi/(:segment)/reject', 'Backend\Application\Training\PurnaPmiController::reject/$1', ['filter' => 'permission']);
@@ -295,14 +308,15 @@ $routes->group('api', function ($routes) {
     $routes->put('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
     $routes->patch('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::update/$1', ['filter' => 'permission']);
     $routes->delete('job-vacancy/(:segment)', 'Backend\Application\JobVacancyController::delete/$1', ['filter' => 'permission']);
+    // Mass Action Routes - Support both PUT and POST methods (Duplicate section)
     $routes->put('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
+    $routes->post('applicant/mass-approve', 'Backend\Application\ApplicantController::massApprove', ['filter' => 'permission']);
     $routes->put('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
+    $routes->post('applicant/mass-process', 'Backend\Application\ApplicantController::massProcess', ['filter' => 'permission']);
     $routes->put('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
+    $routes->post('applicant/mass-reject', 'Backend\Application\ApplicantController::massReject', ['filter' => 'permission']);
     $routes->put('applicant/mass-revert', 'Backend\Application\ApplicantController::massRevert', ['filter' => 'permission']);
-    $routes->put('applicant/(:segment)/process', 'Backend\Application\ApplicantController::process/$1', ['filter' => 'permission']);
-    $routes->put('applicant/(:segment)/approve', 'Backend\Application\ApplicantController::approve/$1', ['filter' => 'permission']);
-    $routes->put('applicant/(:segment)/reject', 'Backend\Application\ApplicantController::reject/$1', ['filter' => 'permission']);
-    $routes->put('applicant/(:segment)/revert', 'Backend\Application\ApplicantController::revert/$1', ['filter' => 'permission']);
+    $routes->post('applicant/mass-revert', 'Backend\Application\ApplicantController::massRevert', ['filter' => 'permission']);
 
     // Applicant Routes
     $routes->get('applicant', 'Backend\Application\ApplicantController::index', ['filter' => 'permission']);
@@ -316,9 +330,13 @@ $routes->group('api', function ($routes) {
     $routes->group('training', static function ($routes) {
         // Job Seeker Mass Actions
         $routes->put('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-approve', 'Backend\Application\Training\JobSeekerController::massApprove', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-process', 'Backend\Application\Training\JobSeekerController::massProcess', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-process', 'Backend\Application\Training\JobSeekerController::massProcess', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-reject', 'Backend\Application\Training\JobSeekerController::massReject', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-reject', 'Backend\Application\Training\JobSeekerController::massReject', ['filter' => 'permission']);
         $routes->put('job-seekers/mass-revert', 'Backend\Application\Training\JobSeekerController::massRevert', ['filter' => 'permission']);
+        $routes->post('job-seekers/mass-revert', 'Backend\Application\Training\JobSeekerController::massRevert', ['filter' => 'permission']);
         
         $routes->put('job-seekers/(:segment)/approve', 'Backend\Application\Training\JobSeekerController::approve/$1', ['filter' => 'permission']);
         $routes->put('job-seekers/(:segment)/reject', 'Backend\Application\Training\JobSeekerController::reject/$1', ['filter' => 'permission']);

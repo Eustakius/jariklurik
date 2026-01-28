@@ -2,6 +2,76 @@
 <?= $this->section('main') ?>
 
 <div class="dashboard-main-body min-h-screen bg-neutral-50 dark:bg-neutral-900">
+    <style>
+        /* 3D Toggle Switch */
+        .toggle-3d-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .toggle-3d-wrapper input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-3d-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            border-radius: 34px;
+            transition: 0.4s;
+            box-shadow: 
+                inset 2px 2px 5px #d1d9e6, 
+                inset -2px -2px 5px #ffffff,
+                1px 1px 2px rgba(0,0,0,0.1);
+            border: 1px solid #d1d5db;
+        }
+
+        .toggle-3d-button:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3px;
+            background: linear-gradient(145deg, #ffffff, #dcdcdc);
+            border-radius: 50%;
+            transition: 0.4s;
+            box-shadow: 
+                2px 2px 4px rgba(0,0,0,0.1),
+                -1px -1px 2px rgba(255,255,255,1);
+        }
+
+        input:checked + .toggle-3d-button {
+            background: linear-gradient(145deg, #4f46e5, #6366f1); /* Primary Color */
+            border-color: #4f46e5;
+        }
+
+        input:checked + .toggle-3d-button:before {
+            transform: translateX(30px);
+            background: #ffffff;
+            box-shadow: 
+                2px 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Dark mode compatibility */
+        .dark .toggle-3d-button {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            border-color: #374151;
+            box-shadow: inset 2px 2px 5px #0f172a, inset -2px -2px 5px #374151;
+        }
+        .dark .toggle-3d-button:before {
+            background: linear-gradient(145deg, #374151, #1f2937);
+        }
+    </style>
     <?= view('Backend/Partial/page-header', ['title' => 'System Settings']) ?>
     
     <form action="<?= site_url($form['route']) ?>" method="post" data-parsley-validate enctype="multipart/form-data" class="mt-6">
@@ -51,7 +121,7 @@
                             <!-- Site Name -->
                             <div class="col-span-12 md:col-span-6">
                                 <label class="form-label text-sm" for="site_name">Site Name</label>
-                                <input type="text" id="site_name" name="site_name" class="form-control" value="<?= esc($data->site_name ?? '') ?>" required>
+                                <input type="text" id="site_name" name="site_name" class="form-control" value="<?= esc($data->site_name ?? '') ?>">
                             </div>
 
                             <!-- Company Logo -->
@@ -66,7 +136,7 @@
                             <!-- Company Email -->
                             <div class="col-span-12 md:col-span-6">
                                 <label class="form-label text-sm" for="company_email">Company Email</label>
-                                <input type="email" id="company_email" name="company_email" class="form-control" value="<?= esc($data->company_email ?? '') ?>" required>
+                                <input type="email" id="company_email" name="company_email" class="form-control" value="<?= esc($data->company_email ?? '') ?>">
                             </div>
 
                             <!-- Company Phone -->
@@ -227,8 +297,10 @@
                         <div class="grid grid-cols-12 gap-4">
                             <!-- Maintenance Mode -->
                             <div class="col-span-12 md:col-span-6">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="maintenance_mode" name="maintenance_mode" class="form-checkbox" value="1" <?= (!empty($data->maintenance_mode ?? null)) ? 'checked' : '' ?>>
+                                    <label class="toggle-3d-wrapper">
+                                        <input type="checkbox" name="maintenance_mode" value="1" <?= (!empty($data->maintenance_mode ?? null)) ? 'checked' : '' ?>>
+                                        <div class="toggle-3d-button"></div>
+                                    </label>
                                     <label for="maintenance_mode" class="form-label text-sm mb-0">Enable Maintenance Mode</label>
                                 </div>
                                 <small class="text-danger-600 dark:text-danger-400">Warning: This will make the site inaccessible to visitors</small>
@@ -236,8 +308,10 @@
 
                             <!-- Auto Backup -->
                             <div class="col-span-12 md:col-span-6">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="auto_backup_enabled" name="auto_backup_enabled" class="form-checkbox" value="1" <?= (!empty($data->auto_backup_enabled ?? null)) ? 'checked' : '' ?>>
+                                    <label class="toggle-3d-wrapper">
+                                        <input type="checkbox" name="auto_backup_enabled" value="1" <?= (!empty($data->auto_backup_enabled ?? null)) ? 'checked' : '' ?>>
+                                        <div class="toggle-3d-button"></div>
+                                    </label>
                                     <label for="auto_backup_enabled" class="form-label text-sm mb-0">Enable Automatic Backups</label>
                                 </div>
                             </div>
@@ -337,8 +411,10 @@
                         <div class="grid grid-cols-12 gap-4">
                             <!-- Require Strong Passwords -->
                             <div class="col-span-12 md:col-span-6">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="require_password_strength" name="require_password_strength" class="form-checkbox" value="1" <?= (!empty($data->require_password_strength ?? null)) ? 'checked' : '' ?>>
+                                    <label class="toggle-3d-wrapper">
+                                        <input type="checkbox" name="require_password_strength" value="1" <?= (!empty($data->require_password_strength ?? null)) ? 'checked' : '' ?>>
+                                        <div class="toggle-3d-button"></div>
+                                    </label>
                                     <label for="require_password_strength" class="form-label text-sm mb-0">Require Strong Passwords</label>
                                 </div>
                                 <small class="text-neutral-600 dark:text-neutral-400">Enforce uppercase, lowercase, numbers, and symbols</small>
@@ -346,8 +422,10 @@
 
                             <!-- Enable MFA -->
                             <div class="col-span-12 md:col-span-6">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="enable_mfa" name="enable_mfa" class="form-checkbox" value="1" <?= (!empty($data->enable_mfa ?? null)) ? 'checked' : '' ?>>
+                                    <label class="toggle-3d-wrapper">
+                                        <input type="checkbox" name="enable_mfa" value="1" <?= (!empty($data->enable_mfa ?? null)) ? 'checked' : '' ?>>
+                                        <div class="toggle-3d-button"></div>
+                                    </label>
                                     <label for="enable_mfa" class="form-label text-sm mb-0">Enable Multi-Factor Authentication</label>
                                 </div>
                             </div>

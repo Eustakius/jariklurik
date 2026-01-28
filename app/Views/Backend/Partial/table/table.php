@@ -201,8 +201,11 @@ if (isset($mas_actions) && !empty($mas_actions)) {
     }
 
     // Mass Action Buttons (Process)
+    // Don't show Mass Process if there's a revert permission (rejected/approved tabs should only show Mass Revert)
+    $revertPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.revert'));
     $processPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.process'));
-    if (!empty($processPerm)) {
+    
+    if (!empty($processPerm) && empty($revertPerm)) {
          $processRouteDef = reset($processPerm)['route']; 
          $massProcessRoute = preg_replace('/\(:(segment|num|any)\)\/process/', 'mass-process', $processRouteDef);
          if ($massProcessRoute === $processRouteDef) {
@@ -211,8 +214,8 @@ if (isset($mas_actions) && !empty($mas_actions)) {
          $massProcessUrl = base_url($massProcessRoute);
          
          $buttons[] = [
-            'text' => '<div class="px-3.5 py-2 text-success-600 hover:text-white flex items-center justify-center gap-2"><iconify-icon icon="mingcute:check-line" class="text-sm"></iconify-icon> Mass Process</div>',
-            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-success-100 [&_span]:text-success-600 hover:bg-success-700 hover:[&_span]:text-white rounded-lg text-sm p-0',
+            'text' => '<div class="px-3.5 py-2 flex items-center justify-center gap-2 text-white"><iconify-icon icon="mingcute:check-line" class="text-sm"></iconify-icon> Mass Process</div>',
+            'className' => 'btn-mass-action' . $props['key'] . ' btn bg-primary-600 [&_div]:text-white hover:bg-primary-700 hover:[&_div]:text-white rounded-lg text-sm p-0',
             'attr' =>  [
                 'data-url' => $massProcessUrl,
                 'data-action-name' => 'process'
@@ -221,7 +224,6 @@ if (isset($mas_actions) && !empty($mas_actions)) {
     }
 
     // Mass Action Buttons (Revert)
-    $revertPerm = array_filter($props['permission'], fn($p) => str_ends_with($p['permission'], '.revert'));
     if (!empty($revertPerm)) {
          $revertRouteDef = reset($revertPerm)['route']; 
          // Helper to derive mass route or fallback
@@ -928,7 +930,10 @@ if (!empty($importPerm)): ?>
                     let btnApproveLabel = 'Process';
                     let btnApproveAction = 'mass-process';
                     let key = '<?= $props['key'] ?>';
-                    if (key === 'process') {
+                    
+                    // For 'process' tab in Applicant, show "Approve" button
+                    // For 'new' tab in JobSeeker/PurnaPMI, show "Approve" button
+                    if (key === 'process' || key === 'new') {
                         btnApproveLabel = 'Approve';
                         btnApproveAction = 'mass-approve';
                     }

@@ -62,10 +62,10 @@
                                             ]
                                         ],
                                         'rejected' => [
-                                            'process' => [
-                                                'label' => 'Mass Process',
-                                                'type' => 'primary',
-                                                'url' => '/back-end/training/job-seekers/mass-process' 
+                                            'revert' => [
+                                                'label' => 'Mass Revert',
+                                                'type' => 'danger',
+                                                'url' => '/back-end/training/job-seekers/mass-revert' 
                                             ]
                                         ],
                                         default => []
