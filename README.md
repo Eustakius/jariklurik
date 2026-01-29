@@ -537,6 +537,30 @@ composer install
 
 ---
 
+### 📅 January 29, 2026 - Staging & Localhost Repair 🛠️
+
+> **✨ Ringkasan Update:**  
+> Perbaikan menyeluruh pada Staging Server (Hostinger) dan Localhost Environment untuk mengatasi error 404, 500, permission yang hilang, dan masalah path upload aset.
+
+**🎯 Fixes Implemented:**
+- 🛣️ **Routing Fix**: Memperbaiki `PageController.php` agar dapat menangani request root tanpa `index.php` secara eksplisit.
+- ⚙️ **Server Config**: Menonaktifkan `RewriteBase /` di `.htaccess` Staging untuk kompatibilitas subdomain Hostinger.
+- 🗄️ **Database Integrity**:
+    - Koreksi username database di `staging/.env`.
+    - Fix host database (`127.0.0.1` -> `localhost`).
+- 🔑 **Permission System Repair**:
+    - Menambahkan permission `security.view` yang hilang.
+    - Mengassign permission `security.view` ke group `developer`, `admin`, `superadmin`, dan `root`.
+    - Mengaktifkan kembali Sidebar Menu "Security Command Center".
+- 📦 **Asset Deployment Fix**:
+    - Menyelesaikan konflik path upload (Production `public_html` vs Staging `public`).
+    - Membuat folder `assets/security-dashboard` secara otomatis menggunakan script probe.
+    - Memastikan file manifest `.vite` terupload untuk mengatasi "White Screen".
+
+**📦 Files Changed:** `PageController.php`, `.htaccess`, `.env`, Database Tables (`auth_permissions`)
+
+---
+
 ### 📅 January 28, 2026 - Maintenance Mode & UI/UX Enhancements 🛠️✨
 
 > **✨ Ringkasan Update:**  

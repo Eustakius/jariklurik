@@ -60,7 +60,7 @@ $title = urlencode("Lihat halaman menarik ini!");
 
 </script>
 <!--Start of Tawk.to Script-->
-<!--<script type="text/javascript">
+<script type="text/javascript">
     var Tawk_API = Tawk_API || {},
         Tawk_LoadStart = new Date();
     (function() {
@@ -72,85 +72,5 @@ $title = urlencode("Lihat halaman menarik ini!");
         s1.setAttribute('crossorigin', '*');
         s0.parentNode.insertBefore(s1, s0);
     })();
-</script>-->
-<!--End of Tawk.to Script-->
-<!-- Floating WhatsApp Button -->
-<style>
-    .wa-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        animation: fadeSlide 0.6s ease forwards;
-    }
-
-    .wa-bubble {
-        background: #ffffff;
-        color: #333;
-        padding: 10px 15px;
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        font-size: 14px;
-        font-family: Arial, sans-serif;
-        opacity: 0;
-        animation: fadeIn 1.2s ease forwards;
-    }
-
-    .wa-button {
-        width: 60px;
-        height: 60px;
-        background: #25D366;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        cursor: pointer;
-        animation: pulse 1.5s infinite;
-        transition: transform .2s;
-    }
-
-    .wa-button:hover {
-        transform: scale(1.1);
-    }
-
-    .wa-button img {
-        width: 34px;
-        height: 34px;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-
-    @keyframes fadeSlide {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-</style>
-
-<div class="wa-container">
-    <div class="wa-bubble">Hubungi Kami</div>
-
-    <div class="wa-button" onclick="openWhatsApp()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" />
-    </div>
-</div>
-
-<script>
-    function openWhatsApp() {
-        // GANTI NOMOR ANDA DI SINI (format internasional tanpa +)
-        var phone = "6285161337403";
-        window.open("https://wa.me/" + phone, "_blank");
-    }
 </script>
+<!--End of Tawk.to Script-->
