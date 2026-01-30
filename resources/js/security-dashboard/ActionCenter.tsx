@@ -6,6 +6,8 @@ interface ScanCheck {
     status: 'PASS' | 'WARNING' | 'FAIL';
     detail: string;
     icon: string;
+    description?: string;
+    recommendation?: string;
 }
 
 interface BlacklistData {
@@ -44,17 +46,43 @@ const ScanResultModal: React.FC<{ result: ActionResult; onClose: () => void }> =
                     {result.type === 'scan' && (
                         <div className="space-y-4">
                             {result.data.map((check: ScanCheck, idx: number) => (
-                                <div key={idx} className="bg-gray-750 p-4 rounded border border-gray-700 flex justify-between items-start">
-                                    <div>
-                                        <h4 className="font-semibold text-gray-200">{check.name}</h4>
-                                        <p className="text-sm text-gray-400 mt-1">{check.detail}</p>
+                                <details key={idx} className="group bg-gray-750 rounded border border-gray-700 overflow-hidden cursor-pointer">
+                                    <summary className="p-4 flex justify-between items-center outline-none list-none hover:bg-gray-700 transition">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl opacity-70 group-open:opacity-100 transition-opacity">
+                                                {check.status === 'PASS' ? '✅' : check.status === 'WARNING' ? '⚠️' : '🚨'}
+                                            </span>
+                                            <div>
+                                                <h4 className="font-semibold text-gray-200">{check.name}</h4>
+                                                <p className="text-sm text-gray-400 mt-1">{check.detail}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`px-2 py-1 rounded text-xs font-bold ${check.status === 'PASS' ? 'bg-green-900 text-green-300' :
+                                                check.status === 'WARNING' ? 'bg-yellow-900 text-yellow-300' : 'bg-red-900 text-red-300'
+                                                }`}>
+                                                {check.status}
+                                            </span>
+                                            <span className="text-gray-500 transform group-open:rotate-180 transition-transform">▼</span>
+                                        </div>
+                                    </summary>
+
+                                    <div className="px-4 pb-4 pt-0 border-t border-gray-700 bg-gray-800">
+                                        <div className="mt-3 grid grid-cols-1 gap-3">
+                                            <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                                                <span className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1 block">Description</span>
+                                                <p className="text-gray-300 text-sm">{check.description || 'No description available.'}</p>
+                                            </div>
+
+                                            {check.status !== 'PASS' && (
+                                                <div className="bg-blue-900/20 p-3 rounded border border-blue-800/50">
+                                                    <span className="text-xs text-blue-400 uppercase font-bold tracking-wider mb-1 block">Recommendation</span>
+                                                    <p className="text-blue-200 text-sm">{check.recommendation || 'No specific recommendation available.'}</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${check.status === 'PASS' ? 'bg-green-900 text-green-300' :
-                                        check.status === 'WARNING' ? 'bg-yellow-900 text-yellow-300' : 'bg-red-900 text-red-300'
-                                        }`}>
-                                        {check.status}
-                                    </span>
-                                </div>
+                                </details>
                             ))}
                         </div>
                     )}
@@ -148,9 +176,10 @@ export const ActionCenter: React.FC = () => {
             } else if (action === 'health') {
                 resultPayload = [
                     { category: 'Status', value: data.status || 'Unknown', status: 'PASS', detail: 'System operational' },
-                    { category: 'Uptime', value: data.uptime || 'N/A', status: 'PASS', detail: 'Service availability' },
-                    { category: 'CPU', value: data.cpu || 'N/A', status: 'INFO', detail: 'Processor usage' },
-                    { category: 'Memory', value: data.memory || 'N/A', status: 'INFO', detail: 'RAM utilization' }
+                    { category: 'Uptime', value: data.uptime || 'N/A', status: 'PASS', detail: 'Database uptime' },
+                    { category: 'DB Latency', value: data.latency || 'N/A', status: 'INFO', detail: 'Query response time' },
+                    { category: 'Memory', value: data.memory || 'N/A', status: 'INFO', detail: 'App memory usage' },
+                    { category: 'Disk Space', value: data.disk || 'N/A', status: 'INFO', detail: 'Storage usage' }
                 ];
             }
 
